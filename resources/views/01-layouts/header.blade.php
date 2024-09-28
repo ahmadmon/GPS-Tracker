@@ -7,25 +7,23 @@
                         <input class="demo-input Typeahead-input form-control-plaintext w-100" type="text"
                             placeholder="Search Cuba .." name="q" title="" autofocus>
                         <div class="spinner-border Typeahead-spinner" role="status"><span
-                                class="sr-only">Loading...</span></div><i class="close-search"
-                            data-feather="x"></i>
+                                class="sr-only">Loading...</span></div><i class="close-search" data-feather="x"></i>
                     </div>
                     <div class="Typeahead-menu"></div>
                 </div>
             </div>
         </form>
         <div class="header-logo-wrapper col-auto p-0">
-            <div class="logo-wrapper"><a href="index.html"><img class="img-fluid"
-                        src="../assets/images/logo/logo.png" alt=""></a></div>
-            <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle"
-                    data-feather="align-center"></i></div>
+            <div class="logo-wrapper"><a href="index.html"><img class="img-fluid" src="../assets/images/logo/logo.png"
+                        alt=""></a></div>
+            <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i>
+            </div>
         </div>
         <div class="left-header col-xxl-5 col-xl-6 col-lg-5 col-md-4 col-sm-3 p-0">
             <div class="notification-slider">
                 <div class="d-flex h-100"> <img src="../assets/images/giftools.gif" alt="gif">
                     <h6 class="mb-0 f-w-400"><span class="font-primary"> Ahmad is your best feriend!!: </span><span
-                            class="f-light">Dont Forget!</span></h6><i
-                        class="icon-arrow-top-right f-light"></i>
+                            class="f-light">Dont Forget!</span></h6><i class="icon-arrow-top-right f-light"></i>
                 </div>
                 <div class="d-flex h-100"><img src="../assets/images/giftools.gif" alt="gif">
                     <h6 class="mb-0 f-w-400"><span class="f-light">I will find you! </span>
@@ -35,7 +33,7 @@
         </div>
         <div class="nav-right col-xxl-7 col-xl-6 col-md-7 col-8 pull-right right-header p-0 ms-auto">
             <ul class="nav-menus">
-                <li class="language-nav">
+                {{-- <li class="language-nav">
                     <div class="translate_wrapper">
                         <div class="current_lang">
                             <div class="lang"><i class="flag-icon flag-icon-us"></i><span class="lang-txt">EN
@@ -59,7 +57,7 @@
                                     class="lang-txt">لعربية <span> (ae)</span></span></div>
                         </div>
                     </div>
-                </li>
+                </li> --}}
                 <li> <span class="header-search">
                         <svg>
                             <use href="../assets/svg/icon-sprite.svg#search"></use>
@@ -72,34 +70,32 @@
                         <div class="flip-card">
                             <div class="flip-card-inner">
                                 <div class="front">
-                                    <h6 class="f-18 mb-0 dropdown-title">Bookmark</h6>
+                                    <h6 class="f-18 mb-0 dropdown-title">نشانک</h6>
                                     <ul class="bookmark-dropdown">
                                         <li>
                                             <div class="row">
                                                 <div class="col-4 text-center">
                                                     <div class="bookmark-content">
-                                                        <div class="bookmark-icon"><i
-                                                                data-feather="file-text"></i></div>
-                                                        <span>Forms</span>
+                                                        <div class="bookmark-icon"><i data-feather="file-text"></i>
+                                                        </div>
+                                                        <span>فرم ها</span>
                                                     </div>
                                                 </div>
                                                 <div class="col-4 text-center">
                                                     <div class="bookmark-content">
                                                         <div class="bookmark-icon"><i data-feather="user"></i>
-                                                        </div><span>Profile</span>
+                                                        </div><span>نمایه</span>
                                                     </div>
                                                 </div>
                                                 <div class="col-4 text-center">
                                                     <div class="bookmark-content">
-                                                        <div class="bookmark-icon"><i
-                                                                data-feather="server"></i></div>
-                                                        <span>Tables</span>
+                                                        <div class="bookmark-icon"><i data-feather="server"></i></div>
+                                                        <span>جدول</span>
                                                     </div>
                                                 </div>
                                             </div>
                                         </li>
-                                        <li class="text-center"><a class="flip-btn f-w-700" id="flip-btn"
-                                                href="javascript:void(0)">Add New Bookmark</a></li>
+
                                     </ul>
                                 </div>
                                 <div class="back">
@@ -110,7 +106,7 @@
                                             </div>
                                         </li>
                                         <li><a class="f-w-700 d-block flip-back" id="flip-back"
-                                                href="javascript:void(0)">Back</a></li>
+                                                href="javascript:void(0)">برگشت</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -124,7 +120,7 @@
                         </svg>
                     </div>
                 </li>
-                <li class="cart-nav onhover-dropdown">
+                {{-- <li class="cart-nav onhover-dropdown">
                     <div class="cart-box">
                         <svg>
                             <use href="../assets/svg/icon-sprite.svg#stroke-ecommerce"></use>
@@ -184,7 +180,7 @@
                             </li>
                         </ul>
                     </div>
-                </li>
+                </li> --}}
                 <li class="onhover-dropdown">
                     <div class="notification-box">
                         <svg>
@@ -192,37 +188,36 @@
                         </svg><span class="badge rounded-pill badge-secondary">4 </span>
                     </div>
                     <div class="onhover-show-div notification-dropdown">
-                        <h6 class="f-18 mb-0 dropdown-title">Notitications </h6>
+                        <h6 class="f-18 mb-0 dropdown-title">اعلان‌ها </h6>
                         <ul>
                             <li class="b-l-primary border-4">
-                                <p>Delivery processing <span class="font-danger">10 min.</span></p>
+                                <p>پردازش تحویل <span class="font-danger">10 دقیقه.</span></p>
                             </li>
                             <li class="b-l-success border-4">
-                                <p>Order Complete<span class="font-success">1 hr</span></p>
+                                <p>سفارش کامل شد<span class="font-success">1 ساعت</span></p>
                             </li>
                             <li class="b-l-secondary border-4">
-                                <p>Tickets Generated<span class="font-secondary">3 hr</span></p>
+                                <p>بلیت‌های تولید شده<span class="font-secondary">3 ساعت</span></p>
                             </li>
                             <li class="b-l-warning border-4">
-                                <p>Delivery Complete<span class="font-warning">6 hr</span></p>
+                                <p>تحویل کامل<span class="font-warning">6 ساعت</span></p>
                             </li>
-                            <li><a class="f-w-700" href="#">Check all</a></li>
+                            <li><a class="f-w-700" href="#">بررسی همه</a></li>
                         </ul>
                     </div>
                 </li>
                 <li class="profile-nav onhover-dropdown pe-0 py-0">
-                    <div class="media profile-media"><img class="b-r-10"
-                            src="../assets/images/dashboard/profile.png" alt="">
-                        <div class="media-body"><span>Emay Walter</span>
-                            <p class="mb-0">Admin <i class="middle fa fa-angle-down"></i></p>
+                    <div class="media profile-media"><img class="b-r-10" src="../assets/images/dashboard/profile.png"
+                            alt="">
+                        <div class="media-body"><span>احمد منتظر</span>
+                            <p class="mb-0">ادمین<i class="middle fa fa-angle-down"></i></p>
                         </div>
                     </div>
                     <ul class="profile-dropdown onhover-show-div">
-                        <li><a href="#"><i data-feather="user"></i><span>Account </span></a></li>
-                        <li><a href="#"><i data-feather="mail"></i><span>Inbox</span></a></li>
-                        <li><a href="#"><i data-feather="file-text"></i><span>Taskboard</span></a></li>
-                        <li><a href="#"><i data-feather="settings"></i><span>Settings</span></a></li>
-                        <li><a href="#"><i data-feather="log-in"> </i><span>Log in</span></a></li>
+                        <li><a href="#"><i data-feather="user"></i><span>حساب </span></a></li>
+                        <li><a href="#"><i data-feather="mail"></i><span>صندوق ورودی</span></a></li>
+                        <li><a href="#"><i data-feather="settings"></i><span>تنظیمات</span></a></li>
+                        <li><a href="#"><i data-feather="log-in"> </i><span>ورود به سیستم</span></a></li>
                     </ul>
                 </li>
             </ul>
@@ -238,3 +233,4 @@
         <script class="empty-template" type="text/x-handlebars-template"><div class="EmptyMessage">Your search turned up 0 results. This most likely means the backend is down, yikes!</div></script>
     </div>
 </div>
+
