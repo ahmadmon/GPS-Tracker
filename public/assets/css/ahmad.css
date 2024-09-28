@@ -1,0 +1,24 @@
+@font-face {
+    font-family: 'samim';
+    font-weight: 700;
+    src: url('../fonts/samim/Samim-Bold-FD-WOL.woff2');
+}
+
+@font-face {
+    font-family: 'samim';
+    font-weight: 400;
+    src: url('../fonts/samim/Samim-FD-WOL.woff2');
+}
+
+
+h1, h2, h3, h4, h5, h6, p, span{
+    font-family: 'samim';
+}
+
+.samim{
+    font-family: 'samim' !important;
+}
+
+
+
+/*  */
