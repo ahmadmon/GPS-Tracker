@@ -38,7 +38,11 @@
             <!-- Page Sidebar Ends-->
 
 
-            @yield('content')
+            <div class="page-body">
+                <div class="container-fluid">
+                   @yield('content')
+                </div>
+            </div>
 
             <!-- footer start-->
             @include('01-layouts.footer')
