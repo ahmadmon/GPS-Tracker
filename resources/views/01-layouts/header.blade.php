@@ -209,15 +209,21 @@
                 <li class="profile-nav onhover-dropdown pe-0 py-0">
                     <div class="media profile-media"><img class="b-r-10" src="../assets/images/dashboard/profile.png"
                             alt="">
-                        <div class="media-body"><span>احمد منتظر</span>
-                            <p class="mb-0">ادمین<i class="middle fa fa-angle-down"></i></p>
+                        <div class="media-body"><span>{{ auth()->user()?->name }}</span>
+                            <p class="mb-0">{{ auth()->user()->user_type ? 'ادمین' : 'کاربر' }}<i class="middle fa fa-angle-down"></i></p>
                         </div>
                     </div>
                     <ul class="profile-dropdown onhover-show-div">
                         <li><a href="#"><i data-feather="user"></i><span>حساب </span></a></li>
                         <li><a href="#"><i data-feather="mail"></i><span>صندوق ورودی</span></a></li>
                         <li><a href="#"><i data-feather="settings"></i><span>تنظیمات</span></a></li>
-                        <li><a href="#"><i data-feather="log-in"> </i><span>ورود به سیستم</span></a></li>
+                        <li>
+                            <form action="{{ route('logout') }}" method="post" class="d-inline">
+                                @csrf
+                                <a onclick="$(this).parent().submit()" type="button"><i
+                                        data-feather="log-out"> </i><span>خروج از سیستم</span></a>
+                            </form>
+                        </li>
                     </ul>
                 </li>
             </ul>

@@ -11,8 +11,8 @@
 }
 
 
-h1, h2, h3, h4, h5, h6, p, span, a{
-    font-family: 'samim';
+h1, h2, h3, h4, h5, h6, p, span, a, label, input, button, ul,li, small, div{
+    font-family: 'samim', serif;
 }
 
 .samim{
