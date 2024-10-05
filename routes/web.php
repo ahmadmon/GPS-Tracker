@@ -19,4 +19,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::get('/send', function () {
+
+    try {
+
+        $sms = Melipayamak\Laravel\Facade::sms();
+        $to = '09337332513';
+        $from = '50004001854432';
+        $text = 'تست وب سرویس ملی پیامک';
+        $response = $sms->send($to, $from, $text);
+    $json = json_decode($response);
+        echo $json->Value; //RecId or Error Number
+    } catch (Exception $e) {
+        echo $e->getMessage();
+    }
+});
+
 require __DIR__.'/auth.php';
