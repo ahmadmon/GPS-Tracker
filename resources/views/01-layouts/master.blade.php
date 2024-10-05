@@ -2,6 +2,7 @@
 <html lang="fa" dir="rtl">
 @include('01-layouts.head')
 @stack('styles')
+{{-- @yield('styles') --}}
 
 <body dir="rtl">
     <!-- loader starts-->
@@ -39,7 +40,7 @@
 
 
             <div class="page-body">
-                <div class="container-fluid">
+                <div class="container-fluid pb-5">
                    @yield('content')
                 </div>
             </div>

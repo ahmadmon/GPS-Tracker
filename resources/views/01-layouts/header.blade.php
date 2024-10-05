@@ -1,4 +1,4 @@
-<div class="page-header">
+<div class="page-header mb-4">
     <div class="header-wrapper row m-0">
         <form class="form-inline search-full col" action="#" method="get">
             <div class="form-group w-100">
