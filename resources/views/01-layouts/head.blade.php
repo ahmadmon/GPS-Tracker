@@ -32,6 +32,9 @@
     <link id="color" rel="stylesheet" href="{{ asset('assets/css/color-1.css')}}" media="screen">
     <!-- Responsive css-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/responsive.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/ahmad.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/daniel.css')}}">
+    @if(!isset($loadAlpineJs) || $loadAlpineJs !== false)
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    @endif
+    @stack('styles')
   </head>

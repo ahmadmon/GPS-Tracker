@@ -1,0 +1,34 @@
+@font-face {
+    font-family: 'dana';
+    /*font-family: 'samim';*/
+    font-weight: 700;
+    /*src: url('../fonts/samim/Samim-Bold-FD-WOL.woff2');*/
+    src: url('../fonts/dana/Dana-FaNum-DemiBold.ttf');
+}
+
+@font-face {
+    /*font-family: 'samim';*/
+    font-family: 'dana';
+    font-weight: 400;
+    src: url('../fonts/dana/Dana-FaNum-Medium.ttf');
+}
+
+
+/*h1, h2, h3, h4, h5, h6, p, span, a, label, input, button, ul, li, ol, small, div, th, tr, td {*/
+/*    font-family: 'dana', serif;*/
+/*}*/
+
+* {
+    font-family: 'dana', serif;
+}
+
+.dana {
+    font-family: 'dana', Serif !important;
+}
+
+[x-clock] {
+    display: none !important;
+}
+
+
+/*  */

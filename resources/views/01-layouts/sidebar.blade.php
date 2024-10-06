@@ -23,7 +23,7 @@
                         </div>
                     </li>
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
-                            class="sidebar-link sidebar-title" href="../theme/index.html"
+                            class="sidebar-link sidebar-title" href="{{ route('home') }}"
                             target="_blank">
                             <svg class="stroke-icon">
                                 <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
@@ -31,6 +31,18 @@
                             <svg class="fill-icon">
                                 <use href="../assets/svg/icon-sprite.svg#fill-home"></use>
                             </svg><span>داشبورد</span></a></li>
+
+                    <li class="sidebar-list">
+                        <i class="fa-solid fa-thumbtack"></i>
+                        <a class="sidebar-link sidebar-title link-nav" href="{{ route('device.index') }}">
+                            <i data-feather="cpu"></i>
+                            <span>دستگاه ها</span>
+                            <div class="according-menu">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </div>
+                        </a>
+                    </li>
+
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
                             class="sidebar-link sidebar-title" href="#">
                             <svg class="stroke-icon">

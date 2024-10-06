@@ -34,7 +34,7 @@
 
 
                             <div class="form-group mb-0">
-                                <button class="btn btn-primary btn-block samim w-100" type="submit">ارسال مجدد لینک
+                                <button class="btn btn-primary btn-block dana w-100" type="submit">ارسال مجدد لینک
                                     تایید
                                 </button>
                             </div>

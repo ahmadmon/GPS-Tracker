@@ -52,7 +52,7 @@
                             </div>
 
                             <div class="form-group mb-0">
-                                <button class="btn btn-primary btn-block samim w-100" type="submit">بازنشانی و ورود
+                                <button class="btn btn-primary btn-block dana w-100" type="submit">بازنشانی و ورود
                                 </button>
                             </div>
                         </form>

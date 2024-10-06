@@ -1,5 +1,5 @@
 <?php
 return [
-    'username' => '09124854432',
-    'password' => 'A0Q19'
+    'username' => env('MELIPAYAMAK_USERNAME'),
+    'password' => env('MELIPAYAMAK_PASSWORD'),
 ];

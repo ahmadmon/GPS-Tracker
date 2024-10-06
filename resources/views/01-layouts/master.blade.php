@@ -1,8 +1,7 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa_IR" dir="rtl">
 @include('01-layouts.head')
-@stack('styles')
-{{-- @yield('styles') --}}
+
 
 <body dir="rtl">
     <!-- loader starts-->

@@ -66,12 +66,12 @@
                                             خط مشی</a></label>
                                     <x-input-error :messages="$errors->get('rule_confirmation')" class="mt-2"/>
                                 </div>
-                                <button class="btn btn-primary btn-block samim w-100" type="submit">ایجاد حساب</button>
+                                <button class="btn btn-primary btn-block dana w-100" type="submit">ایجاد حساب</button>
                             </div>
                             <h6 class="text-muted mt-4 or fw-bolder">یا ثبت‌نام کنید با</h6>
                             <div class="social mt-4">
                                 <div class="btn-showcase">
-                                    <a class="btn btn-light w-100 samim" href="{{ route('social-login', 'google') }}">
+                                    <a class="btn btn-light w-100 dana" href="{{ route('social-login', 'google') }}">
                                         <i class="txt-google-plus" data-feather="at-sign"></i> حساب گوگل
                                     </a>
                                 </div>

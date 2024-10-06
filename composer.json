@@ -10,7 +10,8 @@
         "laravel/socialite": "^5.16",
         "laravel/tinker": "^2.9",
         "livewire/livewire": "^3.5",
-        "melipayamak/laravel": "1.0.0"
+        "melipayamak/laravel": "1.0.0",
+        "morilog/jalali": "3.*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
@@ -29,6 +30,9 @@
         }
     },
     "autoload-dev": {
+        "files": [
+            "app/Helpers/helper.php"
+        ],
         "psr-4": {
             "Tests\\": "tests/"
         }

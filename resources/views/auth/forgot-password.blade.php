@@ -34,7 +34,7 @@
                             </div>
 
                             <div class="form-group mb-0">
-                                <button class="btn btn-primary btn-block samim w-100" type="submit">ارسال لینک بازنشانی
+                                <button class="btn btn-primary btn-block dana w-100" type="submit">ارسال لینک بازنشانی
                                 </button>
                             </div>
 
