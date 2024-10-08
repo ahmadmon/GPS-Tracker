@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\DeviceController;
+use App\Http\Services\Notify\MessageSerivce;
+use App\Http\Services\Notify\SMS\SmsService;
 use Illuminate\Support\Facades\Route;
 
 
@@ -15,6 +17,7 @@ Route::middleware(['auth'])->group(function () {
     })->name('home');
 
     Route::resource('device', DeviceController::class);
+    Route::post('/device/connect-device/{device}', [DeviceController::class, 'connectToDevice'])->name('device.connect-to-device');
 
 //    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
 //    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -27,9 +30,11 @@ Route::middleware(['auth'])->group(function () {
 //
 //    $sms->setTo('09337332513');
 //    $sms->setText('سلام این تست است.');
+////    $res = $sms->fire();
 //
 //    $messageService = new MessageSerivce($sms);
-//    $messageService->send();
+//    $res = $messageService->send();
+//    dd($res);
 //});
 
 require __DIR__.'/auth.php';

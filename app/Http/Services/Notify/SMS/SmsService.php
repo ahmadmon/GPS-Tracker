@@ -13,16 +13,16 @@ class SmsService implements MessageInterface
     private $to;
     private $isFlash = true;
 
-    public function __construct()
-    {
-        //
-    }
-
-
     public function fire()
     {
         $meliPayamak = new MeliPayamakService();
         return $meliPayamak->send($this->from, $this->to, $this->text, $this->isFlash);
+    }
+
+    public function api()
+    {
+        $meliPayamak = new MeliPayamakService();
+        return $meliPayamak->apiSend($this->from, $this->to, $this->text);
     }
 
     public function getFrom()

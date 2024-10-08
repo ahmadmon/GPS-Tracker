@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DeviceRequest;
+use App\Http\Services\Notify\SMS\SmsService;
 use App\Models\Device;
 use App\Models\User;
 
@@ -84,4 +85,26 @@ class DeviceController extends Controller
         Device::destroy($id);
         return back()->with('success-alert', 'دستگاه با موفقیت حذف گردید.');
     }
+
+
+    public function connectToDevice(Device $device)
+    {
+        $serverIp = '127.0.0.1';
+        $serverPort = '8080';
+        $apn = 'mtnirancell';
+//        $msgContent = "SERVER,{$serverIp},{$serverPort}#,\nAPN,{$apn}#,\nUPLOAD,10#";
+        $msgContent = "SERVER,{$serverIp},{$serverPort}#,\nUPLOAD,10#";
+
+        $sms = new SmsService();
+        $sms->setTo($device->phone_number);
+        $sms->setText($msgContent);
+        $res = $sms->api();
+
+        if ($res->getStatusCode() == 200) {
+            return back()->with('success-alert', 'دستگاه با موفقیت وصل شد و آماده خدمات‌رسانی است.');
+        } else {
+            return back()->with('error-alert', 'در مراحل وصل شدن دستگاه, خطایی به وجود آمده است!');
+        }
+    }
+
 }
