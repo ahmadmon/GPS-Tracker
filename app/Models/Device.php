@@ -15,7 +15,7 @@ class Device extends Model
 
     public function vehicle(): BelongsTo
     {
-        return $this->belongsTo(Vehicles::class);
+        return $this->belongsTo(Vehicle::class);
     }
 
     public function user(): BelongsTo

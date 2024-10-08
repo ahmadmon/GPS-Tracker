@@ -32,11 +32,44 @@
                                 <use href="../assets/svg/icon-sprite.svg#fill-home"></use>
                             </svg><span>داشبورد</span></a></li>
 
+{{--                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>--}}
+{{--                        <a--}}
+{{--                            class="sidebar-link sidebar-title" href="#">--}}
+{{--                            <i data-feather="cpu"></i>--}}
+{{--                            <span>دستگاه ها</span></a>--}}
+{{--                        <ul class="sidebar-submenu">--}}
+{{--                            <li>--}}
+{{--                                <a class="submenu-title" href="{{ route('device.index') }}">لیست دستگاه ها--}}
+{{--                                    <span class="sub-arrow">--}}
+{{--                                        <i class="fa fa-chevron-right"></i>--}}
+{{--                                    </span>--}}
+{{--                                </a>--}}
+{{--                            </li>--}}
+{{--                            <li>--}}
+{{--                                <a class="submenu-title" href="{{ route('device.index') }}">فعالسازی دستگاه--}}
+{{--                                    <span class="sub-arrow">--}}
+{{--                                        <i class="fa fa-chevron-right"></i>--}}
+{{--                                    </span>--}}
+{{--                                </a>--}}
+{{--                            </li>--}}
+{{--                        </ul>--}}
+{{--                    </li>--}}
                     <li class="sidebar-list">
                         <i class="fa-solid fa-thumbtack"></i>
                         <a class="sidebar-link sidebar-title link-nav" href="{{ route('device.index') }}">
                             <i data-feather="cpu"></i>
                             <span>دستگاه ها</span>
+                            <div class="according-menu">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </div>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-list">
+                        <i class="fa-solid fa-thumbtack"></i>
+                        <a class="sidebar-link sidebar-title link-nav" href="{{ route('vehicle.index') }}">
+                            <i data-feather="truck"></i>
+                            <span>وسایل نقلیه</span>
                             <div class="according-menu">
                                 <i class="fa-solid fa-angle-right"></i>
                             </div>
