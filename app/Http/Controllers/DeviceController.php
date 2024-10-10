@@ -6,6 +6,7 @@ use App\Http\Requests\DeviceRequest;
 use App\Http\Services\Notify\SMS\SmsService;
 use App\Models\Device;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class DeviceController extends Controller
 {
@@ -87,17 +88,22 @@ class DeviceController extends Controller
     }
 
 
-    public function connectToDevice(Device $device)
+    public function deviceConnection(Device $device)
     {
-        $serverIp = '127.0.0.1';
-        $serverPort = '8080';
-        $apn = 'mtnirancell';
-//        $msgContent = "SERVER,{$serverIp},{$serverPort}#,\nAPN,{$apn}#,\nUPLOAD,10#";
-        $msgContent = "SERVER,{$serverIp},{$serverPort}#,\nUPLOAD,10#";
+        return view('devices.connect-to-device', [
+            'device' => $device
+        ]);
+    }
+
+    public function connectToDevice(Request $request, Device $device)
+    {
+        $request->validate([
+            'command' => 'required|string'
+        ]);
 
         $sms = new SmsService();
         $sms->setTo($device->phone_number);
-        $sms->setText($msgContent);
+        $sms->setText($request->command);
         $res = $sms->api();
 
         if ($res->getStatusCode() == 200) {
@@ -106,5 +112,6 @@ class DeviceController extends Controller
             return back()->with('error-alert', 'در مراحل وصل شدن دستگاه, خطایی به وجود آمده است!');
         }
     }
+
 
 }

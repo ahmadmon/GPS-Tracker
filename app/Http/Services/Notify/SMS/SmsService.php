@@ -3,6 +3,7 @@
 namespace App\Http\Services\Notify\SMS;
 
 use App\Http\Interfaces\MessageInterface;
+use Illuminate\Http\JsonResponse;
 
 
 class SmsService implements MessageInterface
@@ -13,17 +14,23 @@ class SmsService implements MessageInterface
     private $to;
     private $isFlash = true;
 
-    public function fire()
+    public function fire(): JsonResponse
     {
         $meliPayamak = new MeliPayamakService();
         return $meliPayamak->send($this->from, $this->to, $this->text, $this->isFlash);
     }
 
-    public function api()
+    public function api(): JsonResponse
     {
         $meliPayamak = new MeliPayamakService();
         return $meliPayamak->apiSend($this->from, $this->to, $this->text);
     }
+
+//    public function getMessages($count = 5)
+//    {
+//        $meliPayamak = new MeliPayamakService();
+//        return $meliPayamak->getMessages($count, $this->from);
+//    }
 
     public function getFrom()
     {

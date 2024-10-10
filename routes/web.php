@@ -1,8 +1,7 @@
 <?php
 
 use App\Http\Controllers\DeviceController;
-use App\Http\Services\Notify\MessageSerivce;
-use App\Http\Services\Notify\SMS\SmsService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
@@ -12,11 +11,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::post('/', function (Request $request) {
+        Log::info('Received tracker data: ', $request->all());
+    });
+
     Route::get('/', function () {
         return view('admin');
     })->name('home');
 
     Route::resource('device', DeviceController::class);
+    Route::get('/device/connect-device/{device}', [DeviceController::class, 'deviceConnection'])->name('device.device-connection');
     Route::post('/device/connect-device/{device}', [DeviceController::class, 'connectToDevice'])->name('device.connect-to-device');
 
 //    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

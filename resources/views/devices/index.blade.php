@@ -82,12 +82,7 @@
                                                        href="{{ route('device.edit', $device->id) }}">ویرایش</a>
                                                     <a href="javascript:void(0)" class="dropdown-item"
                                                        @click.prevent="show = true">حذف</a>
-                                                    <form action="{{ route('device.connect-to-device', $device->id) }}"
-                                                          method="post" class="d-inline">
-                                                        @csrf
-                                                        <a type="button" @click="$el.parentElement.submit()"
-                                                           class="dropdown-item">فعال کردن دستگاه</a>
-                                                    </form>
+                                                        <a href="{{ route('device.device-connection', $device->id) }}" class="dropdown-item">فعال کردن دستگاه</a>
 
                                                 </ul>
                                             </div>

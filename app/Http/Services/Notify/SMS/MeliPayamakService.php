@@ -47,6 +47,14 @@ class MeliPayamakService
         }
     }
 
+//    public function getMessages($count, $from)
+//    {
+//        $api = new MelipayamakApi(username: $this->userName, password: $this->password);
+//        $sms = $api->sms();
+//
+//        return $sms->getMessages(1, 0, $count, $from);
+//    }
+
     private function parseResponse($response): JsonResponse
     {
         $errorCode = [
