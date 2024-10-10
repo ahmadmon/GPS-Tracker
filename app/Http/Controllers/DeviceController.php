@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DeviceRequest;
+use App\Http\Services\Notify\SMS\SmsService;
 use App\Models\Device;
 use App\Models\User;
+use Illuminate\Http\Request;
 
 class DeviceController extends Controller
 {
@@ -84,4 +86,32 @@ class DeviceController extends Controller
         Device::destroy($id);
         return back()->with('success-alert', 'دستگاه با موفقیت حذف گردید.');
     }
+
+
+    public function deviceConnection(Device $device)
+    {
+        return view('devices.connect-to-device', [
+            'device' => $device
+        ]);
+    }
+
+    public function connectToDevice(Request $request, Device $device)
+    {
+        $request->validate([
+            'command' => 'required|string'
+        ]);
+
+        $sms = new SmsService();
+        $sms->setTo($device->phone_number);
+        $sms->setText($request->command);
+        $res = $sms->api();
+
+        if ($res->getStatusCode() == 200) {
+            return back()->with('success-alert', 'دستگاه با موفقیت وصل شد و آماده خدمات‌رسانی است.');
+        } else {
+            return back()->with('error-alert', 'در مراحل وصل شدن دستگاه, خطایی به وجود آمده است!');
+        }
+    }
+
+
 }

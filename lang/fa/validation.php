@@ -247,7 +247,7 @@ return [
         'notify_status' => 'وضعیت ارسال',
         'rule_confirmation' => 'قوانین',
         'otp_code' => 'کد ورود',
-
+        'command' => 'دستور'
 
     ]
 ];

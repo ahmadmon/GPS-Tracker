@@ -82,7 +82,8 @@
                                                        href="{{ route('device.edit', $device->id) }}">ویرایش</a>
                                                     <a href="javascript:void(0)" class="dropdown-item"
                                                        @click.prevent="show = true">حذف</a>
-                                                    <a class="dropdown-item " href="#">فعال کردن دستگاه</a>
+                                                        <a href="{{ route('device.device-connection', $device->id) }}" class="dropdown-item">فعال کردن دستگاه</a>
+
                                                 </ul>
                                             </div>
                                             <x-partials.btns.confirm-rmv-btn
