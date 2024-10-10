@@ -9,9 +9,6 @@
 <link rel="icon" href="{{ asset('assets/images/favicon.png') }}" type="image/x-icon">
 <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" type="image/x-icon">
 <title>@yield('title', 'احراز هویت')</title>
-<!-- Google font-->
-{{--    <link href="https://fonts.googleapis.com/css?family=Rubik:400,400i,500,500i,700,700i&amp;display=swap" rel="stylesheet">--}}
-{{--    <link href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,500,500i,700,700i,900&amp;display=swap" rel="stylesheet">--}}
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/font-awesome.css') }}">
 <!-- ico-font-->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/icofont.css') }}">
@@ -31,5 +28,4 @@
 <!-- Responsive css-->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/responsive.css') }}">
 <!-- Custom css-->
-<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/ahmad.css')}}">
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/daniel.css')}}">

@@ -11,7 +11,7 @@
                 <div>
                     <div>
                         <a class="logo text-start" href="#">
-                            <img class="img-fluid for-light" src="{{ asset('assets/images/logo/logo.png') }}"
+                            <img class="img-fluid for-light" width="65" src="{{ asset('assets/images/logo/aron.webp') }}"
                                  alt="صفحه ورود">
                             <img class="img-fluid for-dark" src="{{ asset('assets/images/logo/logo_dark.png') }}"
                                  alt="صفحه ورود"></a>
@@ -21,22 +21,25 @@
                             @csrf
                             <h4>حساب خود را ایجاد کنید</h4>
                             <p>اطلاعات شخصی خود را برای ایجاد حساب وارد کنید</p>
+
+                            <x-partials.alert.error-alert />
+
                             <div class="form-group">
                                 <label for="name" class="col-form-label pt-0">نام شما</label>
                                 <div class="row g-2">
                                     <div class="col-12">
                                         <input class="form-control" id="name" name="name" type="text" value="{{ old('name') }}"
-                                               placeholder="نام و نام خانوادگی">
+                                               placeholder="نام و نام خانوادگی" autofocus>
                                         <x-input-error :messages="$errors->get('name')" class="mt-2"/>
                                     </div>
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="email" class="col-form-label">پست الکترونیک</label>
-                                <input class="form-control" id="email" dir="ltr" type="email" name="email"
-                                       value="{{ old('email') }}"
-                                       placeholder="example@gmail.com">
-                                <x-input-error :messages="$errors->get('email')" class="mt-2"/>
+                                <label for="phone" class="col-form-label">شماره موبایل</label>
+                                <input class="form-control" id="phone" dir="ltr" type="number" name="phone"
+                                       value="{{ old('phone') }}"
+                                       placeholder="09123456789">
+                                <x-input-error :messages="$errors->get('phone')" class="mt-2"/>
                             </div>
                             <div class="form-group">
                                 <label for="password" class="col-form-label">گذرواژه</label>
@@ -68,14 +71,14 @@
                                 </div>
                                 <button class="btn btn-primary btn-block dana w-100" type="submit">ایجاد حساب</button>
                             </div>
-                            <h6 class="text-muted mt-4 or fw-bolder">یا ثبت‌نام کنید با</h6>
-                            <div class="social mt-4">
-                                <div class="btn-showcase">
-                                    <a class="btn btn-light w-100 dana" href="{{ route('social-login', 'google') }}">
-                                        <i class="txt-google-plus" data-feather="at-sign"></i> حساب گوگل
-                                    </a>
-                                </div>
-                            </div>
+{{--                            <h6 class="text-muted mt-4 or fw-bolder">یا ثبت‌نام کنید با</h6>--}}
+{{--                            <div class="social mt-4">--}}
+{{--                                <div class="btn-showcase">--}}
+{{--                                    <a class="btn btn-light w-100 dana" href="{{ route('social-login', 'google') }}">--}}
+{{--                                        <i class="txt-google-plus" data-feather="at-sign"></i> حساب گوگل--}}
+{{--                                    </a>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
                             <p class="mt-4 mb-0 text-center">از قبل یک حساب دارید؟<a class="ms-2"
                                                                                      href="{{ route('login') }}">وارد
                                     شوید</a></p>

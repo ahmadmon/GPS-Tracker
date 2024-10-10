@@ -11,7 +11,7 @@
                 <div>
                     <div>
                         <a class="logo text-start" href="#">
-                            <img class="img-fluid for-light" src="{{ asset('assets/images/logo/logo.png') }}"
+                            <img class="img-fluid for-light" width="65" src="{{ asset('assets/images/logo/aron.webp') }}"
                                  alt="صفحه ورود">
                             <img class="img-fluid for-dark" src="{{ asset('assets/images/logo/logo_dark.png') }}"
                                  alt="صفحه ورود"></a>
@@ -20,21 +20,20 @@
                         <form action="{{ route('password.email') }}" class="theme-form" method="POST">
                             @csrf
                             <h4>گذرواژه خود را بازنشانی کنید</h4>
-                            <p>فقط آدرس ایمیل خود را به ما اطلاع دهید تا یک لینک بازنشانی گذرواژه برای شما ارسال کنیم که
-                                به شما امکان انتخاب گذرواژه جدید را می‌دهد.</p>
+                            <p>برای تغییر گذرواژه, شماره موبایل خود را وارد کنید.</p>
 
-                            <x-auth-session-status class="mb-4" :status="session('status')"/>
+                            <x-partials.alert.error-alert />
 
                             <div class="form-group">
-                                <label for="email" class="col-form-label">پست الکترونیک</label>
-                                <input class="form-control" id="email" dir="ltr" type="email" name="email"
-                                       value="{{ old('email') }}" autofocus
-                                       placeholder="example@gmail.com">
-                                <x-input-error :messages="$errors->get('email')" class="mt-2"/>
+                                <label for="phone" class="col-form-label">شماره موبایل</label>
+                                <input class="form-control txt-dark fw-bold" id="phone" dir="ltr" type="text" name="phone"
+                                       value="{{ old('phone') }}" autofocus autocomplete="phone"
+                                       placeholder="09123456789">
+                                <x-input-error :messages="$errors->get('phone')" class="mt-2"/>
                             </div>
 
                             <div class="form-group mb-0">
-                                <button class="btn btn-primary btn-block dana w-100" type="submit">ارسال لینک بازنشانی
+                                <button class="btn btn-primary btn-block dana w-100" type="submit">ادامه
                                 </button>
                             </div>
 

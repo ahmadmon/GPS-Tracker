@@ -1,6 +1,10 @@
 @extends('layouts.auth.auth')
 @section('title', 'ورود')
 
+@push('styles')
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+@endpush
+
 
 @section('content')
     <div class="row m-0">
@@ -11,28 +15,41 @@
                 <div>
                     <div>
                         <a class="logo text-start" href="#">
-                            <img class="img-fluid for-light" src="{{ asset('assets/images/logo/logo.png') }}"
+                            <img class="img-fluid for-light" width="65"
+                                 src="{{ asset('assets/images/logo/aron.webp') }}"
                                  alt="صفحه ورود">
                             <img class="img-fluid for-dark" src="{{ asset('assets/images/logo/logo_dark.png') }}"
                                  alt="صفحه ورود"></a>
                     </div>
                     <div class="login-main">
-                        <form action="{{ route('login') }}" class="theme-form" method="POST">
+                        <form action="{{ route('login') }}" class="theme-form" method="POST" autocomplete="off"
+                              autofocus
+                              x-data="{ phone: @js(old('phone', request()?->phone)) || '', error: false }">
                             @csrf
                             <h4>وارد حساب کاربری شوید</h4>
-                            <p>پست‌الکترونیک و گذرواژه خود را برای ورود وارد کنید</p>
+                            <p>شماره موبایل و گذرواژه خود را برای ورود وارد کنید</p>
+
+                            <x-partials.alert.error-alert/>
+
                             <div class="form-group">
-                                <label for="email" class="col-form-label">پست الکترونیک</label>
-                                <input class="form-control" id="email" dir="ltr" type="email" name="email"
-                                       value="{{ old('email') }}" autofocus autocomplete="username"
-                                       placeholder="example@gmail.com">
-                                <x-input-error :messages="$errors->get('email')" class="mt-2"/>
+                                <label for="phone" class="col-form-label">شماره موبایل</label>
+                                <input class="form-control txt-dark fw-bold" id="phone" dir="ltr" type="text"
+                                       name="phone"
+                                       value="{{ old('phone', request()?->phone) }}" autofocus autocomplete="phone"
+                                       x-model="phone"
+                                       placeholder="09123456789">
+                                <x-input-error :messages="$errors->get('phone')" class="mt-2"/>
+                                <div x-show="error" x-cloak>
+                                    <span class="text-danger mt-1 fw-bold"
+                                          x-text="'لطفا شماره موبایل, وارد کنید.'"></span>
+                                </div>
                             </div>
                             <div class="form-group">
                                 <label for="password" class="col-form-label">گذرواژه</label>
                                 <div class="form-input position-relative">
-                                    <input class="form-control" type="password" dir="ltr" id="password" name="password"
-                                           autocomplete="current-password"
+                                    <input class="form-control txt-dark fw-bold" type="password" dir="ltr" id="password"
+                                           name="password"
+                                           autocomplete="new-password"
                                            placeholder="************">
                                     <div class="show-hide"><span class="show"></span></div>
                                 </div>
@@ -46,15 +63,24 @@
                                 </div>
                                 <button class="btn btn-primary btn-block dana w-100" type="submit">ورود به حساب
                                 </button>
+
+                                <a
+
+                                    :href="phone.length === 11 ? `/otp/verification/${phone}` : 'javascript:void(0)'"
+                                    @click="if(phone.length !== 11) error = true"
+                                    class="btn btn-outline-primary btn-block dana w-100 mt-3">
+                                    ورود با رمز یک‌بار مصرف
+                                    <i class="fa fa-regular fa-chevron-left ms-1" style="font-size: 12px"></i>
+                                </a>
                             </div>
-                            <h6 class="text-muted mt-4 or fw-bolder">یا ورود کنید با</h6>
-                            <div class="social mt-4">
-                                <div class="btn-showcase">
-                                    <a class="btn btn-light w-100 dana" href="{{ route('social-login', 'google') }}">
-                                        <i class="txt-google-plus" data-feather="at-sign"></i> حساب گوگل
-                                    </a>
-                                </div>
-                            </div>
+{{--                            <h6 class="text-muted mt-4 or fw-bolder">یا ورود کنید با</h6>--}}
+{{--                            <div class="social mt-4">--}}
+{{--                                <div class="btn-showcase">--}}
+{{--                                    <a class="btn btn-light w-100 dana" href="{{ route('social-login', 'google') }}">--}}
+{{--                                        <i class="txt-google-plus" data-feather="at-sign"></i> حساب گوگل--}}
+{{--                                    </a>--}}
+{{--                                </div>--}}
+{{--                            </div>--}}
                             <p class="mt-4 mb-0 text-center">حساب کاربری ندارید؟
                                 <a class="ms-2" href="{{ route('register') }}">ثبت نام کنید</a>
                             </p>

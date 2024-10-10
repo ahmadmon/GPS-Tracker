@@ -10,6 +10,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\SocialLoginController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Auth\VerifyVerificationCodeController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -29,14 +30,18 @@ Route::middleware('guest')->group(function () {
     Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
         ->name('password.email');
 
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
+    Route::get('reset-password', [NewPasswordController::class, 'create'])
         ->name('password.reset');
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
 
-    Route::get('/auth/{driver}/redirect', [SocialLoginController::class, 'toProvider'])->name('social-login')->where('driver', 'google');
-    Route::get('/auth/{driver}/login', [SocialLoginController::class, 'handleCallBack'])->name('handle-call-back')->where('driver', 'google');
+    Route::get('/otp/verification/{user:phone}', [VerifyVerificationCodeController::class, 'verification'])->name('verification-otp');
+    Route::post('/otp/verify/{user:phone}', [VerifyVerificationCodeController::class, 'verify'])->name('verify-otp')
+        ->middleware('throttle:6,1');
+
+//    Route::get('/auth/{driver}/redirect', [SocialLoginController::class, 'toProvider'])->name('social-login')->where('driver', 'google');
+//    Route::get('/auth/{driver}/login', [SocialLoginController::class, 'handleCallBack'])->name('handle-call-back')->where('driver', 'google');
 });
 
 Route::middleware('auth')->group(function () {

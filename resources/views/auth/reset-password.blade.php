@@ -1,7 +1,6 @@
 @extends('layouts.auth.auth')
 @section('title', 'بازنشانی گذرواژه')
 
-
 @section('content')
     <div class="row m-0">
         <div class="col-xl-7 p-0">
@@ -11,7 +10,7 @@
                 <div>
                     <div>
                         <a class="logo text-start" href="#">
-                            <img class="img-fluid for-light" src="{{ asset('assets/images/logo/logo.png') }}"
+                            <img class="img-fluid for-light" width="65" src="{{ asset('assets/images/logo/aron.webp') }}"
                                  alt="صفحه ورود">
                             <img class="img-fluid for-dark" src="{{ asset('assets/images/logo/logo_dark.png') }}"
                                  alt="صفحه ورود"></a>
@@ -21,17 +20,16 @@
                             @csrf
                             <h4>گذرواژه جدید خود را وارد کنید.</h4>
 
-                            <!-- Password Reset Token -->
-                            <input type="hidden" name="token" value="{{ $request->route('token') }}">
-
                             <div class="form-group">
-                                <label for="email" class="col-form-label">پست الکترونیک</label>
-                                <input class="form-control" id="email" dir="ltr" type="email" name="email"
-                                       value="{{ old('email', $request->email) }}" autofocus autocomplete="username">
-                                <x-input-error :messages="$errors->get('email')" class="mt-2"/>
+                                <label for="phone" class="col-form-label">شماره موبایل</label>
+                                <input class="form-control fw-bold disabled" id="phone" dir="ltr" type="text"
+                                       name="phone"
+                                       value="{{ $phone ?? '' }}">
                             </div>
                             <div class="form-group">
-                                <label for="password" class="col-form-label">گذرواژه</label>
+                                <label for="password" class="col-form-label">گذرواژه جدید
+                                <sup class="text-danger fw-bold">*</sup>
+                                </label>
                                 <div class="form-input position-relative">
                                     <input class="form-control" type="password" dir="ltr" id="password" name="password"
                                            autocomplete="new-password"
@@ -41,7 +39,9 @@
                                 <x-input-error :messages="$errors->get('password')" class="mt-2"/>
                             </div>
                             <div class="form-group">
-                                <label for="password_confirmation" class="col-form-label">تکرار گذرواژه</label>
+                                <label for="password_confirmation" class="col-form-label">تکرار گذرواژه جدید
+                                    <sup class="text-danger fw-bold">*</sup>
+                                </label>
                                 <div class="form-input position-relative">
                                     <input class="form-control" type="password" dir="ltr" id="password_confirmation"
                                            name="password_confirmation" autocomplete="new-password"

@@ -245,7 +245,8 @@ return [
         'replyMsg' => 'متن پاسخ',
         'reason' => 'دلیل رد کردن',
         'notify_status' => 'وضعیت ارسال',
-        'rule_confirmation' => 'قوانین'
+        'rule_confirmation' => 'قوانین',
+        'otp_code' => 'کد ورود',
 
 
     ]
