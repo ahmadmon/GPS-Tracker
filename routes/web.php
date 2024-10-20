@@ -5,13 +5,11 @@ use App\Http\Controllers\VehicleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-
+Route::post('/', function (Request $request) {
+    Log::info('Received tracker data: ', $request->all());
+});
 
 Route::middleware(['auth'])->group(function () {
-
-    Route::post('/', function (Request $request) {
-        Log::info('Received tracker data: ', $request->all());
-    });
 
     Route::get('/', function () {
         return view('admin');
