@@ -18,6 +18,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('device', DeviceController::class);
     Route::get('/device/connect-device/{device}', [DeviceController::class, 'deviceConnection'])->name('device.device-connection');
     Route::post('/device/connect-device/{device}', [DeviceController::class, 'connectToDevice'])->name('device.connect-to-device');
+    Route::get('/device/get-location/{id}', [DeviceController::class, 'location'])->name('device.get-location');
 
     Route::resource('vehicle', VehicleController::class);
 

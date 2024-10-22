@@ -16,8 +16,10 @@ return new class extends Migration {
             $table->foreignId('device_id')->nullable()->constrained('devices')->cascadeOnUpdate()->cascadeOnDelete();
             $table->foreignId('vehicle_id')->nullable()->constrained('vehicles')->cascadeOnUpdate()->cascadeOnDelete();
             $table->string('name');
+            $table->string('lat',20)->index();
+            $table->string('long',20)->index();
             $table->unsignedBigInteger('distance')->index();
-            $table->json('stats')->index();
+            $table->json('device_stats')->index();
             $table->timestamp('start_at')->nullable();
             $table->timestamp('end_at')->nullable();
             $table->timestamps();

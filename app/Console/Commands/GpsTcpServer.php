@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\StoreGpsDataJob;
 use Exception;
 use Illuminate\Console\Command;
 use Workerman\Connection\TcpConnection;
@@ -50,7 +51,6 @@ class GpsTcpServer extends Command
     }
 
 
-    // تابع راه‌اندازی سرور
     protected function startServer($isDaemon): void
     {
         if ($isDaemon) {
@@ -66,14 +66,16 @@ class GpsTcpServer extends Command
 
         $tcpWorker->onMessage = function (TcpConnection $connection, $data) {
             try {
-                // اینجا داده‌ها را پردازش کنید
+
                 $parsedData = $this->parseData($data);
 
                 if ($parsedData['expectsResponse']) {
                     $connection->send($parsedData['response']);
                 }
 
-                $this->info('Received message: ' . json_encode($parsedData));
+                $this->info('Received message. ' . now()->toDateTimeString());
+
+                StoreGpsDataJob::dispatch($parsedData['data']);
 
             } catch (Exception $e) {
                 $this->error('Error parsing data: ' . $e->getMessage());
@@ -137,7 +139,7 @@ class GpsTcpServer extends Command
         $parsedData['date'] = '20' . substr($parsedData['date'], 4, 2) . '-' . substr($parsedData['date'], 2, 2) . '-' . substr($parsedData['date'], 0, 2);
 
         // Covert the Latitude and Longitude to Standard Format
-        $parsedData['lat'] = $this->convertToDecimal($parsedData['latitude'], $parsedData['lat_dir']);
+        $parsedData['lat'] = $this->convertToDecimal($parsedData['lat'], $parsedData['lat_dir']);
         $parsedData['long'] = $this->convertToDecimal($parsedData['long'], $parsedData['long_dir']);
 
         return [

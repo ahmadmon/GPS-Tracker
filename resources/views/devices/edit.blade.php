@@ -7,20 +7,19 @@
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
-                <div class="col-sm-6">
-                    <h3>ویرایش دستگاه {{ $device->name }}</h3>
-                </div>
-                <div class="col-sm-6">
+                <div class="col-sm-12 d-flex">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('home') }}">
                                 <svg class="stroke-icon">
-                                    <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
+                                    <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item dana">دستگاه ها</li>
-                        <li class="breadcrumb-item active dana">ویرایش دستگاه</li>
+                        <li class="breadcrumb-item dana">
+                            <a href="{{ route('device.index') }}">دستگاه ها</a>
+                        </li>
+                        <li class="breadcrumb-item active dana txt-dark">ویرایش دستگاه</li>
                     </ol>
                 </div>
             </div>

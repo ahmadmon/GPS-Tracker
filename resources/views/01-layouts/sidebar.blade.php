@@ -56,7 +56,7 @@
 {{--                    </li>--}}
                     <li class="sidebar-list">
                         <i class="fa-solid fa-thumbtack"></i>
-                        <a class="sidebar-link sidebar-title link-nav" href="{{ route('device.index') }}">
+                        <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('device.*')]) href="{{ route('device.index') }}">
                             <i data-feather="cpu"></i>
                             <span>دستگاه ها</span>
                             <div class="according-menu">

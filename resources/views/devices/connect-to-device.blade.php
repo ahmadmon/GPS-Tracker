@@ -7,10 +7,7 @@
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
-                <div class="col-sm-6">
-                    <h3>فعال سازی دستگاه</h3>
-                </div>
-                <div class="col-sm-6">
+                <div class="col-sm-12 d-flex">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('home') }}">
@@ -20,7 +17,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item dana">دستگاه ها</li>
-                        <li class="breadcrumb-item active dana">فعال سازی دستگاه</li>
+                        <li class="breadcrumb-item active dana txt-dark">فعال سازی دستگاه</li>
                     </ol>
                 </div>
             </div>
@@ -80,11 +77,11 @@
                 <form action="{{ route('device.connect-to-device', $device->id) }}" method="POST" class="row">
                     @csrf
                     <div class="col-12 mb-3">
-                        <label class="form-label" for="command">   دستور فعالسازی دستگاه را بنویسید
+                        <label class="form-label" for="command">دستور مربوط به دستگاه را وارد کنید.
                             <sup class="text-danger">*</sup>
                         </label>
                         <input class="form-control" id="command" name="command" dir="ltr" value="{{ old('command') }}" type="text"
-                               placeholder="SERVER,example.com#">
+                               placeholder="">
                         <x-input-error :messages="$errors->get('command')" class="mt-2"/>
                     </div>
 

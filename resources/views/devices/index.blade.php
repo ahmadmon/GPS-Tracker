@@ -12,7 +12,7 @@
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-12 d-flex">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('home') }}">
@@ -21,7 +21,7 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active dana">دستگاه ها</li>
+                        <li class="breadcrumb-item active dana  txt-dark">دستگاه ها</li>
                     </ol>
                 </div>
             </div>
@@ -40,7 +40,7 @@
                         <h4>لیست دستگاه ها</h4>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive custom-scrollbar">
+                        <div class="table-responsive">
                             <table class="display" id="basic-1">
                                 <thead>
                                 <tr>
@@ -83,6 +83,8 @@
                                                     <a href="javascript:void(0)" class="dropdown-item"
                                                        @click.prevent="show = true">حذف</a>
                                                         <a href="{{ route('device.device-connection', $device->id) }}" class="dropdown-item">فعال کردن دستگاه</a>
+                                                    <a href="{{ route('device.show', $device->id) }}"
+                                                       class="dropdown-item">نمایش موقعیت مکانی</a>
 
                                                 </ul>
                                             </div>

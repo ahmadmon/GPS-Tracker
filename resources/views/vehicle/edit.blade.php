@@ -7,10 +7,7 @@
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
-                <div class="col-sm-6">
-                    <h3>ویرایش وسیله‌ نقلیه</h3>
-                </div>
-                <div class="col-sm-6">
+                <div class="col-sm-12 d-flex">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('home') }}">
@@ -20,7 +17,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item dana">وسایل نقلیه</li>
-                        <li class="breadcrumb-item active dana">ویرایش وسیله‌ نقلیه</li>
+                        <li class="breadcrumb-item active dana txt-dark">ویرایش وسیله‌ نقلیه</li>
                     </ol>
                 </div>
             </div>

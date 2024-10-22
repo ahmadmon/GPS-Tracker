@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\DeviceRequest;
 use App\Http\Services\Notify\SMS\SmsService;
 use App\Models\Device;
+use App\Models\Trip;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -48,7 +49,37 @@ class DeviceController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $device = Device::find($id);
+        $lastLocation = Trip::where('device_id', $device->id)->orderByDesc('id')->first();
+
+        return view('devices.map', [
+            'device' => $device,
+            'lastLocation' => $lastLocation,
+        ]);
+    }
+
+    public function location(string $id)
+    {
+        $device = Device::find($id);
+        $lastLocation = Trip::where('device_id', $device->id)->orderByDesc('id')->first();
+
+        if ($lastLocation) {
+            return response()->json([
+                'status' => 'success',
+                'data' => [
+                    'lat' => $lastLocation->lat,
+                    'lng' => $lastLocation->long,
+                    'name' => $lastLocation->name,
+                    'speed' => $lastLocation->device_stats['data']['speed'],
+                ]
+            ]);
+        } else {
+            return response()->json([
+                'status' => 'error',
+                'data' => [],
+                'message' => 'An error occurred!'
+            ]);
+        }
     }
 
     /**
@@ -107,9 +138,9 @@ class DeviceController extends Controller
         $res = $sms->api();
 
         if ($res->getStatusCode() == 200) {
-            return back()->with('success-alert', 'دستگاه با موفقیت وصل شد و آماده خدمات‌رسانی است.');
+            return back()->with('success-alert', 'دستور با موفقیت برای دستگاه ارسال شد.');
         } else {
-            return back()->with('error-alert', 'در مراحل وصل شدن دستگاه, خطایی به وجود آمده است!');
+            return back()->with('error-alert', "خطایی به وجود آمده است!\nلطفا بعد از چند لحظه دوباره امتحان کنید");
         }
     }
 

@@ -20,7 +20,7 @@
     );
     jQuery(".sidebar-title").click(function () {
       jQuery(".sidebar-title")
-        .removeClass("active")
+        // .removeClass("active")
         .find("div")
         .replaceWith(
           '<div class="according-menu"><i class="fa fa-angle-right"></i></div>'
@@ -49,7 +49,7 @@
     );
     jQuery(".submenu-title").click(function () {
       jQuery(".submenu-title")
-        .removeClass("active")
+        // .removeClass("active")
         .find("div")
         .replaceWith(
           '<div class="according-menu"><i class="fa fa-angle-right"></i></div>'
@@ -89,7 +89,7 @@
           '<div class="according-menu"><i class="fa fa-angle-right"></i></div>'
         );
         jQuery(".submenu-title").click(function () {
-          jQuery(".submenu-title").removeClass("active");
+          // jQuery(".submenu-title").removeClass("active");
           jQuery(".submenu-title")
             .find("div")
             .replaceWith(
@@ -118,7 +118,7 @@
           '<div class="according-menu"><i class="fa fa-angle-right"></i></div>'
         );
         jQuery(".sidebar-title").click(function () {
-          jQuery(".sidebar-title").removeClass("active");
+          // jQuery(".sidebar-title").removeClass("active");
           jQuery(".sidebar-title")
             .find("div")
             .replaceWith(
@@ -162,7 +162,7 @@
     }
 
     jQuery(".sidebar-title").click(function () {
-      jQuery(".sidebar-title").removeClass("active");
+      // jQuery(".sidebar-title").removeClass("active");
       $(".bg-overlay1").removeClass("active");
       jQuery(".sidebar-submenu").removeClass("close-submenu").slideUp("normal");
       jQuery(".sidebar-submenu, .menu-content").slideUp("normal");
@@ -188,7 +188,7 @@
     );
     jQuery(".submenu-title").click(function () {
       jQuery(".submenu-title")
-        .removeClass("active")
+        // .removeClass("active")
         .find("div")
         .replaceWith(
           '<div class="according-menu"><i class="fa fa-angle-right"></i></div>'
@@ -337,7 +337,7 @@
 
   // page active
   if ($("#pageWrapper").hasClass("compact-wrapper")) {
-    $(".sidebar-wrapper nav").find("a").removeClass("active");
+    // $(".sidebar-wrapper nav").find("a").removeClass("active");
     $(".sidebar-wrapper nav").find("li").removeClass("active");
 
     var current = window.location.pathname;
@@ -434,18 +434,18 @@
     $(this).parent().children("ul").toggleClass("d-block").slideToggle();
   }
 
-  // active link
-  if (
-    $(".simplebar-wrapper .simplebar-content-wrapper") &&
-    $("#pageWrapper").hasClass("compact-wrapper")
-  ) {
-    $(".simplebar-wrapper .simplebar-content-wrapper").animate(
-      {
-        scrollTop:
-          $(".simplebar-wrapper .simplebar-content-wrapper a.active").offset()
-            .top - 400,
-      },
-      1000
-    );
-  }
+  // // active link
+  // if (
+  //   $(".simplebar-wrapper .simplebar-content-wrapper") &&
+  //   $("#pageWrapper").hasClass("compact-wrapper")
+  // ) {
+  //     console.log($(".simplebar-wrapper .simplebar-content-wrapper a.active"))
+  //   $(".simplebar-wrapper .simplebar-content-wrapper").animate(
+  //     {
+  //       scrollTop:
+  //         $(".simplebar-wrapper .simplebar-content-wrapper a.active").offset().top - 400,
+  //     },
+  //     1000
+  //   );
+  // }
 })(jQuery);

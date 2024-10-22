@@ -7,10 +7,7 @@
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
-                <div class="col-sm-6">
-                    <h3>ایجاد دستگاه</h3>
-                </div>
-                <div class="col-sm-6">
+                <div class="col-sm-12 d-flex">
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a href="{{ route('home') }}">
@@ -19,8 +16,10 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item dana">دستگاه ها</li>
-                        <li class="breadcrumb-item active dana">ایجاد دستگاه</li>
+                        <li class="breadcrumb-item dana">
+                            <a href="{{ route('device.index') }}">لیست دستگاه ها</a>
+                        </li>
+                        <li class="breadcrumb-item active dana txt-dark">ایجاد دستگاه</li>
                     </ol>
                 </div>
             </div>
