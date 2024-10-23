@@ -21,7 +21,7 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item active dana  txt-dark">دستگاه ها</li>
+                        <li class="breadcrumb-item dana">دستگاه ها</li>
                     </ol>
                 </div>
             </div>
@@ -40,13 +40,14 @@
                         <h4>لیست دستگاه ها</h4>
                     </div>
                     <div class="card-body">
-                        <div class="table-responsive">
+                        <div class="table-responsive text-nowrap">
                             <table class="display" id="basic-1">
                                 <thead>
                                 <tr>
                                     <th>نام</th>
                                     <th>مدل</th>
                                     <th>شماره سیم کارت</th>
+                                    <th>خریدار</th>
                                     <th>وضعیت</th>
                                     <th>متصل شده در</th>
                                     <th>عملیات</th>
@@ -63,6 +64,11 @@
                                         </td>
                                         <td>{{ $device->model }}</td>
                                         <td>{{ $device?->phone_number }}</td>
+                                        <td>
+                                            <a href="{{ route('user.show', $device->user_id) }}" target="_blank">
+                                                {{ $device->user->name }}
+                                            </a>
+                                        </td>
                                         <td>
                                             @if($device->status)
                                                 <span class="badge dana rounded-pill badge-success">فعال</span>
@@ -82,7 +88,8 @@
                                                        href="{{ route('device.edit', $device->id) }}">ویرایش</a>
                                                     <a href="javascript:void(0)" class="dropdown-item"
                                                        @click.prevent="show = true">حذف</a>
-                                                        <a href="{{ route('device.device-connection', $device->id) }}" class="dropdown-item">فعال کردن دستگاه</a>
+                                                    <a href="{{ route('device.device-connection', $device->id) }}"
+                                                       class="dropdown-item">دستورات دستگاه</a>
                                                     <a href="{{ route('device.show', $device->id) }}"
                                                        class="dropdown-item">نمایش موقعیت مکانی</a>
 
@@ -111,9 +118,7 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
-    {{--    <script src="{{ asset('assets/js/datatable/datatables/dataTables1.js')}}"></script>--}}
     <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
-{{--    <script src="{{ asset('assets/js/datatable/datatables/datatable.custom2.js')}}"></script>--}}
     <script>
         $('#basic-1').DataTable({
             "language": {

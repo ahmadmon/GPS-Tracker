@@ -7,5 +7,8 @@
     },
     "devDependencies": {
         "vite": "^5.0"
+    },
+    "dependencies": {
+        "localtunnel": "^2.0.2"
     }
 }

@@ -12,12 +12,16 @@
                         <li class="breadcrumb-item">
                             <a href="{{ route('home') }}">
                                 <svg class="stroke-icon">
-                                    <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
+                                    <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item dana">دستگاه ها</li>
-                        <li class="breadcrumb-item active dana txt-dark">فعال سازی دستگاه</li>
+                        <li class="breadcrumb-item dana">
+                            <a href="{{ route('device.index') }}">
+                                دستگاه ها
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item dana">فعال سازی دستگاه</li>
                     </ol>
                 </div>
             </div>

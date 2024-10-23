@@ -19,7 +19,7 @@
                         <li class="breadcrumb-item dana">
                             <a href="{{ route('device.index') }}">دستگاه ها</a>
                         </li>
-                        <li class="breadcrumb-item active dana txt-dark">ویرایش دستگاه</li>
+                        <li class="breadcrumb-item dana txt-dark">ویرایش دستگاه</li>
                     </ol>
                 </div>
             </div>
@@ -71,13 +71,7 @@
                         <label class="form-label" for="user_id">خریدار
                             <sup class="text-danger">*</sup>
                         </label>
-                        <select class="form-select" name="user_id" id="user_id">
-                            <option value="0" selected>انتخاب کنید</option>
-                            @foreach($users as $user)
-                                <option
-                                    value="{{ $user->id }}" @selected(old('user_id',$device->user_id) == $user->id)>{{ $user?->name }}</option>
-                            @endforeach
-                        </select>
+                        <x-partials.alpine.select2.select-option :options="$users->pluck('name', 'id')->toArray()" name="user_id" :value="$device->user_id"/>
                         <x-input-error :messages="$errors->get('user_id')" class="mt-2"/>
                     </div>
 

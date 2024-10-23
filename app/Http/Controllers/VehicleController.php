@@ -13,7 +13,7 @@ class VehicleController extends Controller
      */
     public function index()
     {
-        $vehicles = Vehicle::all();
+        $vehicles = Vehicle::with('user')->cursor();
 
         return view('vehicle.index', compact('vehicles'));
     }

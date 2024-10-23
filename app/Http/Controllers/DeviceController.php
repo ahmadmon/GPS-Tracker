@@ -16,7 +16,7 @@ class DeviceController extends Controller
      */
     public function index()
     {
-        $devices = Device::with(['user'])->orderByDesc('created_at')->cursor();
+        $devices = Device::with(['user:id,name'])->orderByDesc('created_at')->cursor();
 
         return view('devices.index', compact('devices'));
     }

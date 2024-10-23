@@ -14,18 +14,19 @@
             </div>
         </form>
         <div class="header-logo-wrapper col-auto p-0">
-            <div class="logo-wrapper"><a href="index.html"><img class="img-fluid" src="../assets/images/logo/logo.png"
+            <div class="logo-wrapper"><a href="{{ route('home') }}"><img class="img-fluid"
+                                                                         src="{{ asset('assets/images/logo/logo.png') }}"
                         alt=""></a></div>
             <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i>
             </div>
         </div>
         <div class="left-header col-xxl-5 col-xl-6 col-lg-5 col-md-4 col-sm-3 p-0">
             <div class="notification-slider">
-                <div class="d-flex h-100"> <img src="../assets/images/giftools.gif" alt="gif">
+                <div class="d-flex h-100"><img src="{{ asset('assets/images/giftools.gif') }}" alt="gif">
                     <h6 class="mb-0 f-w-400"><span class="font-primary"> Ahmad is your best feriend!!: </span><span
                             class="f-light">Dont Forget!</span></h6><i class="icon-arrow-top-right f-light"></i>
                 </div>
-                <div class="d-flex h-100"><img src="../assets/images/giftools.gif" alt="gif">
+                <div class="d-flex h-100"><img src="{{ asset('assets/images/giftools.gif') }}" alt="gif">
                     <h6 class="mb-0 f-w-400"><span class="f-light">I will find you! </span>
                     </h6><a class="ms-1" href="https://1.envato.market/3GVzd" target="_blank">Gps!</a>
                 </div>
@@ -102,7 +103,7 @@
                                     <ul>
                                         <li>
                                             <div class="bookmark-dropdown flip-back-content">
-                                                <input type="text" placeholder="search...">
+                                                <input type="text" placeholder="search..." aria-label="search">
                                             </div>
                                         </li>
                                         <li><a class="f-w-700 d-block flip-back" id="flip-back"
@@ -116,7 +117,7 @@
                 <li>
                     <div class="mode">
                         <svg>
-                            <use href="../assets/svg/icon-sprite.svg#moon"></use>
+                            <use href="{{ asset('assets/svg/icon-sprite.svg#moon') }}"></use>
                         </svg>
                     </div>
                 </li>
@@ -184,7 +185,7 @@
                 <li class="onhover-dropdown">
                     <div class="notification-box">
                         <svg>
-                            <use href="../assets/svg/icon-sprite.svg#notification"></use>
+                            <use href="{{ asset('assets/svg/icon-sprite.svg#notification') }}"></use>
                         </svg><span class="badge rounded-pill badge-secondary">4 </span>
                     </div>
                     <div class="onhover-show-div notification-dropdown">
@@ -207,7 +208,8 @@
                     </div>
                 </li>
                 <li class="profile-nav onhover-dropdown pe-0 py-0">
-                    <div class="media profile-media"><img class="b-r-10" src="../assets/images/dashboard/profile.png"
+                    <div class="media profile-media"><img class="b-r-10"
+                                                          src="{{ asset('assets/images/dashboard/profile.png') }}"
                             alt="">
                         <div class="media-body"><span>{{ auth()->user()?->name }}</span>
                             <p class="mb-0">{{ auth()->user()->user_type ? 'ادمین' : 'کاربر' }}<i class="middle fa fa-angle-down"></i></p>

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -21,6 +22,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/device/get-location/{id}', [DeviceController::class, 'location'])->name('device.get-location');
 
     Route::resource('vehicle', VehicleController::class);
+    Route::resource('user', UserController::class);
 
 });
 

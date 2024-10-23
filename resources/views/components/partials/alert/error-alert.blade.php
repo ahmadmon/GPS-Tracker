@@ -7,7 +7,7 @@
             <line x1="12" y1="8" x2="12" y2="12"></line>
             <line x1="12" y1="16" x2="12.01" y2="16"></line>
         </svg>
-        <p class="mb-0 text-danger-emphasis">{!! e(nl2br(session('error-alert'))) !!}</p>
+        <p class="mb-0 text-danger-emphasis">{!! nl2br(session('error-alert')) !!}</p>
         <button class="btn-close" type="button" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 @endif

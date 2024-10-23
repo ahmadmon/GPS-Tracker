@@ -26,7 +26,7 @@ class VehicleRequest extends FormRequest
 //            'license_plate' => 'required|array',
 //            'license_plate.*' => 'required|string|max:3',
             'license_plate' => 'required|string',
-            'user_id' => 'nullable|numeric|exists:users,id',
+            'user_id' => 'required|numeric|exists:users,id',
             'status' => 'required|numeric|in:0,1'
         ];
     }
@@ -37,6 +37,7 @@ class VehicleRequest extends FormRequest
         return [
             'name' => 'نام وسیله نقلیه',
             'license_plate' => 'پلاک',
+            'user_id' => 'راننده'
         ];
     }
 }

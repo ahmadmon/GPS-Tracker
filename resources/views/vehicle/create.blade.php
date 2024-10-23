@@ -12,12 +12,16 @@
                         <li class="breadcrumb-item">
                             <a href="{{ route('home') }}">
                                 <svg class="stroke-icon">
-                                    <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
+                                    <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item dana">وسایل نقلیه</li>
-                        <li class="breadcrumb-item active dana txt-dark">ایجاد وسیله‌ نقلیه</li>
+                        <li class="breadcrumb-item dana">
+                            <a href="{{ route('vehicle.index') }}">
+                                وسایل نقلیه
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item dana">ایجاد وسیله‌ نقلیه</li>
                     </ol>
                 </div>
             </div>
@@ -83,13 +87,7 @@
                         <label class="form-label" for="user_id">راننده
                             <sup class="text-danger">*</sup>
                         </label>
-                        <select class="form-select" name="user_id" id="user_id">
-                            <option value="" selected>انتخاب کنید</option>
-                            @foreach($users as $user)
-                                <option
-                                    value="{{ $user->id }}" @selected(old('user_id') == $user->id)>{{ $user?->name }}</option>
-                            @endforeach
-                        </select>
+                       <x-partials.alpine.select2.select-option name="user_id" :options="$users->pluck('name' , 'id')->toArray()" />
                         <x-input-error :messages="$errors->get('user_id')" class="mt-2"/>
                     </div>
 

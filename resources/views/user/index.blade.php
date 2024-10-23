@@ -1,6 +1,6 @@
 @extends('01-layouts.master')
 
-@section('title', 'لیست وسایل نقلیه')
+@section('title', 'لیست کاربران')
 
 @push('styles')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/jquery.dataTables.css') }}">
@@ -21,7 +21,7 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item dana">وسایل نقلیه</li>
+                        <li class="breadcrumb-item dana">کاربران</li>
                     </ol>
                 </div>
             </div>
@@ -34,39 +34,43 @@
         <div class="row">
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
-                <a href="{{ route('vehicle.create') }}" class="btn btn-primary mb-4">+ ایجاد وسیله نقلیه</a>
+                <a href="{{ route('user.create') }}" class="btn btn-primary mb-4">+ ثبت‌نام کاربر جدید</a>
                 <div class="card">
                     <div class="card-header pb-0 card-no-border">
-                        <h4>لیست وسایل نقلیه</h4>
+                        <h4>لیست کاربران</h4>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive custom-scrollbar text-nowrap">
                             <table class="display" id="basic-1">
                                 <thead>
                                 <tr>
-                                    <th>وسیله نقلیه</th>
-                                    <th>پلاک</th>
-                                    <th>راننده</th>
+                                    <th>کاربر</th>
+                                    <th>شماره تماس</th>
                                     <th>وضعیت</th>
+                                    <th>تاریخ عضویت</th>
                                     <th>عملیات</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @forelse($vehicles as $vehicle)
+                                @forelse($users as $user)
                                     <tr>
                                         <td>
                                             <div class="d-flex flex-column">
-                                                <span class="fw-bold">{{ $vehicle->name }}</span>
+                                                <span class="fw-bold">{{ $user->name }}</span>
+                                                <small
+                                                    class="text-muted">{{ $user->user_type ? 'ادمین' : 'کاربر' }}</small>
                                             </div>
                                         </td>
-                                        <td>{{ $vehicle->license_plate }}</td>
-                                        <td>{{ $vehicle?->user?->name }}</td>
+                                        <td>{{ $user->phone }}</td>
                                         <td>
-                                            @if($vehicle->status)
+                                            @if($user->status)
                                                 <span class="badge dana rounded-pill badge-success">فعال</span>
                                             @else
                                                 <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
                                             @endif
+                                        </td>
+                                        <td>
+                                            <span class="text-muted">{{ jalaliDate($user->created_at) }}</span>
                                         </td>
                                         <td x-data="{ show: false }">
                                             <div class="btn-group" x-cloak x-show="!show">
@@ -75,15 +79,16 @@
                                                     <i class="icofont icofont-listing-box txt-dark"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-block text-center" style="">
-                                                    <a class="dropdown-item "
-                                                       href="{{ route('vehicle.edit', $vehicle->id) }}">ویرایش</a>
+                                                    <a class="dropdown-item"
+                                                       href="{{ route('user.edit', $user->id) }}">ویرایش</a>
                                                     <a href="javascript:void(0)" class="dropdown-item"
                                                        @click.prevent="show = true">حذف</a>
-                                                    <a class="dropdown-item" href="#">نمایش موقعیت</a>
+                                                    <a class="dropdown-item"
+                                                       href="{{ route('user.show', $user->id) }}">مشاهده جزئیات</a>
                                                 </ul>
                                             </div>
                                             <x-partials.btns.confirm-rmv-btn
-                                                url="{{ route('vehicle.destroy', $vehicle->id) }}"/>
+                                                url="{{ route('user.destroy', $user->id) }}"/>
                                         </td>
                                     </tr>
                                 @empty
@@ -109,6 +114,7 @@
 
     <script>
         $('#basic-1').DataTable({
+            order: [[3, 'asc']],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
             }

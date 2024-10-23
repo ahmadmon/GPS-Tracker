@@ -25,7 +25,7 @@
                                 لیست دستگاه ها
                             </a>
                         </li>
-                        <li class="breadcrumb-item active dana txt-dark">نمایش موقعیت در نقشه</li>
+                        <li class="breadcrumb-item dana">نمایش موقعیت در نقشه</li>
                     </ol>
                 </div>
             </div>
