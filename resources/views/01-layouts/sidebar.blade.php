@@ -30,30 +30,31 @@
                             </svg>
                             <svg class="fill-icon">
                                 <use href="../assets/svg/icon-sprite.svg#fill-home"></use>
-                            </svg><span>داشبورد</span></a></li>
+                            </svg>
+                            <span>داشبورد</span></a></li>
 
-{{--                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>--}}
-{{--                        <a--}}
-{{--                            class="sidebar-link sidebar-title" href="#">--}}
-{{--                            <i data-feather="cpu"></i>--}}
-{{--                            <span>دستگاه ها</span></a>--}}
-{{--                        <ul class="sidebar-submenu">--}}
-{{--                            <li>--}}
-{{--                                <a class="submenu-title" href="{{ route('device.index') }}">لیست دستگاه ها--}}
-{{--                                    <span class="sub-arrow">--}}
-{{--                                        <i class="fa fa-chevron-right"></i>--}}
-{{--                                    </span>--}}
-{{--                                </a>--}}
-{{--                            </li>--}}
-{{--                            <li>--}}
-{{--                                <a class="submenu-title" href="{{ route('device.index') }}">فعالسازی دستگاه--}}
-{{--                                    <span class="sub-arrow">--}}
-{{--                                        <i class="fa fa-chevron-right"></i>--}}
-{{--                                    </span>--}}
-{{--                                </a>--}}
-{{--                            </li>--}}
-{{--                        </ul>--}}
-{{--                    </li>--}}
+                    {{--                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>--}}
+                    {{--                        <a--}}
+                    {{--                            class="sidebar-link sidebar-title" href="#">--}}
+                    {{--                            <i data-feather="cpu"></i>--}}
+                    {{--                            <span>دستگاه ها</span></a>--}}
+                    {{--                        <ul class="sidebar-submenu">--}}
+                    {{--                            <li>--}}
+                    {{--                                <a class="submenu-title" href="{{ route('device.index') }}">لیست دستگاه ها--}}
+                    {{--                                    <span class="sub-arrow">--}}
+                    {{--                                        <i class="fa fa-chevron-right"></i>--}}
+                    {{--                                    </span>--}}
+                    {{--                                </a>--}}
+                    {{--                            </li>--}}
+                    {{--                            <li>--}}
+                    {{--                                <a class="submenu-title" href="{{ route('device.index') }}">فعالسازی دستگاه--}}
+                    {{--                                    <span class="sub-arrow">--}}
+                    {{--                                        <i class="fa fa-chevron-right"></i>--}}
+                    {{--                                    </span>--}}
+                    {{--                                </a>--}}
+                    {{--                            </li>--}}
+                    {{--                        </ul>--}}
+                    {{--                    </li>--}}
                     <li class="sidebar-list">
                         <i class="fa-solid fa-thumbtack"></i>
                         <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('device.*')]) href="{{ route('device.index') }}">
@@ -77,12 +78,21 @@
                     </li>
 
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
-                            class="sidebar-link sidebar-title" href="#">
+                                class="sidebar-link sidebar-title" href="#">
                             <i data-feather="users"></i>
                             <span>کاربران</span></a>
                         <ul class="sidebar-submenu">
                             <li><a href="{{ route('user.index') }}"><span>لیست کاربران</span></a></li>
                             <li><a href="{{ route('user.create') }}"><span>ایجاد کاربر جدید</span></a></li>
+                        </ul>
+                    </li>
+                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
+                                class="sidebar-link sidebar-title" href="#">
+                            <i data-feather="life-buoy"></i>
+                            <span>سازمان</span></a>
+                        <ul class="sidebar-submenu">
+                            <li><a href="{{ route('company.index') }}"><span>لیست سازمان ها</span></a></li>
+                            <li><a href="{{ route('company.create') }}"><span>ایجاد سازمان جدید</span></a></li>
                         </ul>
                     </li>
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a

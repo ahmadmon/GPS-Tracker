@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
@@ -23,6 +24,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('vehicle', VehicleController::class);
     Route::resource('user', UserController::class);
+    Route::resource('company', CompanyController::class);
 
 });
 

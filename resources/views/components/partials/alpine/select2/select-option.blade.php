@@ -1,11 +1,15 @@
 <div class="select-box w-100">
     <div class="options-container">
-        @foreach($options as $key => $option)
+        @forelse($options as $key => $option)
             <div class="selection-option">
                 <input class="radio" id="{{ $key }}" value="{{ $key }}" type="radio" @checked(old($name, $value ?? '') == $key))>
                 <label class="mb-0" for="{{ $key }}">{{ $option }}</label>
             </div>
-        @endforeach
+        @empty
+            <div>
+               موردی یافت نشد...
+            </div>
+        @endforelse
 
     </div>
     <div class="selected-box rounded" style="padding: 9px 24px">{{ $options[old($name, $value ?? '')] ?? 'انتخاب کنید...' }}</div>

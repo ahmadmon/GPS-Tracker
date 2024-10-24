@@ -34,5 +34,9 @@
     cursor: pointer !important;
 }
 
+img.img-opacity:hover {
+    filter: opacity(.5);
+    transition: 0.4s;
+}
 
 /*  */
