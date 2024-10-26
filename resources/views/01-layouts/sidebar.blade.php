@@ -26,35 +26,12 @@
                             class="sidebar-link sidebar-title" href="{{ route('home') }}"
                             target="_blank">
                             <svg class="stroke-icon">
-                                <use href="../assets/svg/icon-sprite.svg#stroke-home"></use>
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
                             </svg>
                             <svg class="fill-icon">
-                                <use href="../assets/svg/icon-sprite.svg#fill-home"></use>
+                                <use href="{{ asset('assets/svg/icon-sprite.svg#fill-home') }}"></use>
                             </svg>
                             <span>داشبورد</span></a></li>
-
-                    {{--                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>--}}
-                    {{--                        <a--}}
-                    {{--                            class="sidebar-link sidebar-title" href="#">--}}
-                    {{--                            <i data-feather="cpu"></i>--}}
-                    {{--                            <span>دستگاه ها</span></a>--}}
-                    {{--                        <ul class="sidebar-submenu">--}}
-                    {{--                            <li>--}}
-                    {{--                                <a class="submenu-title" href="{{ route('device.index') }}">لیست دستگاه ها--}}
-                    {{--                                    <span class="sub-arrow">--}}
-                    {{--                                        <i class="fa fa-chevron-right"></i>--}}
-                    {{--                                    </span>--}}
-                    {{--                                </a>--}}
-                    {{--                            </li>--}}
-                    {{--                            <li>--}}
-                    {{--                                <a class="submenu-title" href="{{ route('device.index') }}">فعالسازی دستگاه--}}
-                    {{--                                    <span class="sub-arrow">--}}
-                    {{--                                        <i class="fa fa-chevron-right"></i>--}}
-                    {{--                                    </span>--}}
-                    {{--                                </a>--}}
-                    {{--                            </li>--}}
-                    {{--                        </ul>--}}
-                    {{--                    </li>--}}
                     <li class="sidebar-list">
                         <i class="fa-solid fa-thumbtack"></i>
                         <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('device.*')]) href="{{ route('device.index') }}">
@@ -68,7 +45,7 @@
 
                     <li class="sidebar-list">
                         <i class="fa-solid fa-thumbtack"></i>
-                        <a class="sidebar-link sidebar-title link-nav" href="{{ route('vehicle.index') }}">
+                        <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('vehicle.*')]) href="{{ route('vehicle.index') }}">
                             <i data-feather="truck"></i>
                             <span>وسایل نقلیه</span>
                             <div class="according-menu">
@@ -77,8 +54,9 @@
                         </a>
                     </li>
 
-                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
-                                class="sidebar-link sidebar-title" href="#">
+                    <li class="sidebar-list">
+                        <i class="fa fa-thumb-tack"></i>
+                        <a class="sidebar-link sidebar-title" href="#">
                             <i data-feather="users"></i>
                             <span>کاربران</span></a>
                         <ul class="sidebar-submenu">
@@ -96,23 +74,15 @@
                         </ul>
                     </li>
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
-                            class="sidebar-link sidebar-title"
-                            href="https://support.pixelstrap.com/portal/en/signin" target="_blank">
-                            <svg class="stroke-icon">
-                                <use href="../assets/svg/icon-sprite.svg#stroke-social"></use>
-                            </svg>
-                            <svg class="fill-icon">
-                                <use href="../assets/svg/icon-sprite.svg#fill-social"></use>
-                            </svg><span>Raise Support</span></a></li>
-                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
-                            class="sidebar-link sidebar-title"
-                            href="https://docs.pixelstrap.com/cuba/html/document/" target="_blank">
-                            <svg class="stroke-icon">
-                                <use href="../assets/svg/icon-sprite.svg#stroke-form"></use>
-                            </svg>
-                            <svg class="fill-icon">
-                                <use href="../assets/svg/icon-sprite.svg#fill-form"></use>
-                            </svg><span>Documentation </span></a></li>
+                            class="sidebar-link sidebar-title" href="#">
+                            <i data-feather="octagon"></i>
+                            <span>حصار جغرافیایی</span></a>
+                        <ul class="sidebar-submenu">
+                            <li><a href="{{ route('geofence.index') }}"><span>لیست حصار‌های جغرافیایی</span></a></li>
+                            <li><a href="{{ route('geofence.create') }}"><span>ایجاد حصار جدید</span></a></li>
+                        </ul>
+                    </li>
+
                 </ul>
             </div>
             <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>

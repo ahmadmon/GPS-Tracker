@@ -103,7 +103,7 @@
                                 <label class="form-label" for="user_id">مدیر سازمان
                                     <sup class="text-danger">*</sup>
                                 </label>
-                                <x-partials.alpine.select2.select-option name="user_id" :options="$managers->pluck('name' , 'id')->toArray()" />
+                                <x-partials.alpine.input.select-option name="user_id" :options="$managers->pluck('name' , 'id')->toArray()" />
                                 <x-input-error :messages="$errors->get('user_id')" class="mt-2"/>
                             </div>
 

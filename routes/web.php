@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\GeofenceController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\UserController;
@@ -25,6 +26,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('vehicle', VehicleController::class);
     Route::resource('user', UserController::class);
     Route::resource('company', CompanyController::class);
+    Route::resource('geofence', GeofenceController::class);
 
 });
 

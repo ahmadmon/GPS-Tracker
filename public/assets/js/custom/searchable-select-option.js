@@ -1,51 +1,54 @@
-// Custom add search option
-const selected = document.querySelector(".selected-box");
-const optionsContainer = document.querySelector(".options-container");
-const searchBox = document.querySelector(".search-box input");
-const finalValue = document.getElementById('finalValue');
-const optionsList = document.querySelectorAll(".selection-option");
+document.querySelectorAll('.select-box').forEach(selectBox => {
+    const selected = selectBox.querySelector(".selected-box");
+    const optionsContainer = selectBox.querySelector(".options-container");
+    const searchBox = selectBox.querySelector(".search-box input");
+    const finalValue = selectBox.querySelector("input[type=hidden]");
+    const optionsList = selectBox.querySelectorAll(".selection-option");
 
-selected.addEventListener("click", () => {
-    optionsContainer.classList.toggle("active");
+    selected.addEventListener("click", () => {
+        optionsContainer.classList.toggle("active");
 
-    searchBox.value = "";
-    filterList("");
+        searchBox.value = "";
+        filterList("");
 
-    if (optionsContainer.classList.contains("active")) {
-        searchBox.focus();
-    }
-});
-
-optionsList.forEach((o) => {
-    o.addEventListener("click", (e) => {
-        finalValue.value = e.target.children[0].value;
-        selected.innerHTML = o.querySelector("label").innerHTML;
-        optionsContainer.classList.remove("active");
-    });
-});
-
-searchBox.addEventListener("keyup", function (e) {
-    filterList(e.target.value);
-});
-
-const filterList = (searchTerm) => {
-    searchTerm = searchTerm.toLowerCase();
-    optionsList.forEach((option) => {
-        let label =
-            option.firstElementChild.nextElementSibling.innerText.toLowerCase();
-        if (label.indexOf(searchTerm) !== -1) {
-            option.style.display = "block";
-        } else {
-            option.style.display = "none";
+        if (optionsContainer.classList.contains("active")) {
+            searchBox.focus();
         }
     });
-};
 
-// Ensure selected value stays on page load based on hidden input
-const currentValue = finalValue.value;
-if (currentValue) {
-    const selectedOption = document.querySelector(`.selection-option input[value="${currentValue}"]`)
-    if (selectedOption) {
-        selected.innerHTML = selectedOption.nextElementSibling.innerText;
+    optionsList.forEach((o) => {
+        o.addEventListener("click", (e) => {
+            const inputElement = o.querySelector("input.radio"); // به‌جای children[0]، مستقیماً input را انتخاب می‌کنیم
+            if (inputElement) {
+                finalValue.value = inputElement.value;
+                selected.innerHTML = o.querySelector("label").innerHTML;
+                optionsContainer.classList.remove("active");
+            }
+        });
+    });
+
+    searchBox.addEventListener("keyup", function (e) {
+        filterList(e.target.value);
+    });
+
+    const filterList = (searchTerm) => {
+        searchTerm = searchTerm.toLowerCase();
+        optionsList.forEach((option) => {
+            let label = option.querySelector("label").innerText.toLowerCase();
+            if (label.indexOf(searchTerm) !== -1) {
+                option.style.display = "block";
+            } else {
+                option.style.display = "none";
+            }
+        });
+    };
+
+    // Ensure selected value stays on page load based on hidden input
+    const currentValue = finalValue.value;
+    if (currentValue) {
+        const selectedOption = selectBox.querySelector(`.selection-option input[value="${currentValue}"]`);
+        if (selectedOption) {
+            selected.innerHTML = selectedOption.nextElementSibling.innerText;
+        }
     }
-}
+});

@@ -25,7 +25,7 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        $managers = User::whereIn('user_type', [1, 2])->cursor();
+        $managers = User::where('status', 1)->whereIn('user_type', [1, 2])->cursor();
 
         return view('company.create', compact('managers'));
     }
@@ -69,7 +69,7 @@ class CompanyController extends Controller
      */
     public function edit(Company $company)
     {
-        $managers = User::whereIn('user_type', [1, 2])->cursor();
+        $managers = User::where('status', 1)->whereIn('user_type', [1, 2])->cursor();
 
         return view('company.edit', compact('managers', 'company'));
     }

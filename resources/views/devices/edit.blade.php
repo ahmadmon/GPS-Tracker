@@ -71,7 +71,7 @@
                         <label class="form-label" for="user_id">خریدار
                             <sup class="text-danger">*</sup>
                         </label>
-                        <x-partials.alpine.select2.select-option :options="$users->pluck('name', 'id')->toArray()" name="user_id" :value="$device->user_id"/>
+                        <x-partials.alpine.input.select-option :options="$users->pluck('name', 'id')->toArray()" name="user_id" :value="$device->user_id"/>
                         <x-input-error :messages="$errors->get('user_id')" class="mt-2"/>
                     </div>
 

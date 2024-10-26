@@ -1,4 +1,4 @@
-<div class="select-box w-100">
+<div class="select-box w-100" data-component="{{ $name }}">
     <div class="options-container">
         @forelse($options as $key => $option)
             <div class="selection-option">
@@ -19,6 +19,6 @@
     <input type="hidden" value="{{ old($name, $value ?? '') }}" name="{{ $name }}" id="finalValue">
 </div>
 
-@push('scripts')
+@pushonce('scripts')
     <script src="{{ asset('assets/js/custom/searchable-select-option.js') }}"></script>
-@endpush
+@endpushonce
