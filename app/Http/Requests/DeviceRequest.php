@@ -27,6 +27,8 @@ class DeviceRequest extends FormRequest
             'serial' => 'required|numeric|min:10',
             'phone_number' => 'nullable|numeric|digits:11',
             'user_id' => 'required|numeric|exists:users,id',
+            'password'=> 'nullable',
+            'brand'=> 'required|string|in:sinotrack,wanway,concox',
 //            'vehicle_id' => 'required|numeric|exists:vehicles,id',
             'status' => 'required|numeric|in:0,1'
         ];

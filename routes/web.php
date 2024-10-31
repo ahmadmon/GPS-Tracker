@@ -19,8 +19,8 @@ Route::middleware(['auth'])->group(function () {
     })->name('home');
 
     Route::resource('device', DeviceController::class);
-    Route::get('/device/connect-device/{device}', [DeviceController::class, 'deviceConnection'])->name('device.device-connection');
-    Route::post('/device/connect-device/{device}', [DeviceController::class, 'connectToDevice'])->name('device.connect-to-device');
+    Route::get('/device/device-setting/{device}', [DeviceController::class, 'deviceSetting'])->name('device.device-setting');
+    Route::post('/device/store-sms/{device}', [DeviceController::class, 'storeSMS'])->name('device.store-sms');
     Route::get('/device/get-location/{id}', [DeviceController::class, 'location'])->name('device.get-location');
 
     Route::resource('vehicle', VehicleController::class);

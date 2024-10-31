@@ -1,3 +1,4 @@
+@php use App\Enums\DeviceBrand; @endphp
 @extends('01-layouts.master')
 
 @section('title', 'ویرایش دستگاه')
@@ -34,7 +35,7 @@
                 <form action="{{ route('device.update', $device->id) }}" method="POST" class="row">
                     @csrf
                     @method('PUT')
-                    <div class="col-md-6 mb-3">
+                    <div class="col-12 mb-3">
                         <label class="form-label" for="name">نام
                             <sup class="text-danger">*</sup>
                         </label>
@@ -71,9 +72,33 @@
                         <label class="form-label" for="user_id">خریدار
                             <sup class="text-danger">*</sup>
                         </label>
-                        <x-partials.alpine.input.select-option :options="$users->pluck('name', 'id')->toArray()" name="user_id" :value="$device->user_id"/>
+                        <x-partials.alpine.input.select-option :options="$users->pluck('name', 'id')->toArray()"
+                                                               name="user_id" :value="$device->user_id"/>
                         <x-input-error :messages="$errors->get('user_id')" class="mt-2"/>
                     </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="brand">برند
+                            <sup class="text-danger">*</sup>
+                        </label>
+                        <select class="form-select" name="brand" id="brand">
+                            <option value="">برند را انتخاب کنید...</option>
+                            <option
+                                value="{{ DeviceBrand::SINOTRACK }}" @selected(old('brand', $device->brand) == DeviceBrand::SINOTRACK)>
+                                سینوترک (sinotrack)
+                            </option>
+                            <option
+                                value="{{ DeviceBrand::WANWAY }}" @selected(old('brand', $device->brand) == DeviceBrand::WANWAY)>
+                                ون وی (wan way)
+                            </option>
+                            <option
+                                value="{{ DeviceBrand::CONCOX }}" @selected(old('brand', $device->brand) == DeviceBrand::CONCOX)>
+                                کانکاکس (concox)
+                            </option>
+                        </select>
+                        <x-input-error :messages="$errors->get('brand')" class="mt-2"/>
+                    </div>
+
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label" for="status">وضعیت

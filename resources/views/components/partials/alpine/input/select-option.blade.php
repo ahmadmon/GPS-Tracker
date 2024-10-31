@@ -1,5 +1,5 @@
 <div class="select-box w-100" data-component="{{ $name }}">
-    <div class="options-container">
+    <div class="options-container mw-100">
         @forelse($options as $key => $option)
             <div class="selection-option">
                 <input class="radio" id="{{ $key }}" value="{{ $key }}" type="radio" @checked(old($name, $value ?? '') == $key))>
@@ -12,9 +12,9 @@
         @endforelse
 
     </div>
-    <div class="selected-box rounded" style="padding: 9px 24px">{{ $options[old($name, $value ?? '')] ?? 'انتخاب کنید...' }}</div>
+    <div class="selected-box rounded mw-100" style="padding: 9px 24px">{{ $options[old($name, $value ?? '')] ?? 'انتخاب کنید...' }}</div>
     <div class="search-box">
-        <input type="text" placeholder="جستجو کردن..." aria-label="search">
+        <input type="text" class="mw-100" placeholder="جستجو کردن..." aria-label="search">
     </div>
     <input type="hidden" value="{{ old($name, $value ?? '') }}" name="{{ $name }}" id="finalValue">
 </div>

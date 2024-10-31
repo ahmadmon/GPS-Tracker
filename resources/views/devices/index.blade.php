@@ -46,6 +46,7 @@
                                 <tr>
                                     <th>نام</th>
                                     <th>مدل</th>
+                                    <th>برند</th>
                                     <th>شماره سیم کارت</th>
                                     <th>خریدار</th>
                                     <th>وضعیت</th>
@@ -63,6 +64,15 @@
                                             </div>
                                         </td>
                                         <td>{{ $device->model }}</td>
+                                        <td>
+                                            <span @class(['badge dana',
+                                                          'badge-dark' => $device->brand->isSinotrack(),
+                                                          'badge-warning' => $device->brand->isWanWay(),
+                                                          'badge-info' => $device->brand->isConcox(),
+                                                        ])>
+                                                {{ $device->brand }}
+                                            </span>
+                                        </td>
                                         <td>{{ $device?->phone_number }}</td>
                                         <td>
                                             <a href="{{ route('user.show', $device->user_id) }}" target="_blank">
@@ -88,8 +98,8 @@
                                                        href="{{ route('device.edit', $device->id) }}">ویرایش</a>
                                                     <a href="javascript:void(0)" class="dropdown-item"
                                                        @click.prevent="show = true">حذف</a>
-                                                    <a href="{{ route('device.device-connection', $device->id) }}"
-                                                       class="dropdown-item">دستورات دستگاه</a>
+                                                    <a href="{{ route('device.device-setting', $device->id) }}"
+                                                       class="dropdown-item">تنظیمات دستگاه</a>
                                                     <a href="{{ route('device.show', $device->id) }}"
                                                        class="dropdown-item">نمایش موقعیت مکانی</a>
 

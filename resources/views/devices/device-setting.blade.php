@@ -1,6 +1,7 @@
+@php use App\Enums\DeviceBrand; @endphp
 @extends('01-layouts.master')
 
-@section('title', 'فعال سازی دستگاه')
+@section('title', 'تنظیمات دستگاه')
 
 @section('content')
 
@@ -21,7 +22,7 @@
                                 دستگاه ها
                             </a>
                         </li>
-                        <li class="breadcrumb-item dana">فعال سازی دستگاه</li>
+                        <li class="breadcrumb-item dana">تنظیمات دستگاه</li>
                     </ol>
                 </div>
             </div>
@@ -32,8 +33,11 @@
 
         <!-- DEVICE INFO -->
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 <h5>اطلاعات دستگاه {{ $device->name }}</h5>
+                <div>
+                    <a href="{{ route('device.edit', $device->id) }}" class="btn btn-sm btn-primary">ویرایش</a>
+                </div>
             </div>
             <div class="card-body">
                 <div class="card-wrapper border row rounded-3">
@@ -64,6 +68,21 @@
                         </label>
                         <input class="form-control" id="user_id" value="{{ $device->user->name }}" disabled type="text">
                     </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="password">رمز عبور</label>
+                        <input class="form-control disabled" disabled id="password"
+                               dir="{{ $device->password ? 'ltr' : 'rtl' }}"
+                               value="{{  $device->password ?? 'رمز عبور پیشفرض' }}" type="text">
+                    </div>
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="brand">برند
+                            <sup class="text-danger">*</sup>
+                        </label>
+                        <input class="form-control disabled" disabled id="brand" value="{{  $device->brand }}"
+                               type="text">
+                    </div>
                 </div>
             </div>
         </div>
@@ -74,20 +93,16 @@
 
     <div class="card">
         <div class="card-header">
-            <h5>فعالسازی دستگاه</h5>
+            <h5>دستورات دستگاه</h5>
         </div>
         <div class="card-body">
             <div class="card-wrapper border rounded-3">
-                <form action="{{ route('device.connect-to-device', $device->id) }}" method="POST" class="row">
+                <form action="{{ route('device.store-sms', $device->id) }}" method="POST">
                     @csrf
-                    <div class="col-12 mb-3">
-                        <label class="form-label" for="command">دستور مربوط به دستگاه را وارد کنید.
-                            <sup class="text-danger">*</sup>
-                        </label>
-                        <input class="form-control" id="command" name="command" dir="ltr" value="{{ old('command') }}" type="text"
-                               placeholder="">
-                        <x-input-error :messages="$errors->get('command')" class="mt-2"/>
-                    </div>
+
+                    @includeWhen($device->brand === DeviceBrand::SINOTRACK,'devices.partials.sinotrack-settings')
+                    @includeWhen($device->brand === DeviceBrand::CONCOX,'devices.partials.concox-settings')
+                    @includeWhen($device->brand === DeviceBrand::WANWAY,'devices.partials.wanway-settings')
 
 
                     <div class="col-12 mt-2 text-end">

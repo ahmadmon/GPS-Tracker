@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\DeviceRequest;
+use App\Http\Requests\StoreSmsRequest;
+use App\Http\Services\DeviceManager;
 use App\Http\Services\Notify\SMS\SmsService;
 use App\Models\Device;
 use App\Models\Trip;
 use App\Models\User;
-use Illuminate\Http\Request;
+use Exception;
 
 class DeviceController extends Controller
 {
@@ -119,22 +121,39 @@ class DeviceController extends Controller
     }
 
 
-    public function deviceConnection(Device $device)
+    public function deviceSetting(Device $device)
     {
-        return view('devices.connect-to-device', [
+        return view('devices.device-setting', [
             'device' => $device
         ]);
     }
 
-    public function connectToDevice(Request $request, Device $device)
+    /**
+     * @throws Exception
+     */
+    public function storeSMS(StoreSmsRequest $request, Device $device)
     {
-        $request->validate([
-            'command' => 'required|string'
-        ]);
+        $request->validated();
+
+        $params = [
+            'apn' => $request->apn,
+            'interval' => $request->interval,
+            'password' => $request->password,
+            'phone' => $request->phone
+        ];
+
+        if (isset($request->password)) {
+            $device->update(['password' => $request->password]);
+        }
+
+        $deviceManager = new DeviceManager($device);
+        $deviceBrand = $deviceManager->getDevice($device->brand->value);
+        $command = $deviceBrand->getCommand($request->command, $params);
+
 
         $sms = new SmsService();
         $sms->setTo($device->phone_number);
-        $sms->setText($request->command);
+        $sms->setText($command);
         $res = $sms->api();
 
         if ($res->getStatusCode() == 200) {
