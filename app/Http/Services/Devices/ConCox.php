@@ -3,6 +3,7 @@
 namespace App\Http\Services\Devices;
 
 use App\Http\Interfaces\DeviceInterface;
+use App\Models\Device;
 use Exception;
 use Illuminate\Support\Facades\Config;
 
@@ -13,7 +14,7 @@ class ConCox implements DeviceInterface
     protected string $ip;
     protected string $port;
 
-    public function __construct(string $ip,string $port,$password = null)
+    public function __construct(string $ip, string $port, $password = null)
     {
         $this->ip = $ip;
         $this->port = $port;
@@ -59,6 +60,38 @@ class ConCox implements DeviceInterface
         foreach ($parameters as $key => $value) {
             $template = str_replace("{{$key}}", $value, $template);
         }
+        dd(str_replace(',,', ',', $template));
         return $template;
+    }
+
+
+    public function parseData(Device $device, string $data): array
+    {
+        $packet = substr(strrchr($data, '7878'), 0, strpos(strrchr($data, '7878'), '0d0a') + 4);
+
+        $year = 2000 + hexdec(substr($packet, 8, 2));
+        $month = hexdec(substr($packet, 10, 2));
+        $day = hexdec(substr($packet, 12, 2));
+        $hour = hexdec(substr($packet, 14, 2));
+        $minute = hexdec(substr($packet, 16, 2));
+        $second = hexdec(substr($packet, 18, 2));
+
+
+        $latitudeHex = substr($packet, 20, 8);
+        $longitudeHex = substr($packet, 28, 8);
+        $speed = hexdec(substr($packet, 36, 2));
+
+        $lat = hexdec($latitudeHex) / 1800000;
+        $lng = hexdec($longitudeHex) / 1800000;
+
+
+        return [
+            'device_id' => $device->serial,
+            'date' => "{$year}-{$month}-{$day}",
+            'time' => "{$hour}:{$minute}:{$second}",
+            'lat' => $lat,
+            'long' => $lng,
+            'speed' => $speed,
+        ];
     }
 }
