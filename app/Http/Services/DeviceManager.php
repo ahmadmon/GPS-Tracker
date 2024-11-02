@@ -13,11 +13,11 @@ class DeviceManager
     const IP = '31.214.251.139';
     const PORT = '5024';
 
-    public function __construct(Device $device)
+    public function __construct(?Device $device = null)
     {
         $this->devices = [
-            'sinotrack' => new SinoTrack(self::IP,self::PORT, $device->password),
-            'concox' => new ConCox(self::IP,self::PORT, $device->password),
+            'sinotrack' => new SinoTrack(self::IP,self::PORT, $device?->password),
+            'concox' => new ConCox(self::IP,self::PORT, $device?->password),
         ];
     }
 

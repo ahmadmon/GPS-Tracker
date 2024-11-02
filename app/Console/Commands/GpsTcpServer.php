@@ -61,7 +61,7 @@ class GpsTcpServer extends Command
         $tcpWorker = new Worker('tcp://31.214.251.139:5024');
         $tcpWorker->count = 4;
 
-        $tcpWorker->onConnect = function ($connection) {
+        $tcpWorker->onConnect = function () {
             $this->info("Client connected\n");
         };
 
@@ -76,7 +76,9 @@ class GpsTcpServer extends Command
 
                 $this->info('Received message. ' . now()->toDateTimeString());
 
-                StoreGpsDataJob::dispatch($parsedData['data']);
+                if ($parsedData['data'] != null) {
+                    StoreGpsDataJob::dispatch($parsedData['data']);
+                }
 
             } catch (Exception $e) {
                 $this->error('Error parsing data: ' . $e->getMessage());
@@ -89,7 +91,7 @@ class GpsTcpServer extends Command
         Worker::runAll();
     }
 
-    // تابع متوقف کردن سرور
+
     protected function stopServer(): void
     {
         Worker::stopAll();
@@ -108,45 +110,44 @@ class GpsTcpServer extends Command
     private function parseData($data): array
     {
 
-        $brand = $this->detectDeviceBrand($data);
+        $device = $this->detectDevice($data);
 
-//        $deviceManager = new DeviceManager()
+        $deviceManager = new DeviceManager();
+        $deviceBrand = $deviceManager->getDevice($device['brand']);
+        $parsedData = $deviceBrand->parseData($data, $device['serial']);
 
-
-//        return [
-//            'expectsResponse' => true,
-//            'response' => 'ACK',
-//            'data' => $parsedData
-//        ];
+        return [
+            'expectsResponse' => is_string($parsedData),
+            'response' => is_string($parsedData) ? $parsedData : null,
+            'data' => is_array($parsedData) ? $parsedData : null
+        ];
     }
 
-    private function detectDeviceBrand($data): string
+    private function detectDevice($data): array|null
     {
-        if (str_starts_with($data, '7878')) {
-            if (strlen($data) == 28) {
-                return 'concox';
-            } elseif (strlen($data) == 32) {
-                return 'wanway';
+        if (str_starts_with($data, '*HQ')) {
+            preg_match('/\*HQ,(\d{10,15}),/', $data, $matches);
+            return [
+                'brand' => 'sinotrack',
+                'serial' => $matches[1] ?? null,
+            ];
+        } else {
+            $data = bin2hex($data);
+            if (str_starts_with($data, '7878')) {
+                if (strlen($data) == 36) {
+                    return [
+                        'brand' => 'concox',
+                        'serial' => substr($data, 9, 15)
+                    ];
+                } elseif (strlen($data) == 44) {
+                    return [
+                        'brand' => 'wanway',
+                        'serial' => substr($data, 9, 15)
+                    ];
+                }
             }
-        } elseif (str_starts_with($data, '*HQ')) {
-            return 'sinotrack';
         }
 
-        return 'Unknown';
+        return null;
     }
-
-//    private function convertToDecimal($coordinate, $direction): float|int
-//    {
-//        // separate degrees and minutes
-//        $degrees = floor($coordinate / 100);
-//        $minutes = $coordinate - ($degrees * 100);
-//        $decimal = $degrees + ($minutes / 60);
-//
-//        // if direction is South or West -> convert to negative.
-//        if ($direction == 'S' || $direction == 'W') {
-//            $decimal = -$decimal;
-//        }
-//
-//        return $decimal;
-//    }
 }

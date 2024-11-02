@@ -16,7 +16,7 @@ class StoreGpsDataJob implements ShouldQueue
 {
     use Queueable, Dispatchable, InteractsWithQueue;
 
-    protected $data;
+    protected array $data;
 
     /**
      * Create a new job instance.
@@ -34,8 +34,7 @@ class StoreGpsDataJob implements ShouldQueue
         try {
             $device = Device::where('serial', $this->data['device_id'])->first();
 
-            if ($this->data['validity'] === 'A') {
-                DB::transaction(function () use ($device) {
+            DB::transaction(function () use ($device) {
                     Trip::create([
                         'device_id' => $device->id,
                         'user_id' => $device->user_id,
@@ -49,13 +48,13 @@ class StoreGpsDataJob implements ShouldQueue
                         'end_at' => null
                     ]);
                 });
-            }
 
         } catch (\Exception $e) {
             Log::error('Error storing trips Data: ' . $e->getMessage());
         }
     }
 
+// calculating Distance between two points
 
 //   private function haversine($lat1, $lon1, $lat2, $lon2) {
 //        $earth_radius = 6371;

@@ -3,7 +3,6 @@
 namespace App\Http\Services\Devices;
 
 use App\Http\Interfaces\DeviceInterface;
-use App\Models\Device;
 use Exception;
 
 class SinoTrack implements DeviceInterface
@@ -63,7 +62,7 @@ class SinoTrack implements DeviceInterface
     /**
      * @throws Exception
      */
-    public function parseData(Device $device, $data): array
+    public function parseData($data, string $serial = null): array|null
     {
         // REMOVE '*' AND '#'
         $data = trim($data, "*#");
@@ -101,7 +100,7 @@ class SinoTrack implements DeviceInterface
         $parsedData['lat'] = $this->convertToDecimal($parsedData['lat'], $parsedData['lat_dir']);
         $parsedData['long'] = $this->convertToDecimal($parsedData['long'], $parsedData['long_dir']);
 
-        return $parsedData;
+        return $parsedData['validity'] === 'A' ? $parsedData : null;
     }
 
     private function convertToDecimal($coordinate, $direction): float|int

@@ -3,7 +3,6 @@
 namespace App\Http\Services\Devices;
 
 use App\Http\Interfaces\DeviceInterface;
-use App\Models\Device;
 use Exception;
 use Illuminate\Support\Facades\Config;
 
@@ -65,33 +64,59 @@ class ConCox implements DeviceInterface
     }
 
 
-    public function parseData(Device $device, string $data): array
+    public function parseData(string $data, string $serial = null): array|string|null
     {
-        $packet = substr(strrchr($data, '7878'), 0, strpos(strrchr($data, '7878'), '0d0a') + 4);
+        $data = bin2hex($data);
+        $startBit = substr($data, 0, 4);
+        $packetLength = hexdec(substr($data, 4, 2));
+        $protocolNumber = substr($data, 6, 2);
 
-        $year = 2000 + hexdec(substr($packet, 8, 2));
-        $month = hexdec(substr($packet, 10, 2));
-        $day = hexdec(substr($packet, 12, 2));
-        $hour = hexdec(substr($packet, 14, 2));
-        $minute = hexdec(substr($packet, 16, 2));
-        $second = hexdec(substr($packet, 18, 2));
+        //if is Login Packet data then send a Response to device
+        if ($protocolNumber == '01') {
+            return hex2bin('787805010001d9dc0d0a');
+        }
+        //if is not Location Packet data then return null
+        if ($protocolNumber != '12') {
+            return null;
+        }
 
+        // Get Last Packet Data
+        $packet = (strlen($data) > 72) ? substr(strrchr($data, '7878'), 0, strpos(strrchr($data, '7878'), '0d0a') + 4) : $data;
 
-        $latitudeHex = substr($packet, 20, 8);
-        $longitudeHex = substr($packet, 28, 8);
-        $speed = hexdec(substr($packet, 36, 2));
+        // check GPS status
+        $courseStatus = hexdec(substr($packet, 20, 2)) & 0x80;
+        if (!$courseStatus) {
+            return null;
+        }
 
-        $lat = hexdec($latitudeHex) / 1800000;
-        $lng = hexdec($longitudeHex) / 1800000;
+        // Parse Date and Time
+        $dateTime = [
+            'year' => 2000 + hexdec(substr($packet, 8, 2)),
+            'month' => hexdec(substr($packet, 10, 2)),
+            'day' => hexdec(substr($packet, 12, 2)),
+            'hour' => hexdec(substr($packet, 14, 2)),
+            'minute' => hexdec(substr($packet, 16, 2)),
+            'second' => hexdec(substr($packet, 18, 2))
+        ];
+
+        //parsing Points
+        $lat = hexdec(substr($packet, 20, 8)) / 1800000;
+        $lng = hexdec(substr($packet, 28, 8)) / 1800000;
+        if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
+            return null;
+        }
 
 
         return [
-            'device_id' => $device->serial,
-            'date' => "{$year}-{$month}-{$day}",
-            'time' => "{$hour}:{$minute}:{$second}",
+            'device_id' => $serial,
+            'date' => "{$dateTime['year']}-{$dateTime['month']}-{$dateTime['day']}",
+            'time' => "{$dateTime['hour']}:{$dateTime['minute']}:{$dateTime['second']}",
+            'gps_quantity' => hexdec(substr($packet, 10, 1)),
+            'lac' => hexdec(substr($packet, 25, 2)),
+            'cell_id' => hexdec(substr($packet, 27, 3)),
             'lat' => $lat,
             'long' => $lng,
-            'speed' => $speed,
+            'speed' => hexdec(substr($packet, 36, 2))
         ];
     }
 }
