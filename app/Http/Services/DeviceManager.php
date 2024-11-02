@@ -5,6 +5,7 @@ namespace App\Http\Services;
 use App\Http\Interfaces\DeviceInterface;
 use App\Http\Services\Devices\ConCox;
 use App\Http\Services\Devices\SinoTrack;
+use App\Http\Services\Devices\WanWay;
 use App\Models\Device;
 
 class DeviceManager
@@ -18,6 +19,7 @@ class DeviceManager
         $this->devices = [
             'sinotrack' => new SinoTrack(self::IP,self::PORT, $device?->password),
             'concox' => new ConCox(self::IP,self::PORT, $device?->password),
+            'wanway' => new WanWay(self::IP,self::PORT, $device?->password),
         ];
     }
 

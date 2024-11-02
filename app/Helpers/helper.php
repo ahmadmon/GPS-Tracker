@@ -21,20 +21,6 @@ function convertJalaliToGregorian($date, $format = 'Y/m/d H:i:s'): string
 }
 
 
-function avatar($name = null, $family = null): string
-{
-    $stateNum = rand(0, 6);
-    $states = ['success', 'danger', 'warning', 'info', 'dark', 'primary', 'secondary'];
-    $state = $states[$stateNum];
-    if (!empty($name) && !empty($family)) {
-        $initials = strtoupper((mb_substr($name, 0, 1)) . '‌' . (mb_substr($family, 0, 1)));
-    } else {
-        $initials = strtoupper((mb_substr($name, 0, 1)) . '‌' . (mb_substr($name, -1)));
-    }
-    return '<span class="avatar-initial rounded-circle pull-up fw-bold bg-label-' . $state . '">' . $initials . '</span>';
-}
-
-
 function randomBadge()
 {
     $stateNum = rand(0, 6);
@@ -114,27 +100,6 @@ function is_image($file)
 }
 
 
-function sizeName(int $size)
-{
-    switch ($size) {
-        case 0:
-            $result = 'کوچک';
-            break;
-        case 1:
-            $result = 'متوسط';
-            break;
-        case 2:
-            $result = 'بزرگ';
-            break;
-        case 3:
-            $result = 'خیلی بزرگ';
-            break;
-        default:
-            $result = '';
-    }
-    return $result;
-}
-
 function randomKey(int $number = 10)
 {
     return now() . '-' . \Illuminate\Support\Str::random($number);
@@ -158,10 +123,15 @@ function shortHash(string $string, $type = 'hash'): string
     return $str;
 }
 
-function cacheImage($path, $size = 'medium'): string
+function getLastPacket($data): string
 {
-    $imgUrl = route('image.cache', ['path' => $path, 'size' => $size]);
-
-    $pattern = '/\/[^\/]+$/';
-    return preg_replace($pattern, '', $imgUrl);
+    $lastPacket = '';
+    $start = 0;
+    while (($pos = strpos($data, '7878', $start)) !== false) {
+        $end = strpos($data, '0d0a', $pos) + 4;
+        $lastPacket = substr($data, $pos, $end - $pos);
+        $start = $end;
+    }
+    return $lastPacket;
 }
+

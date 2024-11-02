@@ -6,7 +6,7 @@ use App\Http\Interfaces\DeviceInterface;
 use Exception;
 use Illuminate\Support\Facades\Config;
 
-class ConCox implements DeviceInterface
+class WanWay implements DeviceInterface
 {
 
     protected string $password = '';

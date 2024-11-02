@@ -6,6 +6,7 @@ use App\Http\Services\DeviceManager;
 use App\Jobs\StoreGpsDataJob;
 use Exception;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Cache;
 use Workerman\Connection\TcpConnection;
 use Workerman\Worker;
 
@@ -68,10 +69,11 @@ class GpsTcpServer extends Command
         $tcpWorker->onMessage = function (TcpConnection $connection, $data) {
             try {
 
-                $parsedData = $this->parseData($data);
+                $parsedData = $this->parseData($data, $connection);
 
                 if ($parsedData['expectsResponse']) {
                     $connection->send($parsedData['response']);
+                    $this->info('Response Sent at: ' . now()->toDateTimeString());
                 }
 
                 $this->info('Received message. ' . now()->toDateTimeString());
@@ -83,6 +85,11 @@ class GpsTcpServer extends Command
             } catch (Exception $e) {
                 $this->error('Error parsing data: ' . $e->getMessage());
             }
+        };
+
+        $tcpWorker->onClose = function (TcpConnection $connection) {
+            $uniqueKey = $connection->getRemoteIp() . ':' . $connection->getRemotePort();
+            Cache::forget("device_{$uniqueKey}");
         };
 
         Worker::$pidFile = storage_path('logs/pidfile.pid');
@@ -107,10 +114,10 @@ class GpsTcpServer extends Command
     /**
      * @throws Exception
      */
-    private function parseData($data): array
+    private function parseData($data, $connection): array
     {
 
-        $device = $this->detectDevice($data);
+        $device = $this->detectDevice($data, $connection);
 
         $deviceManager = new DeviceManager();
         $deviceBrand = $deviceManager->getDevice($device['brand']);
@@ -123,8 +130,10 @@ class GpsTcpServer extends Command
         ];
     }
 
-    private function detectDevice($data): array|null
+    private function detectDevice($data, $connection): array|null
     {
+        $uniqueKey = $connection->getRemoteIp() . ':' . $connection->getRemotePort();
+
         if (str_starts_with($data, '*HQ')) {
             preg_match('/\*HQ,(\d{10,15}),/', $data, $matches);
             return [
@@ -134,20 +143,29 @@ class GpsTcpServer extends Command
         } else {
             $data = bin2hex($data);
             if (str_starts_with($data, '7878')) {
-                if (strlen($data) == 36) {
+                $protocolNumber = substr($data, 6, 2);
+                if ($protocolNumber === '01') {  // Login Packet
+                    $serial = substr($data, 9, 15);
+                    $brand = (strlen($data) == 36) ? 'concox' : 'wanway';
+
+                    Cache::put("device_{$uniqueKey}", ['brand' => $brand, 'serial' => $serial], 600);
+
                     return [
-                        'brand' => 'concox',
-                        'serial' => substr($data, 9, 15)
+                        'brand' => $brand,
+                        'serial' => $serial,
                     ];
-                } elseif (strlen($data) == 44) {
-                    return [
-                        'brand' => 'wanway',
-                        'serial' => substr($data, 9, 15)
-                    ];
+                }
+
+                if ($protocolNumber === '12') {  // Location Packet
+                    $cachedDevice = Cache::get("device_{$uniqueKey}");
+                    if ($cachedDevice) {
+                        return $cachedDevice;
+                    }
                 }
             }
         }
 
         return null;
     }
+
 }
