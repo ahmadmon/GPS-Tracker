@@ -76,52 +76,44 @@ class ConCox implements DeviceInterface
 
         $startBit = substr($packet, 0, 4);
         $packetLength = hexdec(substr($packet, 4, 2));
+        dd($packetLength);
         $protocolNumber = substr($packet, 6, 2);
 
         //if is Login Packet data then send a Response to device
         if ($protocolNumber == '01') {
-            $pattern = '/.' . preg_quote($serial) . '/';
-            $response = preg_replace($pattern, '', $packet);
+//            $pattern = '/.' . preg_quote($serial) . '/';
+//            $response = preg_replace($pattern, '', $packet);
 
-            return hex2bin($response); //old response = 787805010001d9dc0d0a
+            return hex2bin("{$startBit}05{$protocolNumber}0001D9DC0D0A");
         }
         //if is not Location Packet data then return null
-        if (!in_array($protocolNumber, ['12', '16'])) {
+        if (!in_array($protocolNumber, ['12', '16', '22'])) {
             return null;
         }
 
         // check GPS status
-        $courseStatus = hexdec(substr($packet, 20, 2)) & 0x80;
-        if (!$courseStatus) {
+        $courseStatus = $this->courseStatus(substr($packet, 40, 4));
+        if (!$courseStatus->has_signal) {
             return null;
         }
 
-        // Parse Date and Time
-        $dateTime = [
-            'year' => 2000 + hexdec(substr($packet, 8, 2)),
-            'month' => hexdec(substr($packet, 10, 2)),
-            'day' => hexdec(substr($packet, 12, 2)),
-            'hour' => hexdec(substr($packet, 14, 2)),
-            'minute' => hexdec(substr($packet, 16, 2)),
-            'second' => hexdec(substr($packet, 18, 2))
-        ];
-
         //parsing Points
-        $lat = $this->decodeGt06Lat(substr($packet, 20, 8));
-        dd($lat);
-        $lng = $this->convertToRealCoordinates(substr($packet, 28, 8));
+        $lat = $this->convertToRealCoordinates(substr($packet, 22, 8), $courseStatus->lat_dir === 'east');
+        $lng = $this->convertToRealCoordinates(substr($packet, 30, 8), $courseStatus->lng_dir === 'south');
 
 
         return [
             'device_id' => $serial,
-            'date' => "{$dateTime['year']}-{$dateTime['month']}-{$dateTime['day']}",
-            'time' => "{$dateTime['hour']}:{$dateTime['minute']}:{$dateTime['second']}",
-            'gps_quantity' => hexdec(substr($packet, 10, 1)),
-            'lac' => hexdec(substr($packet, 25, 2)),
-            'cell_id' => hexdec(substr($packet, 27, 3)),
+            'datetime' => $this->datetime(substr($packet, 8, 12)),
+            'satellites' => $this->satellite(substr($packet, 20, 2)),
+            'lac' => hexdec(substr($packet, 50, 4)),
+            'cell_id' => hexdec(substr($packet, 54, 6)),
             'lat' => $lat,
             'long' => $lng,
-            'speed' => hexdec(substr($packet, 36, 2))
+            'direction' => $courseStatus->direction,
+            'speed' => hexdec(substr($packet, 38, 2))
+//            'mcc' => hexdec(substr($packet, 44, 4)),
+//            'mnc' => hexdec(substr($packet, 48, 2)),
         ];
     }
 }

@@ -146,7 +146,7 @@ class GpsTcpServer extends Command
                 $protocolNumber = substr($data, 6, 2);
                 if ($protocolNumber === '01') {  // Login Packet
                     $serial = substr($data, 9, 15);
-                    $brand = (strlen($data) == 36) ? 'concox' : 'wanway';
+                    $brand = (in_array(strlen($protocolNumber), [36, 44])) ? 'concox' : 'wanway';
 
                     Cache::put("device_{$uniqueKey}", ['brand' => $brand, 'serial' => $serial], 600);
 
