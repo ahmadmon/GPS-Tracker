@@ -3,11 +3,13 @@
 namespace App\Http\Services\Devices;
 
 use App\Http\Interfaces\DeviceInterface;
+use App\Traits\ParserHelper;
 use Exception;
 use Illuminate\Support\Facades\Config;
 
 class ConCox implements DeviceInterface
 {
+    use ParserHelper;
 
     protected string $password = '';
     protected string $ip;
@@ -66,10 +68,10 @@ class ConCox implements DeviceInterface
 
     public function parseData(string $data, string $serial = null): array|string|null
     {
-        $data = '78781f122c0610060408cc03d40c1c05811f3024146c01b02315860114fe121224540d0a';
+//        $data = bin2hex($data);
 
         // Get Last Packet Data
-        $packet = (strlen($data) > 72) ? getLastPacket($data) : $data;
+        $packet = (strlen($data) > 84) ? getLastPacket($data) : $data;
 
 
         $startBit = substr($packet, 0, 4);
@@ -78,10 +80,13 @@ class ConCox implements DeviceInterface
 
         //if is Login Packet data then send a Response to device
         if ($protocolNumber == '01') {
-            return hex2bin('787805010001d9dc0d0a');
+            $pattern = '/.' . preg_quote($serial) . '/';
+            $response = preg_replace($pattern, '', $packet);
+
+            return hex2bin($response); //old response = 787805010001d9dc0d0a
         }
         //if is not Location Packet data then return null
-        if ($protocolNumber != '12') {
+        if (!in_array($protocolNumber, ['12', '16'])) {
             return null;
         }
 
@@ -102,11 +107,9 @@ class ConCox implements DeviceInterface
         ];
 
         //parsing Points
-        $lat = hexdec(substr($packet, 20, 8)) / 30000;
-        $lng = hexdec(substr($packet, 28, 8)) / 30000;
-        if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
-            return null;
-        }
+        $lat = $this->decodeGt06Lat(substr($packet, 20, 8));
+        dd($lat);
+        $lng = $this->convertToRealCoordinates(substr($packet, 28, 8));
 
 
         return [

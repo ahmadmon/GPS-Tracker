@@ -156,7 +156,7 @@ class GpsTcpServer extends Command
                     ];
                 }
 
-                if ($protocolNumber === '12') {  // Location Packet
+                if (in_array($protocolNumber, ['12', '16'])) {  // Location or Alarm Packet
                     $cachedDevice = Cache::get("device_{$uniqueKey}");
                     if ($cachedDevice) {
                         return $cachedDevice;
