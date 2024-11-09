@@ -76,14 +76,11 @@ class ConCox implements DeviceInterface
 
         $startBit = substr($packet, 0, 4);
         $packetLength = hexdec(substr($packet, 4, 2));
-        dd($packetLength);
+
         $protocolNumber = substr($packet, 6, 2);
 
         //if is Login Packet data then send a Response to device
         if ($protocolNumber == '01') {
-//            $pattern = '/.' . preg_quote($serial) . '/';
-//            $response = preg_replace($pattern, '', $packet);
-
             return hex2bin("{$startBit}05{$protocolNumber}0001D9DC0D0A");
         }
         //if is not Location Packet data then return null

@@ -6,6 +6,7 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use Illuminate\Http\Request;
+use App\Livewire\MapPage;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/', function (Request $request) {
@@ -17,6 +18,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/', function () {
         return view('admin');
     })->name('home');
+
+    Route::get('/map', MapPage::class)->name('map');
 
     Route::resource('device', DeviceController::class);
     Route::get('/device/device-setting/{device}', [DeviceController::class, 'deviceSetting'])->name('device.device-setting');
@@ -30,17 +33,5 @@ Route::middleware(['auth'])->group(function () {
 
 });
 
-//Route::get('/send', function () {
-//
-//    $sms = new SmsService();
-//
-//    $sms->setTo('09337332513');
-//    $sms->setText('سلام این تست است.');
-////    $res = $sms->fire();
-//
-//    $messageService = new MessageSerivce($sms);
-//    $res = $messageService->send();
-//    dd($res);
-//});
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';

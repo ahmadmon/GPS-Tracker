@@ -76,7 +76,7 @@ class GpsTcpServer extends Command
                     $this->info('Response Sent at: ' . now()->toDateTimeString());
                 }
 
-                $this->info('Received message. ' . now()->toDateTimeString());
+                $this->info('Received message at: ' . now()->toDateTimeString());
 
                 if ($parsedData['data'] != null) {
                     StoreGpsDataJob::dispatch($parsedData['data']);

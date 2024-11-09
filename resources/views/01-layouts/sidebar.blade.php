@@ -34,7 +34,8 @@
                             <h6>پین شده</h6>
                         </div>
                     </li>
-                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
+                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>
+                        <a
                             class="sidebar-link sidebar-title" href="{{ route('home') }}"
                             target="_blank">
                             <svg class="stroke-icon">
@@ -43,7 +44,19 @@
                             <svg class="fill-icon">
                                 <use href="{{ asset('assets/svg/icon-sprite.svg#fill-home') }}"></use>
                             </svg>
-                            <span>داشبورد</span></a></li>
+                            <span>داشبورد</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-list">
+                        <i class="fa-solid fa-thumbtack"></i>
+                        <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('map')]) href="{{ route('map') }}">
+                            <i data-feather="map"></i>
+                            <span>نقشه</span>
+                            <div class="according-menu">
+                                <i class="fa-solid fa-angle-right"></i>
+                            </div>
+                        </a>
+                    </li>
                     <li class="sidebar-list">
                         <i class="fa-solid fa-thumbtack"></i>
                         <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('device.*')]) href="{{ route('device.index') }}">
@@ -77,7 +90,7 @@
                         </ul>
                     </li>
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
-                                class="sidebar-link sidebar-title" href="#">
+                            class="sidebar-link sidebar-title" href="#">
                             <i data-feather="life-buoy"></i>
                             <span>سازمان</span></a>
                         <ul class="sidebar-submenu">
