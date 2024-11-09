@@ -80,6 +80,7 @@ class GpsTcpServer extends Command
 
                 if ($parsedData['data'] != null) {
                     StoreGpsDataJob::dispatch($parsedData['data']);
+                    $this->info('Data Inserted to Database.');
                 }
 
             } catch (Exception $e) {
@@ -119,9 +120,12 @@ class GpsTcpServer extends Command
 
         $device = $this->detectDevice($data, $connection);
 
-        $deviceManager = new DeviceManager();
-        $deviceBrand = $deviceManager->getDevice($device['brand']);
-        $parsedData = $deviceBrand->parseData($data, $device['serial']);
+        $parsedData = null;
+        if (isset($device)) {
+            $deviceManager = new DeviceManager();
+            $deviceBrand = $deviceManager->getDevice($device['brand']);
+            $parsedData = $deviceBrand->parseData($data, $device['serial']);
+        }
 
         return [
             'expectsResponse' => is_string($parsedData),
@@ -156,7 +160,7 @@ class GpsTcpServer extends Command
                     ];
                 }
 
-                if (in_array($protocolNumber, ['12', '16'])) {  // Location or Alarm Packet
+                if (in_array($protocolNumber, ['12', '16', '22'])) {  // Location or Alarm Packet
                     $cachedDevice = Cache::get("device_{$uniqueKey}");
                     if ($cachedDevice) {
                         return $cachedDevice;

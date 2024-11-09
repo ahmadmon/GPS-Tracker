@@ -68,7 +68,7 @@ class ConCox implements DeviceInterface
 
     public function parseData(string $data, string $serial = null): array|string|null
     {
-//        $data = bin2hex($data);
+        $data = bin2hex($data);
 
         // Get Last Packet Data
         $packet = (strlen($data) > 84) ? getLastPacket($data) : $data;

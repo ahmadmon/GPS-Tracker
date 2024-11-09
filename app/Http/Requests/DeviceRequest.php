@@ -24,7 +24,7 @@ class DeviceRequest extends FormRequest
         return [
             'name' => 'required|string|min:3|max:255',
             'model' => 'required|string|min:3|max:255',
-            'serial' => 'required|numeric|min:10',
+            'serial' => 'required|numeric|min:10|unique',
             'phone_number' => 'nullable|numeric|digits:11',
             'user_id' => 'required|numeric|exists:users,id',
             'password'=> 'nullable',
@@ -42,6 +42,7 @@ class DeviceRequest extends FormRequest
             'model' => 'مدل',
             'phone_number' => 'شماره سیم‌کارت',
             'user_id' => 'خریدار',
+            'brand' => 'برند'
         ];
     }
 }

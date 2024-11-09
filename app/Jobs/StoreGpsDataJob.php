@@ -34,20 +34,22 @@ class StoreGpsDataJob implements ShouldQueue
         try {
             $device = Device::where('serial', $this->data['device_id'])->first();
 
-            DB::transaction(function () use ($device) {
-                Trip::create([
-                    'device_id' => $device->id,
-                    'user_id' => $device->user_id,
-                    'vehicle_id' => $device?->vehicle_id,
-                    'name' => jalaliDate(Carbon::now(), format: 'Y/m/d H:i:s'),
-                    'lat' => $this->data['lat'],
-                    'long' => $this->data['long'],
-                    'device_stats' => json_encode($this->data),
-                    'distance' => 0,
-                    'start_at' => null,
-                    'end_at' => null
-                ]);
-            });
+            if ($device) {
+                DB::transaction(function () use ($device) {
+                    Trip::create([
+                        'device_id' => $device->id,
+                        'user_id' => $device->user_id,
+                        'vehicle_id' => $device?->vehicle_id,
+                        'name' => jalaliDate(Carbon::now(), format: 'Y/m/d H:i:s'),
+                        'lat' => $this->data['lat'],
+                        'long' => $this->data['long'],
+                        'device_stats' => json_encode($this->data),
+                        'distance' => 0,
+                        'start_at' => null,
+                        'end_at' => null
+                    ]);
+                });
+            }
 
         } catch (\Exception $e) {
             Log::error('Error storing trips Data: ' . $e->getMessage());
