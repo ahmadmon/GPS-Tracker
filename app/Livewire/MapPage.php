@@ -4,8 +4,10 @@ namespace App\Livewire;
 
 use App\Models\Device;
 use App\Models\Trip;
+use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Renderless;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
@@ -19,34 +21,59 @@ class MapPage extends Component
     public string $search = '';
 
     public array $selected = [];
+    public array $deviceLocations = [];
 
     public $trips = [];
 
     public function rules(): array
     {
         return [
-            'selected' => 'array|max:3',
-            'selected.*' => 'numeric|unique:devices,id'
+            'selected' => 'nullable|array|max:4',
+            'selected.*' => 'nullable|numeric|unique:devices,id'
         ];
     }
 
-    public function mount(Request $request)
+    public function mount(Request $request): void
     {
         $this->search = $request->query('q') ?? '';
+    }
 
-
+    public function refreshMap(): void
+    {
+        $this->updateDeviceLocation();
     }
 
     public function updatedSelected(): void
     {
-        if (!empty($this->selected))
-            $this->trips = Trip::where('device_id', $this->selected[0])->orderBy('created_at')->pluck('created_at', 'id')->toArray();
-//        dd($this->trips);
+        $this->updateDeviceLocation();
+        $this->dispatch('locationUpdated');
     }
 
-    public function render()
+    private function updateDeviceLocation(): void
+    {
+//        dd($this->selected);
+        if (empty($this->selected)) {
+            $this->deviceLocations = [];
+            return;
+        }
+
+        $this->deviceLocations = Trip::whereIn('device_id', $this->selected)
+            ->whereIn('id', function ($query) {
+                $query->selectRaw('MAX(id)')
+                    ->from('trips')
+                    ->whereIn('device_id', $this->selected)
+                    ->groupBy('device_id');
+            })
+            ->with(['device:id,name,serial,model', 'user:id,name', 'vehicle:id,name,license_plate'])
+            ->get()
+            ->keyBy('device_id')
+            ->toArray();
+    }
+
+    public function render(): View
     {
         $devices = Device::with(['vehicle', 'user'])
+            ->where('status', 1)
             ->when($this->search !== '', function ($q) {
                 $q->whereLike('name', "%{$this->search}%")->orWhereLike('serial', "%{$this->search}%");
             })
@@ -54,6 +81,8 @@ class MapPage extends Component
             ->cursor();
 
         $this->selected[] = $devices->first()->id;
+
+        $this->updateDeviceLocation();
 
         return view('livewire.map-page', [
             'devices' => $devices
