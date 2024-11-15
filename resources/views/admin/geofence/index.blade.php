@@ -62,7 +62,9 @@
                                             <div>
                                                 <a class="f-14 mb-0 f-w-500 c-light"
                                                    href="{{ route('geofence.edit', $geofence->id) }}">{{ $geofence->name }}</a>
-                                                <p class="c-o-light text-muted">{{ str($geofence?->description)->limit(35) }}</p>
+                                                <p class="c-o-light text-muted"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $geofence?->description }}"
+                                                >{{ str($geofence?->description)->limit(35) }}</p>
                                             </div>
                                         </td>
                                         <td>

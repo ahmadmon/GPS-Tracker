@@ -281,8 +281,7 @@
                     }).on('markgeocode', function (e) {
                         const coords = [e.geocode.center.lat, e.geocode.center.lng];
                         map.setView(coords, 15);
-                    })
-                        .addTo(map);
+                    }).addTo(map);
 
                     if (initialGeometry) {
                         try {

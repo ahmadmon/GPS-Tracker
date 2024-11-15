@@ -38,18 +38,32 @@
                                                 <input class="form-control rounded-0" id="search" type="text"
                                                        placeholder="جستجو بر اساس نام یا شناسه..." aria-label="جسنجو"
                                                        wire:model.live.debounce.850ms="search">
+                                                <x-input-error :messages="$errors->get('search')" class="mt-1"/>
                                             </div>
                                             <div class="taskadd">
                                                 <div class="table-responsive custom-scrollbar">
                                                     <table class="table">
                                                         <tbody>
+                                                        <tr>
+                                                            <td @class(['w-100 d-none justify-content-start align-items-center', 'd-flex' => $errors->has('selected')])>
+                                                                <x-input-error :messages="$errors->get('selected')"
+                                                                               class="mt-1"/>
+                                                            </td>
+                                                            <td @class(['w-100 d-none justify-content-start align-items-center', 'd-flex' => $errors->has('selected.*')])>
+                                                                <x-input-error
+                                                                    :messages="$errors->get('selected.*')"
+                                                                    class="mt-1"/>
+                                                            </td>
+                                                        </tr>
                                                         @forelse($devices as $key => $device)
                                                             <tr>
                                                                 <td class="w-100 d-flex justify-content-start align-items-center">
                                                                     <input type="checkbox" id="input-{{ $key }}"
                                                                            value="{{ $device->id }}"
                                                                            class="ui-checkbox me-2"
-                                                                           @checked($loop->first) wire:model.live="selected">
+                                                                           @checked(in_array($device->id,$selected))
+                                                                           wire:model.live="selected"
+                                                                    >
                                                                     <label for="input-{{ $key }}"
                                                                            class="cursor-pointer">
                                                                         <h6 class="task_title_0">
@@ -80,34 +94,35 @@
                 <div class="card">
                     <div class="card-body">
                         <div class="row g-3 custom-input">
-                            <div class="col-xl col-md-6">
-                                <label class="form-label" for="datetime-local">انتخاب تاریخ: </label>
+                            <div class="col-xl col-md-6" x-data="dateTimeRange($refs.dateRangeInp)">
+                                <label class="form-label" for="datetime-range">انتخاب تاریخ: </label>
                                 <div class="input-group flatpicker-calender">
-                                    <div class="input-group flatpicker-calender">
-                                        <input class="form-control" id="range-date" type="date">
+                                    <div class="input-group flatpicker-calender" wire:ignore>
+                                        <input class="form-control" id="datetime-range" type="date"
+                                               wire:model="dateTimeRange"
+                                               x-ref="dateRangeInp"
+                                               :disabled="disabled"
+                                               :placeholder="placeholder"
+                                        >
                                     </div>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">انتخاب سفر دستگاه S20</label>
-                                <select class="form-select">
-                                    <option value="" @selected(empty($selected))>ابتدا دستگاه را انتخاب کنید...</option>
-                                    @forelse($trips as $key => $trip)
-                                        <option
-                                            value="{{ $key }}">{{ jalaliDate($trip, format: '%d %B %Y H:i') }}</option>
-                                    @empty
-                                        <option disabled selected>سفری برای این دستگاه یافت نشد.</option>
-                                    @endforelse
-                                </select>
+                                <x-input-error :messages="$errors->get('dateTimeRange')" class="mt-1"/>
                             </div>
                             <div class="col d-flex justify-content-start align-items-center m-t-40"><a
-                                    class="btn btn-primary f-w-500" href="#!">فیلتر</a></div>
+                                    class="btn btn-primary f-w-500" type="button" wire:click="handleTrip">فیلتر</a>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="card-body z-1" x-data="mapComponent($refs.map)" wire:ignore>
+                <div class="card-body z-1 position-relative" x-data="mapComponent($refs.map)" wire:ignore>
                     <div class="map-js-height" x-ref="map" id="map"></div>
+
+                    <div wire:loading>
+                        <div class="bg-loader">
+                            <div class="loader"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -116,27 +131,35 @@
 </div>
 
 @assets
+<!-- // Leaflet JS assets  -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
+<!-- // Leaflet Geoman for Geofence assets  -->
 <link
     rel="stylesheet"
     href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css"
 />
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.js"></script>
-<link rel="stylesheet" href="{{ asset('assets/js/leaflet/Control.FullScreen.css') }}">
 
+<!-- // Fullscreen Map assets  -->
+<link rel="stylesheet" href="{{ asset('assets/js/leaflet/Control.FullScreen.css') }}">
+<script src="{{ asset('assets/js/leaflet/Control.FullScreen.js') }}"></script>
+
+<!-- // dataTable for Device lists assets  -->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/jquery.dataTables.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/select.bootstrap5.css') }}">
 
-
+<!-- // Date Picker assets  -->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/flatpickr/flatpickr.min.css') }}">
-<script src="{{ asset('assets/js/leaflet/Control.FullScreen.js') }}"></script>
-<script src="{{ asset('assets/js/flat-pickr/flatpickr.js') }}"></script>
+<script src="{{ asset('assets/js/flat-pickr/jdate.js') }}"></script>
+<script src="{{ asset('assets/js/flat-pickr/flatpickr-jdate.js') }}"></script>
+<script src="{{ asset('assets/js/flat-pickr/l10n/fa-jdate.js') }}"></script>
 
-<link rel="stylesheet" href="{{ asset('assets/libs/leaflet-routing-machine/css/leaflet-routing-machine.css') }}"></link>
+<!-- // Waypoint assets  -->
+<link rel="stylesheet" href="{{ asset('assets/libs/leaflet-routing-machine/css/leaflet-routing-machine.css') }}">
 <script src="{{ asset('assets/libs/leaflet-routing-machine/js/leaflet-routing-machine.js') }}"></script>
 
 
@@ -184,12 +207,13 @@
         color: #666;
     }
 
-
 </style>
 @endassets
 
 @script
 <script>
+    // Map
+    //------------------------------------------------------
     Alpine.data('mapComponent', (el) => ({
         arrows: [],
         isArrowVisible: false,
@@ -197,6 +221,7 @@
         mapCenter: [35.715298, 51.404343],
         control: null,
         markers: {},
+        drownGeofences: {},
 
         init() {
             this.map = L.map(el, {
@@ -220,7 +245,15 @@
 
             L.control.layers(null, layers).addTo(this.map);
 
+            // Showing Geofences
             this.map.pm.setLang("fa");
+            $wire.on('geo-fetched', (data) => {
+                if (data[0].length > 0) {
+                    this.showGeofences(data[0]);
+                }
+            });
+
+            $wire.on('geo-reset', () => this.removeGeofences())
 
 
             // Initial Map Waypoint
@@ -267,11 +300,11 @@
             // Update Live Location
             this.updateLocations($wire.deviceLocations);
             $wire.on('locationUpdated', () => this.updateLocations($wire.deviceLocations));
-            setInterval(() => {
-                $wire.refreshMap();
-
-                this.updateLocations($wire.deviceLocations);
-            }, 10000)
+            // setInterval(() => {
+            //     $wire.refreshMap();
+            //
+            //     this.updateLocations($wire.deviceLocations);
+            // }, 10000)
 
             // let arrowButton = L.DomUtil.create('button', 'show-arrows-btn');
             // arrowButton.innerHTML = 'نمایش جهت مسیر';
@@ -306,8 +339,9 @@
                     delete this.markers[deviceId];
                 }
             });
-
             // add markers
+            let bounds = L.latLngBounds();
+
             Object.entries(locations).forEach(([deviceId, data]) => {
                 const position = [parseFloat(data.lat), parseFloat(data.long)];
                 const status = this.getMarkerStatus(data);
@@ -330,8 +364,23 @@
                         .addTo(this.map);
                 }
 
-                this.mapCenter = position;
-                this.map.setView(this.mapCenter, 14);
+                bounds.extend(position);
+                if (!bounds.isValid()) {
+                    this.map.fitBounds(bounds, {maxZoom: 14});
+                }
+
+                if ($wire.selected.includes(deviceId)) {
+                    bounds.extend(position);
+                }
+
+                if ($wire.selected.length > 0) {
+                    const selectedDeviceId = $wire.selected.at(-1);
+                    const selectedDevicePosition = [
+                        parseFloat(locations[selectedDeviceId].lat),
+                        parseFloat(locations[selectedDeviceId].long),
+                    ];
+                    this.map.setView(selectedDevicePosition, 14);
+                }
             });
         },
 
@@ -361,6 +410,58 @@
             if (diffMinutes < 15) return 'warning';
             return 'inactive';
         },
+
+        showGeofences(geoFences) {
+            this.removeGeofences();
+            geoFences.forEach(fence => {
+                try {
+                    // make Geofence Color
+                    const color = this.getColorForGeofence(fence.id);
+
+                    if (fence.points) {
+                        const latlngCoordinates = fence.points.map(coord => [coord[1], coord[0]]);
+                        const polygon = L.polygon(latlngCoordinates, {color: color}).addTo(this.map);
+                        const label = L.marker(polygon.getBounds().getCenter(), {
+                            icon: L.divIcon({
+                                className: 'geofence-label',
+                                html: `<span class="fw-bold bg-white d-block p-1 mb-1 text-center rounded">${fence.name}</span>`,
+                                iconSize: [100, 20],
+                            })
+                        }).addTo(this.map);
+
+                        this.drownGeofences[fence.id] = {polygon};
+                        this.drownGeofences[fence.id].label = label;
+
+                    }
+                } catch (error) {
+                    console.error("Invalid geometry format:", error);
+                }
+            });
+        },
+
+        removeGeofences() {
+            Object.values(this.drownGeofences).forEach(({polygon, label}) => {
+                this.map.removeLayer(polygon);
+                if (label) {
+                    this.map.removeLayer(label);
+                }
+            });
+            this.drownGeofences = {};
+        },
+
+        getColorForGeofence(geofenceId) {
+            const colors = [
+                "#FF5733", "#33FF57", "#3357FF", "#FF33A1", "#33FFA1", "#A133FF", "#3D27CD", "#DEF61D", "#811414", "#382F18", "#F3D24D", "#3ABA61"
+            ];
+            const savedColors = JSON.parse(localStorage.getItem('geofenceColors')) || {};
+
+            if (!savedColors[geofenceId]) {
+                savedColors[geofenceId] = colors[Math.floor(Math.random() * colors.length)];
+                localStorage.setItem('geofenceColors', JSON.stringify(savedColors));
+            }
+
+            return savedColors[geofenceId];
+        }
 
         // addArrowsToRoute(route) {
         //     this.arrows.forEach(arrow => this.map.removeLayer(arrow));
@@ -402,6 +503,41 @@
         //         this.arrows.push(marker);
         //     }
         // }
+    }));
+
+    // DatePicker (Enter Time)
+    //------------------------------------------------------
+    Alpine.data('dateTimeRange', (input) => ({
+        disabled: true,
+        placeholder: 'لطفا ابتدا دستگاه را انتخاب کنید!',
+
+        init() {
+            this.updateInputState();
+
+            $wire.on('locationUpdated', () => this.updateInputState());
+
+
+            flatpickr(input, {
+                mode: "range",
+                enableTime: true,
+                time_24hr: true,
+                locale: "fa",
+                altInput: true,
+                altFormat: 'Y/m/d - H:i',
+                maxDate: "today",
+                disableMobile: true
+            });
+        },
+
+        updateInputState() {
+            if ($wire.selected.length === 0) {
+                this.disabled = true;
+                this.placeholder = 'لطفا ابتدا دستگاه را انتخاب کنید!';
+            } else {
+                this.disabled = false;
+                this.placeholder = 'انتخاب زمان و تاریخ';
+            }
+        }
     }));
 </script>
 @endscript

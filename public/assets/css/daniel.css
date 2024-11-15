@@ -39,4 +39,76 @@ img.img-opacity:hover {
     transition: 0.4s;
 }
 
-/*  */
+
+.flatpickr-calendar {
+    .dayContainer, .flatpickr-weekdaycontainer {
+        flex-direction: row-reverse;
+    }
+
+    .flatpickr-months {
+        .flatpickr-month {
+            height: 32px;
+        }
+    }
+}
+
+.flatpickr-day {
+    &.selected.startRange, &.startRange.startRange, &.endRange.startRange {
+        border-radius: 0 50px 50px 0;
+    }
+
+    &.selected.endRange, &.startRange.endRange, &.endRange.endRange {
+        border-radius: 50px 0 0 50px;
+    }
+
+    &.selected.startRange + .endRange:not(:nth-child(7n+1)), &.startRange.startRange + .endRange:not(:nth-child(7n+1)), &.endRange.startRange + .endRange:not(:nth-child(7n+1)) {
+        box-shadow: 10px 0 0 #569ff7;
+    }
+}
+
+.bg-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    opacity: 1;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.bg-loader .loader {
+    width: 50px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 8px solid #0000;
+    border-right-color: #0F0FB296;
+    position: relative;
+    animation: l24 1s infinite linear;
+}
+
+.bg-loader .loader:before,
+.bg-loader .loader:after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    border: inherit;
+    animation: inherit;
+    animation-duration: 2s;
+}
+
+.bg-loader .loader:after {
+    animation-duration: 4s;
+}
+
+@keyframes l24 {
+    100% {
+        transform: rotate(1turn)
+    }
+}

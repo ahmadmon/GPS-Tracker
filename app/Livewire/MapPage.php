@@ -3,38 +3,51 @@
 namespace App\Livewire;
 
 use App\Models\Device;
+use App\Models\Geofence;
 use App\Models\Trip;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Renderless;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Morilog\Jalali\Jalalian;
 
 #[Title('نقشه')]
 class MapPage extends Component
 {
     #[Url(as: 'q')]
-    #[Validate('string')]
+    #[Validate('string', as: 'جستجو')]
     public string $search = '';
 
+    #[Validate([
+        'selected' => 'array|max:4',
+        'selected.*' => ['integer', 'exists:devices,id']
+    ], as: 'دستگاه انتخابی')]
     public array $selected = [];
+    public $dateTimeRange;
     public array $deviceLocations = [];
-
     public $trips = [];
+    public $geofences = [];
 
     public function rules(): array
     {
         return [
-            'selected' => 'nullable|array|max:4',
-            'selected.*' => 'nullable|numeric|unique:devices,id'
+            'dateTimeRange' => 'required|date|before_or_equal:' . now()->format('Y-m-d')
+        ];
+    }
+
+    public function validationAttributes(): array
+    {
+        return [
+            'dateTimeRange' => 'تاریخ',
         ];
     }
 
     public function mount(Request $request): void
     {
+        $this->trips = collect([]);
+
         $this->search = $request->query('q') ?? '';
     }
 
@@ -45,13 +58,21 @@ class MapPage extends Component
 
     public function updatedSelected(): void
     {
+        if (!empty($this->selected)) {
+            $this->geofences = Geofence::whereIn('device_id', $this->selected)
+                ->where('status', 1)->get();
+            $this->dispatch('geo-fetched', $this->geofences);
+        } else {
+            $this->reset('geofences');
+            $this->dispatch('geo-reset', $this->geofences);
+        }
+
         $this->updateDeviceLocation();
         $this->dispatch('locationUpdated');
     }
 
     private function updateDeviceLocation(): void
     {
-//        dd($this->selected);
         if (empty($this->selected)) {
             $this->deviceLocations = [];
             return;
@@ -80,12 +101,31 @@ class MapPage extends Component
             ->orderByDesc('connected_at')
             ->cursor();
 
-        $this->selected[] = $devices->first()->id;
-
         $this->updateDeviceLocation();
 
         return view('livewire.map-page', [
             'devices' => $devices
         ]);
+    }
+
+
+    public function handleTrip(): void
+    {
+        $range = explode('تا', $this->dateTimeRange);
+        $dateRange = [
+            Jalalian::fromFormat('Y-m-d H:i', trim($range[0], ' '))->toCarbon(),
+            Jalalian::fromFormat('Y-m-d H:i', trim($range[1], ' '))->toCarbon(),
+        ];
+        if (empty($this->selected)) {
+            $this->addError('dateTimeRange', 'لطفا حداقل یک دستگاه را انتخاب کنید.');
+            return;
+        };
+
+        $this->trips = Trip::whereIn('device_id', $this->selected)
+            ->whereBetween('created_at', $dateRange)->get();
+
+        dd($this->trips);
+
+        $this->dispatch('trips-fetched', $this->trips);
     }
 }
