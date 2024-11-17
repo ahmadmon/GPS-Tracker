@@ -28,20 +28,20 @@
                     <div class="card email-body radius-left">
                         <div class="ps-0">
                             <div class="tab-content">
-                                <div class="tab-pane fade active show" id="pills-created" role="tabpanel">
+                                <div id="pills-created" role="tabpanel">
                                     <div class="card mb-0">
                                         <div class="card-header d-flex">
                                             <h5>دستگاه ها</h5>
                                         </div>
-                                        <div class="card-body p-0">
+                                        <div class="card-body p-0 device-sidebar overflow-hidden">
                                             <div class="col-md-12">
                                                 <input class="form-control rounded-0" id="search" type="text"
                                                        placeholder="جستجو بر اساس نام یا شناسه..." aria-label="جسنجو"
                                                        wire:model.live.debounce.850ms="search">
                                                 <x-input-error :messages="$errors->get('search')" class="mt-1"/>
                                             </div>
-                                            <div class="taskadd">
-                                                <div class="table-responsive custom-scrollbar">
+                                            <div class="taskadd visible-scroll">
+                                                <div class="table-responsive text-nowrap">
                                                     <table class="table">
                                                         <tbody>
                                                         <tr>
@@ -57,22 +57,33 @@
                                                         </tr>
                                                         @forelse($devices as $key => $device)
                                                             <tr>
-                                                                <td class="w-100 d-flex justify-content-start align-items-center">
-                                                                    <input type="checkbox" id="input-{{ $key }}"
-                                                                           value="{{ $device->id }}"
-                                                                           class="ui-checkbox me-2"
-                                                                           @checked(in_array($device->id,$selected))
-                                                                           wire:model.live="selected"
-                                                                    >
-                                                                    <label for="input-{{ $key }}"
-                                                                           class="cursor-pointer">
-                                                                        <h6 class="task_title_0">
-                                                                            دستگاه {{ str($device->name)->replace('دستگاه', '') }}</h6>
-                                                                        <small
-                                                                            class="project_name_0 text-muted">{{ $device->serial }}</small>
-                                                                    </label>
+                                                                <td class="w-100 d-flex justify-content-between align-items-center">
+                                                                    <div
+                                                                        class="d-flex justify-content-start align-items-center me-3">
+                                                                        <input type="checkbox" id="input-{{ $key }}"
+                                                                               value="{{ $device->id }}"
+                                                                               class="ui-checkbox me-2"
+                                                                               @checked(in_array($device->id,$selected))
+                                                                               wire:model.live="selected"
+                                                                        >
+                                                                        <label for="input-{{ $key }}"
+                                                                               class="cursor-pointer">
+                                                                            <h6 class="task_title_0">
+                                                                                دستگاه {{ str($device->name)->replace('دستگاه', '') }}</h6>
+                                                                            <small
+                                                                                class="project_name_0 text-muted">{{ $device->serial }}</small>
+                                                                        </label>
+                                                                    </div>
+                                                                    @if($device->lastLocation())
+                                                                        <div
+                                                                            class="d-flex justify-content-end align-items-center">
+                                                                            <span><strong
+                                                                                    class="text-success">{{ json_decode($device?->lastLocation()->device_stats)?->speed }}</strong> KM/H</span>
+                                                                        </div>
+                                                                    @endif
                                                                 </td>
                                                             </tr>
+                                                            <tr x-intersect.once="$wire.loadMore()"></tr>
                                                         @empty
                                                             <tr>
                                                                 <p class="text-muted text-center">دستگاهی یافت نشد.</p>
@@ -204,6 +215,9 @@
         color: #666;
     }
 
+    .device-sidebar {
+        height: 90vh;
+    }
 </style>
 @endassets
 
@@ -212,44 +226,55 @@
     // Map
     //------------------------------------------------------
     Alpine.data('mapComponent', (el) => ({
-        arrows: [],
         isArrowVisible: false,
         map: null,
         mapCenter: [35.715298, 51.404343],
         control: null,
         markers: {},
+        isUpdating: false,
+        pendingUpdate: false,
         drownGeofences: {},
         drawnWaypoints: {},
+        activePopup: null,
 
         init() {
+            // Initializing The Map
             this.map = L.map(el, {
                 pmIgnore: false,
                 fullscreenControl: true,
             }).setView(this.mapCenter, 11);
 
             let layers = {
-                "تصویر ماهواره ای": L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {subdomains: ['mt0', 'mt1', 'mt2', 'mt3']}),
+                "تصویر ماهواره ای": L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+                    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
+                }),
                 "تصویر خیابانی گوگل": L.tileLayer('http://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}', {
                     maxZoom: 20,
                     subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
                 }),
             }
 
-
             L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
                 maxZoom: 35,
             }).addTo(this.map);
 
+            // Fixing Popup when zooming
+            L.Popup.prototype._animateZoom = function (e) {
+                if (!this._map) return;
+                let pos = this._map._latLngToNewLayerPoint(this._latlng, e.zoom, e.center),
+                    anchor = this._getAnchor();
+                L.DomUtil.setPosition(this._container, pos.add(anchor));
+            }
 
             L.control.layers(null, layers).addTo(this.map);
 
-            // Showing Geofences
             this.map.pm.setLang("fa");
+
+            // Livewire Events
             $wire.on('geo-fetched', (data) => {
-                if (data[0].length > 0) {
-                    this.showGeofences(data[0]);
-                }
+                if (data[0].length > 0) this.showGeofences(data[0]);
             });
+            $wire.on('geo-reset', () => this.removeGeofences());
 
 
             // Initial Map Waypoint
@@ -264,63 +289,54 @@
             $wire.on('trips-reset', () => this.removeWayPoints())
 
 
-            // Update Live Location
             this.updateLocations($wire.deviceLocations);
             $wire.on('locationUpdated', () => this.updateLocations($wire.deviceLocations));
         },
         // Handle The Devices live location
         //-----------------------------------
         updateLocations(locations) {
-            //remove Markers
-            Object.keys(this.markers).forEach(deviceId => {
-                if (!locations[deviceId]) {
-                    this.map.removeLayer(this.markers[deviceId]);
-                    delete this.markers[deviceId];
-                }
+            // Remove old Markers
+            Object.values(this.markers).forEach(marker => {
+                marker.remove();
             });
-            // add markers
+            this.markers = {};
+
             let bounds = L.latLngBounds();
 
+            // Add New Markers
             Object.entries(locations).forEach(([deviceId, data]) => {
+                if (!data?.lat || !data?.long) return;
+
                 const position = [parseFloat(data.lat), parseFloat(data.long)];
+                if (isNaN(position[0]) || isNaN(position[1])) return;
+
                 const status = this.getMarkerStatus(data);
+                const marker = L.marker(position, {
+                    icon: this.createCustomIcon(status, data.device_stats?.['direction'])
+                }).bindPopup(this.createPopupContent(data));
 
-                if (this.markers[deviceId]) {
-                    this.markers[deviceId].setLatLng(position);
-                    this.markers[deviceId].setIcon(this.createCustomIcon(status, data.device_stats['direction']));
-
-                } else {
-                    let popup = `
-                                <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right"><span style="margin-left: 5px"><i class="fa fa-car"></i></span>${data.vehicle?.name || 'نامشخص'} </p>
-                                <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right"><span style="margin-left: 5px"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock" style="width: 15px;height: 15px"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>${data.name} </p>
-                                <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right"><span style="margin-left: 5px"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin" style="width: 15px;height: 15px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span> <a href="https://maps.google.com/?q=${data.lat},${data.long}" rel="nofollow noopener noreferrer" target="_blank">${parseFloat(data.lat).toFixed()},${parseFloat(data.long).toFixed(4)}</a></p>
-                                <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right"><span style="margin-left: 5px"><i class="icofont icofont-speed-meter"></i></span> ${Math.round(parseFloat(data.device_stats['speed'] || 0))} کیلومتر ‌بر ساعت </p>
-                               `
-                    this.markers[deviceId] = L.marker(position, {
-                        icon: this.createCustomIcon(status, data.device_stats['direction'])
-                    })
-                        .bindPopup(popup)
-                        .addTo(this.map);
-                }
-
+                this.markers[deviceId] = marker;
+                marker.addTo(this.map);
                 bounds.extend(position);
-                if (!bounds.isValid()) {
-                    this.map.fitBounds(bounds, {maxZoom: 14});
-                }
-
-                if ($wire.selected.includes(deviceId)) {
-                    bounds.extend(position);
-                }
-
-                if ($wire.selected.length > 0) {
-                    const selectedDeviceId = $wire.selected.at(-1);
-                    const selectedDevicePosition = [
-                        parseFloat(locations[selectedDeviceId].lat),
-                        parseFloat(locations[selectedDeviceId].long),
-                    ];
-                    this.map.setView(selectedDevicePosition, 14);
-                }
             });
+
+            // Set Map View
+            if ($wire.selected.length > 0) {
+                const selectedLocation = locations[$wire.selected.at(-1)];
+                if (selectedLocation) {
+                    const position = [parseFloat(selectedLocation.lat), parseFloat(selectedLocation.long)];
+                    if (!isNaN(position[0]) && !isNaN(position[1])) {
+                        this.map.setView(position, 14, {animate: true, duration: 1});
+                    }
+                }
+            } else if (bounds.isValid()) {
+                this.map.fitBounds(bounds, {
+                    padding: [50, 50],
+                    maxZoom: 14,
+                    animate: true,
+                    duration: 1
+                });
+            }
         },
 
         createCustomIcon(status = 'active', degree) {
@@ -338,6 +354,37 @@
                 iconAnchor: [16, 32],
                 popupAnchor: [0, -32]
             });
+        },
+
+        createPopupContent(data) {
+            return `
+            <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
+                <span style="margin-left: 5px"><i class="icofont icofont-micro-chip"></i></span>${data.device?.name} - ${data.device?.model}
+            </p>
+            <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
+                <span style="margin-left: 5px"><i class="fa fa-car"></i></span>${data.vehicle?.name || 'نامشخص'}
+            </p>
+            <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
+                <span style="margin-left: 5px"><i class="icofont icofont-bar-code"></i></span>${data.vehicle?.license_plate || 'نامشخص'}
+            </p>
+            <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
+                <span style="margin-left: 5px"><i class="fa fa-user"></i></span>${data.user?.name} - ${data.user?.phone}
+            </p>
+            <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
+                <span style="margin-left: 5px"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock" style="width: 15px;height: 15px"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></span>${data.name}
+            </p>
+            <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
+                <span style="margin-left: 5px"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-map-pin" style="width: 15px;height: 15px"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg></span>
+                <a href="https://maps.google.com/?q=${data.lat},${data.long}" rel="nofollow noopener noreferrer" target="_blank">${parseFloat(data.lat).toFixed(4)},${parseFloat(data.long).toFixed(4)}</a>
+            </p>
+            <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
+                <span style="margin-left: 5px"><i class="icofont icofont-street-view"></i></span>
+                <a href="https://www.google.com/maps?q&layer=c&cbll=${data.lat},${data.long}" rel="nofollow noopener noreferrer" target="_blank">نمایش خیابانی 360 درجه (صفحه جدید)</a>
+            </p>
+            <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
+                <span style="margin-left: 5px"><i class="icofont icofont-speed-meter"></i></span> ${Math.round(JSON.parse(data.device_stats).speed)} کیلومتر ‌بر ساعت
+            </p>
+        `;
         },
 
         getMarkerStatus(data) {

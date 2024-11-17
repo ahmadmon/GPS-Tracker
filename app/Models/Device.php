@@ -17,8 +17,13 @@ class Device extends Model
     protected function casts(): array
     {
         return [
-            'brand' => DeviceBrand::class
+            'brand' => DeviceBrand::class,
         ];
+    }
+
+    public function lastLocation(): Trip|null
+    {
+        return Trip::where('device_id', $this->id)->orderByDesc('id')->first() ?? null;
     }
 
 

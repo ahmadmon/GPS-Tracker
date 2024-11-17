@@ -34,6 +34,8 @@ class MapPage extends Component
     public $trips = [];
     public $geofences = [];
 
+    public int $take = 10;
+
     public function rules(): array
     {
         return [
@@ -53,6 +55,24 @@ class MapPage extends Component
         $this->trips = collect([]);
 
         $this->search = $request->query('q') ?? '';
+    }
+
+    public function render(): View
+    {
+        $devices = Device::with(['vehicle', 'user'])
+            ->where('status', 1)
+            ->when($this->search !== '', function ($q) {
+                $q->whereLike('name', "%{$this->search}%")->orWhereLike('serial', "%{$this->search}%");
+            })
+            ->orderByDesc('connected_at')
+            ->take($this->take)
+            ->cursor();;
+
+        $this->updateDeviceLocation();
+
+        return view('livewire.map-page', [
+            'devices' => $devices
+        ]);
     }
 
     public function refreshMap(): void
@@ -95,27 +115,10 @@ class MapPage extends Component
                     ->whereIn('device_id', $this->selected)
                     ->groupBy('device_id');
             })
-            ->with(['device:id,name,serial,model', 'user:id,name', 'vehicle:id,name,license_plate'])
+            ->with(['device:id,name,serial,model', 'user:id,name,phone', 'vehicle:id,name,license_plate'])
             ->get()
             ->keyBy('device_id')
             ->toArray();
-    }
-
-    public function render(): View
-    {
-        $devices = Device::with(['vehicle', 'user'])
-            ->where('status', 1)
-            ->when($this->search !== '', function ($q) {
-                $q->whereLike('name', "%{$this->search}%")->orWhereLike('serial', "%{$this->search}%");
-            })
-            ->orderByDesc('connected_at')
-            ->cursor();
-
-        $this->updateDeviceLocation();
-
-        return view('livewire.map-page', [
-            'devices' => $devices
-        ]);
     }
 
 
@@ -169,5 +172,10 @@ class MapPage extends Component
         }
 
         $this->dispatch('trips-fetched', $this->trips);
+    }
+
+    public function loadMore(): void
+    {
+        $this->take += 10;
     }
 }
