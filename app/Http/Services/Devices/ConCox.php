@@ -32,6 +32,8 @@ class ConCox implements DeviceInterface
     {
         $meliPayamakNumber = Config::get('melipayamak.number');
 
+        $hasPass = !empty($this->password);
+
         // 0 => Server Setting
         // 1 => APN Setting
         // 2 => Upload Time
@@ -39,12 +41,12 @@ class ConCox implements DeviceInterface
         // 4 => set Admin Number
         // 5 => Hard Reset Factory
         $commands = [
-            '0' => "SERVER,{$this->password},0,{$this->ip},{$this->port},0#",
-            '1' => "APN,{$this->password},{apn}#",
-            '2' => "TIMER,{$this->password},{interval},3600#",
-            '3' => "PASSWORD,{$this->password},{password}",
-            '4' => "SOS,{$this->password},A,{phone},{$meliPayamakNumber}#",
-            '5' => "FACTORY,{$this->password},#",
+            '0' => $hasPass ? "SERVER,{$this->password},0,{$this->ip},{$this->port},0#" : "SERVER,0,{$this->ip},{$this->port},0#",
+            '1' => $hasPass ? "APN,{$this->password},{apn}#" : "APN,{apn}#",
+            '2' => $hasPass ? "TIMER,{$this->password},{interval},3600#" : "TIMER,{interval},3600#",
+            '3' => $hasPass ? "PASSWORD,{$this->password},{password}" : "PASSWORD,{password}",
+            '4' => $hasPass ? "SOS,{$this->password},A,{phones},{$meliPayamakNumber}#" : "SOS,A,{phones},{$meliPayamakNumber}#",
+            '5' => $hasPass ? "FACTORY,{$this->password},#" : "FACTORY#",
         ];
 
         $commandTemplate = $commands[$commandKey] ?? null;
@@ -61,7 +63,6 @@ class ConCox implements DeviceInterface
         foreach ($parameters as $key => $value) {
             $template = str_replace("{{$key}}", $value, $template);
         }
-        dd(str_replace(',,', ',', $template));
         return $template;
     }
 

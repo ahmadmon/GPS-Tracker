@@ -26,7 +26,9 @@ class StoreSmsRequest extends FormRequest
             'apn' => 'nullable|required_if:command,1|string',
             'interval' => 'nullable|required_if:command,2|numeric|min:10',
             'password' => 'nullable|required_if:command,3|numeric|digits:4',
-            'phone' => 'nullable|required_if:command,4|numeric|digits:11',
+            'phones' => 'nullable|required_if:command,4|array|max:2',
+            'phones.0' => 'nullable|required_if:command,4|numeric|digits:11',
+            'phones.1' => 'nullable|numeric|digits:11',
         ];
     }
 
@@ -37,7 +39,8 @@ class StoreSmsRequest extends FormRequest
             'apn' => 'نقطه دستیابی (APN)',
             'interval' => 'زمان',
             'password' => 'رمز عبور',
-            'phone' => 'شماره تماس ادمین',
+            'phones' => 'شماره تماس ادمین',
+            'phones.*' => 'شماره تماس ادمین'
         ];
     }
 
@@ -52,7 +55,8 @@ class StoreSmsRequest extends FormRequest
             'apn.required_if' => "فیلد :attribute الزامی میباشد.",
             'interval.required_if' => "فیلد :attribute الزامی میباشد.",
             'password.required_if' => "فیلد :attribute الزامی میباشد.",
-            'phone.required_if' => "فیلد :attribute الزامی میباشد.",
+            'phones.required_if' => "فیلد :attribute الزامی میباشد.",
+            'phones.*.required_if' => "فیلد :attribute الزامی میباشد.",
         ];
     }
 }

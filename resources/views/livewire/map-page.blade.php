@@ -350,7 +350,7 @@
             });
         },
 
-        createPopupContent(data) {
+        createPopupContent(data, distance = null) {
             return `
             <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
                 <span style="margin-left: 5px"><i class="icofont icofont-micro-chip"></i></span>${data.device?.name} - ${data.device?.model}
@@ -378,6 +378,12 @@
             <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
                 <span style="margin-left: 5px"><i class="icofont icofont-speed-meter"></i></span> ${Math.round(JSON.parse(data.device_stats)?.speed || 0)} کیلومتر ‌بر ساعت
             </p>
+            ${distance ?
+                `<p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
+                    <span style="margin-left: 5px"><i class="fa fa-solid fa-flag-checkered"></i></span> ${Math.round(distance)} کیلومتر
+                </p>`
+                : ''
+            }
         `;
         },
 
@@ -466,7 +472,103 @@
             this.circleMarkers = []; // Array to store circle markers
 
             trips.forEach((trip, i) => {
-                console.log(trip[0]);
+                const routeCoords = trip.map(coord => [parseFloat(coord.lat), parseFloat(coord.long)]);
+
+                // Calculate total distance
+                let totalDistance = 0;
+                for (let j = 0; j < routeCoords.length - 1; j++) {
+                    totalDistance += this.map.distance(routeCoords[j], routeCoords[j + 1]);
+                }
+                totalDistance = (totalDistance / 1000).toFixed(2);
+
+
+                const polyline = L.polyline(routeCoords, {
+                    color: "#F50A0AFF",
+                    weight: 5,
+                    opacity: 0.9
+                }).addTo(this.map);
+
+                const startMarker = L.marker(routeCoords[0], {icon: startIcon, title: 'شروع'}).addTo(this.map);
+                const endMarker = L.marker(routeCoords.at(-1), {icon: endIcon, title: 'پایان'}).addTo(this.map);
+
+                startMarker.bindPopup(this.createPopupContent(trip[0], totalDistance));
+                endMarker.bindPopup(this.createPopupContent(trip.at(-1), totalDistance));
+
+                routeCoords.forEach((coord, i) => {
+                    const circle = L.circleMarker(coord, {
+                        radius: 5,
+                        color: "#3388ff",
+                        fillOpacity: 0.5
+                    }).addTo(this.map);
+
+                    circle.on('click', (event) => {
+                        const popupContent = this.createPopupContent(trip[i]);
+                        L.popup()
+                            .setLatLng(event.latlng)
+                            .setContent(popupContent)
+                            .openOn(this.map);
+                    });
+
+                    this.circleMarkers.push(circle);
+                });
+
+                this.map.on('zoomend', () => {
+                    const currentZoom = this.map.getZoom();
+                    this.circleMarkers.forEach((circle) => {
+                        if (currentZoom >= 15) {
+                            circle.addTo(this.map); // Show circles
+                        } else {
+                            this.map.removeLayer(circle); // Hide circles
+                        }
+                    });
+                });
+
+                this.drawnWaypoints[i] = polyline;
+                this.drawnWaypoints[i].markers = {startMarker, endMarker};
+            });
+
+            console.log(this.drawnWaypoints);
+        },
+
+        removeWayPoints() {
+            Object.values(this.drawnWaypoints).forEach((route) => {
+                if (route) this.map.removeLayer(route);
+
+                if (route.markers) {
+                    Object.values(route.markers).forEach((marker) => {
+                        if (marker) this.map.removeLayer(marker);
+                    });
+                }
+            });
+
+            this.circleMarkers.forEach((circle) => {
+                if (circle) this.map.removeLayer(circle);
+            });
+
+            this.drawnWaypoints = {};
+            this.circleMarkers = [];
+        },
+
+
+        showWayPointWithRouteMachineLibrary(trips) {
+            const startIcon = L.icon({
+                iconUrl: '{{ asset('assets/libs/leaflet-routing-machine/img/map-start.svg') }}',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+
+            const endIcon = L.icon({
+                iconUrl: '{{ asset('assets/libs/leaflet-routing-machine/img/map-end.svg') }}',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+
+            this.removeWayPoints();
+            this.circleMarkers = []; // Array to store circle markers
+
+            trips.forEach((trip, i) => {
                 const control = L.Routing.control({
                     waypoints: [
                         L.latLng(parseFloat(trip[0].lat), parseFloat(trip[0].long)),
@@ -493,8 +595,10 @@
                     }
                 }).addTo(this.map);
 
+
                 control.on('routesfound', (e) => {
                     const route = e.routes[0];
+                    console.log(route.coordinates)
                     const totalDistance = route.summary.totalDistance;
                     // route.coordinates.forEach
                     trip.forEach((coord) => {
@@ -504,6 +608,7 @@
                             color: "#3388ff",
                             fillOpacity: 0.5
                         }).addTo(this.map);
+                        console.log(trip)
 
                         // Add click event for displaying trip info
                         circle.on('click', (event) => {
@@ -534,8 +639,7 @@
             });
         },
 
-
-        removeWayPoints() {
+        removeWayPointWithRouteMachineLibrary() {
             Object.values(this.drawnWaypoints).forEach((route) => {
                 this.map.removeControl(route);
             });

@@ -63,10 +63,10 @@
             </label>
             <small class="text-muted d-block">در این بخش، شماره ادمین را وارد کنید تا در صورت نیاز،
                 امکان دریافت اطلاعات از دستگاه فراهم شود.</small>
-            <input class="form-control" id="selected-4" name="phone" type="number"
-                   value="{{ old('phone') }}"
+            <input class="form-control" id="selected-4" name="phones[0]" type="number"
+                   value="{{ old('phones.0') }}"
                    placeholder="برای مثال: 09123456789">
-            <x-input-error :messages="$errors->get('phone')" class="mt-2"/>
+            <x-input-error :messages="$errors->get('phones.0')" class="mt-2"/>
         </div>
     </section>
 </div>

@@ -139,7 +139,7 @@ class DeviceController extends Controller
             'apn' => $request->apn,
             'interval' => $request->interval,
             'password' => $request->password,
-            'phone' => $request->phone
+            'phones' => ($device->brand == 'sinotrack' || count($request->phones) == 1) ? $request->phones[0] : implode(',', $request->phones)
         ];
 
         if (isset($request->password)) {

@@ -141,24 +141,20 @@ class MapPage extends Component
             return;
         };
 
-        $trips = Trip::whereIn('device_id', $this->selected)
+        $this->trips = Trip::whereIn('device_id', $this->selected)
             ->whereBetween('created_at', $dateRange)
-            ->select(['device_id', 'device_stats', 'name', 'lat', 'long'])
+            ->with([
+                'device:id,name,serial,model',
+                'user:id,name,phone',
+                'vehicle:id,name,license_plate'
+            ])
             ->orderBy('device_id')
             ->orderBy('created_at')
             ->get()
-            ->groupBy('device_id');
-
-        $this->trips = $trips->map(function ($records) {
-            return $records->map(function ($trip) {
-                return [
-                    'device_stats' => $trip->device_stats,
-                    'created_at' => $trip->created_at,
-                    'lat' => $trip->lat,
-                    'long' => $trip->long,
-                ];
+            ->groupBy('device_id')
+            ->map(function ($records) {
+                return $records->values();
             });
-        });
 
 
         if ($this->trips->isEmpty()) {
