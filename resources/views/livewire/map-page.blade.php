@@ -1,4 +1,5 @@
 <div>
+
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
@@ -19,9 +20,6 @@
     </div>
 
     <div class="row">
-        <div class="col-12">
-
-        </div>
         <div class="row">
             <div class="col-md-4">
                 <div class="email-right-aside bookmark-tabcontent">
@@ -226,16 +224,13 @@
     // Map
     //------------------------------------------------------
     Alpine.data('mapComponent', (el) => ({
-        isArrowVisible: false,
         map: null,
         mapCenter: [35.715298, 51.404343],
         control: null,
         markers: {},
-        isUpdating: false,
-        pendingUpdate: false,
         drownGeofences: {},
         drawnWaypoints: {},
-        activePopup: null,
+        circleMarkers: [],
 
         init() {
             // Initializing The Map
@@ -274,8 +269,6 @@
             $wire.on('geo-fetched', (data) => {
                 if (data[0].length > 0) this.showGeofences(data[0]);
             });
-            $wire.on('geo-reset', () => this.removeGeofences());
-
 
             // Initial Map Waypoint
             $wire.on('trips-fetched', (trips) => {
@@ -292,6 +285,7 @@
             this.updateLocations($wire.deviceLocations);
             $wire.on('locationUpdated', () => this.updateLocations($wire.deviceLocations));
         },
+
         // Handle The Devices live location
         //-----------------------------------
         updateLocations(locations) {
@@ -382,7 +376,7 @@
                 <a href="https://www.google.com/maps?q&layer=c&cbll=${data.lat},${data.long}" rel="nofollow noopener noreferrer" target="_blank">نمایش خیابانی 360 درجه (صفحه جدید)</a>
             </p>
             <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
-                <span style="margin-left: 5px"><i class="icofont icofont-speed-meter"></i></span> ${Math.round(JSON.parse(data.device_stats).speed)} کیلومتر ‌بر ساعت
+                <span style="margin-left: 5px"><i class="icofont icofont-speed-meter"></i></span> ${Math.round(JSON.parse(data.device_stats)?.speed || 0)} کیلومتر ‌بر ساعت
             </p>
         `;
         },
@@ -469,12 +463,14 @@
             });
 
             this.removeWayPoints();
+            this.circleMarkers = []; // Array to store circle markers
 
             trips.forEach((trip, i) => {
-                this.drawnWaypoints[i] = L.Routing.control({
+                console.log(trip[0]);
+                const control = L.Routing.control({
                     waypoints: [
-                        L.latLng(parseFloat(trip.start.lat), parseFloat(trip.start.long)),
-                        L.latLng(parseFloat(trip.end.lat), parseFloat(trip.end.long))
+                        L.latLng(parseFloat(trip[0].lat), parseFloat(trip[0].long)),
+                        L.latLng(parseFloat(trip.at(-1).lat), parseFloat(trip.at(-1).long))
                     ],
                     routeWhileDragging: false,
                     addWaypoints: false,
@@ -496,16 +492,60 @@
                         }]
                     }
                 }).addTo(this.map);
-            })
+
+                control.on('routesfound', (e) => {
+                    const route = e.routes[0];
+                    const totalDistance = route.summary.totalDistance;
+                    // route.coordinates.forEach
+                    trip.forEach((coord) => {
+                        // Create a circle marker on each coordinate of the route
+                        const circle = L.circleMarker([coord.lat, coord.long], {
+                            radius: 5,
+                            color: "#3388ff",
+                            fillOpacity: 0.5
+                        }).addTo(this.map);
+
+                        // Add click event for displaying trip info
+                        circle.on('click', (event) => {
+                            const popupContent = this.createPopupContent(trip);
+                            L.popup()
+                                .setLatLng(event.latlng)
+                                .setContent(popupContent)
+                                .openOn(this.map);
+                        });
+
+                        this.circleMarkers.push(circle);
+                    });
+
+                    // Add zoom event to show/hide circles based on zoom level
+                    this.map.on('zoomend', () => {
+                        const currentZoom = this.map.getZoom();
+                        this.circleMarkers.forEach((circle) => {
+                            if (currentZoom >= 15) {
+                                circle.addTo(this.map); // Show circles
+                            } else {
+                                this.map.removeLayer(circle); // Hide circles
+                            }
+                        });
+                    });
+                });
+
+                this.drawnWaypoints[i] = control;
+            });
         },
+
 
         removeWayPoints() {
             Object.values(this.drawnWaypoints).forEach((route) => {
                 this.map.removeControl(route);
             });
+            this.circleMarkers.forEach((circle) => this.map.removeLayer(circle))
+
             this.drawnWaypoints = {};
+            this.circleMarkers = [];
         }
-    }));
+    }))
+    ;
 
     // DatePicker (Enter Time)
     //------------------------------------------------------

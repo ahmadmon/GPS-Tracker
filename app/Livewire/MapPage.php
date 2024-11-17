@@ -87,7 +87,7 @@ class MapPage extends Component
                 ->where('status', 1)->get();
             $this->dispatch('geo-fetched', $this->geofences);
 
-            if(isset($this->dateTimeRange)){
+            if (isset($this->dateTimeRange)) {
                 $this->handleTrip();
             }
 
@@ -125,6 +125,13 @@ class MapPage extends Component
     public function handleTrip(): void
     {
         $range = explode('تا', $this->dateTimeRange);
+
+        if (count($range) !== 2) {
+            $this->addError('dateTimeRange', 'تاریخ نامعتبر می باشد.');
+            return;
+        }
+        $this->resetErrorBag('dateTimeRange');
+
         $dateRange = [
             Jalalian::fromFormat('Y-m-d H:i', trim($range[0], ' '))->toCarbon(),
             Jalalian::fromFormat('Y-m-d H:i', trim($range[1], ' '))->toCarbon(),
@@ -134,31 +141,28 @@ class MapPage extends Component
             return;
         };
 
-        $startIds = Trip::whereIn('device_id', $this->selected)
+        $trips = Trip::whereIn('device_id', $this->selected)
             ->whereBetween('created_at', $dateRange)
-            ->selectRaw('MIN(id) as id')
-            ->groupBy('device_id')
-            ->pluck('id');
+            ->select(['device_id', 'device_stats', 'name', 'lat', 'long'])
+            ->orderBy('device_id')
+            ->orderBy('created_at')
+            ->get()
+            ->groupBy('device_id');
 
-        $endIds = Trip::whereIn('device_id', $this->selected)
-            ->whereBetween('created_at', $dateRange)
-            ->selectRaw('MAX(id) as id')
-            ->groupBy('device_id')
-            ->pluck('id');
-
-        $trips = Trip::whereIn('id', $startIds->merge($endIds))->get();
-
-        $tripsByDevice = $trips->groupBy('device_id')->map(function ($records) {
-            return [
-                'start' => $records->firstWhere('id', $records->min('id')),
-                'end' => $records->firstWhere('id', $records->max('id')),
-            ];
+        $this->trips = $trips->map(function ($records) {
+            return $records->map(function ($trip) {
+                return [
+                    'device_stats' => $trip->device_stats,
+                    'created_at' => $trip->created_at,
+                    'lat' => $trip->lat,
+                    'long' => $trip->long,
+                ];
+            });
         });
 
-        $this->trips = $tripsByDevice;
 
-        if($this->trips->isEmpty()){
-            $this->alert('warning','سفری در این تاریخ یافت نشد!', [
+        if ($this->trips->isEmpty()) {
+            $this->alert('warning', 'سفری در این تاریخ یافت نشد!', [
                 'position' => 'top',
                 'timer' => 3000,
                 'toast' => true,
