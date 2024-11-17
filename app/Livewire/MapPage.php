@@ -7,6 +7,8 @@ use App\Models\Geofence;
 use App\Models\Trip;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Jantinnerezo\LivewireAlert\LivewireAlert;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
@@ -16,6 +18,8 @@ use Morilog\Jalali\Jalalian;
 #[Title('نقشه')]
 class MapPage extends Component
 {
+    use LivewireAlert;
+
     #[Url(as: 'q')]
     #[Validate('string', as: 'جستجو')]
     public string $search = '';
@@ -62,9 +66,15 @@ class MapPage extends Component
             $this->geofences = Geofence::whereIn('device_id', $this->selected)
                 ->where('status', 1)->get();
             $this->dispatch('geo-fetched', $this->geofences);
+
+            if(isset($this->dateTimeRange)){
+                $this->handleTrip();
+            }
+
         } else {
-            $this->reset('geofences');
+            $this->reset('geofences', 'dateTimeRange', 'trips');
             $this->dispatch('geo-reset', $this->geofences);
+            $this->dispatch('trips-reset', $this->geofences);
         }
 
         $this->updateDeviceLocation();
@@ -117,14 +127,46 @@ class MapPage extends Component
             Jalalian::fromFormat('Y-m-d H:i', trim($range[1], ' '))->toCarbon(),
         ];
         if (empty($this->selected)) {
-            $this->addError('dateTimeRange', 'لطفا حداقل یک دستگاه را انتخاب کنید.');
+            $this->addError('dateTimeRange', 'لطفا ابتدا دستگاه را انتخاب کنید.');
             return;
         };
 
-        $this->trips = Trip::whereIn('device_id', $this->selected)
-            ->whereBetween('created_at', $dateRange)->get();
+        $startIds = Trip::whereIn('device_id', $this->selected)
+            ->whereBetween('created_at', $dateRange)
+            ->selectRaw('MIN(id) as id')
+            ->groupBy('device_id')
+            ->pluck('id');
 
-        dd($this->trips);
+        $endIds = Trip::whereIn('device_id', $this->selected)
+            ->whereBetween('created_at', $dateRange)
+            ->selectRaw('MAX(id) as id')
+            ->groupBy('device_id')
+            ->pluck('id');
+
+        $trips = Trip::whereIn('id', $startIds->merge($endIds))->get();
+
+        $tripsByDevice = $trips->groupBy('device_id')->map(function ($records) {
+            return [
+                'start' => $records->firstWhere('id', $records->min('id')),
+                'end' => $records->firstWhere('id', $records->max('id')),
+            ];
+        });
+
+        $this->trips = $tripsByDevice;
+
+        if($this->trips->isEmpty()){
+            $this->alert('warning','سفری در این تاریخ یافت نشد!', [
+                'position' => 'top',
+                'timer' => 3000,
+                'toast' => true,
+                'customClass' => [
+                    'popup' => 'colored-toast',
+                    'icon' => 'white'
+                ],
+                'showCancelButton' => false,
+                'showConfirmButton' => false
+            ]);
+        }
 
         $this->dispatch('trips-fetched', $this->trips);
     }

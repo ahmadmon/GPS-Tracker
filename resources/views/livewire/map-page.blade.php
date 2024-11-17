@@ -93,23 +93,22 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-body">
-                        <div class="row g-3 custom-input">
-                            <div class="col-xl col-md-6" x-data="dateTimeRange($refs.dateRangeInp)">
+                        <div class="row g-3 custom-input" x-data="dateTimeRange($refs.dateRangeInp)">
+                            <div class="col-xl col-md-6">
                                 <label class="form-label" for="datetime-range">انتخاب تاریخ: </label>
                                 <div class="input-group flatpicker-calender">
                                     <div class="input-group flatpicker-calender" wire:ignore>
                                         <input class="form-control" id="datetime-range" type="date"
                                                wire:model="dateTimeRange"
                                                x-ref="dateRangeInp"
-                                               :disabled="disabled"
-                                               :placeholder="placeholder"
                                         >
                                     </div>
                                 </div>
                                 <x-input-error :messages="$errors->get('dateTimeRange')" class="mt-1"/>
                             </div>
                             <div class="col d-flex justify-content-start align-items-center m-t-40"><a
-                                    class="btn btn-primary f-w-500" type="button" wire:click="handleTrip">فیلتر</a>
+                                    class="btn btn-primary f-w-500" type="button" wire:click="handleTrip"
+                                    :class="disabled && 'disabled'">فیلتر</a>
                             </div>
                         </div>
                     </div>
@@ -132,10 +131,8 @@
 
 @assets
 <!-- // Leaflet JS assets  -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/libs/leaflet/leaflet.css') }}">
+<script src="{{ asset('assets/libs/leaflet/leaflet.js') }}"></script>
 
 <!-- // Leaflet Geoman for Geofence assets  -->
 <link
@@ -145,8 +142,8 @@
 <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.js"></script>
 
 <!-- // Fullscreen Map assets  -->
-<link rel="stylesheet" href="{{ asset('assets/js/leaflet/Control.FullScreen.css') }}">
-<script src="{{ asset('assets/js/leaflet/Control.FullScreen.js') }}"></script>
+<link rel="stylesheet" href="{{ asset('assets/libs/leaflet/fullscreen/Control.FullScreen.css') }}">
+<script src="{{ asset('assets/libs/leaflet/fullscreen/Control.FullScreen.js') }}"></script>
 
 <!-- // dataTable for Device lists assets  -->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/jquery.dataTables.css') }}">
@@ -222,6 +219,7 @@
         control: null,
         markers: {},
         drownGeofences: {},
+        drawnWaypoints: {},
 
         init() {
             this.map = L.map(el, {
@@ -253,84 +251,25 @@
                 }
             });
 
-            $wire.on('geo-reset', () => this.removeGeofences())
-
 
             // Initial Map Waypoint
-            const startIcon = L.icon({
-                iconUrl: '{{ asset('assets/libs/leaflet-routing-machine/img/map-start.svg') }}',
-                iconSize: [32, 32],
-                iconAnchor: [16, 32],
-                popupAnchor: [0, -32]
-            });
-
-            const endIcon = L.icon({
-                iconUrl: '{{ asset('assets/libs/leaflet-routing-machine/img/map-end.svg') }}',
-                iconSize: [32, 32],
-                iconAnchor: [16, 32],
-                popupAnchor: [0, -32]
-            });
-
-            this.control = L.Routing.control({
-                waypoints: [
-                    L.latLng(35.72446125156188, 51.43498545935407),
-                    L.latLng(35.70130758910315, 51.41301462126029)
-                ],
-                routeWhileDragging: false,
-                addWaypoints: false,
-                draggableWaypoints: false,
-                createMarker: function (i, waypoint, n) {
-                    let marker_icon = (i === 0) ? startIcon : endIcon;
-                    let marker_title = (i === 0) ? 'شروع' : 'پایان';
-                    return L.marker(waypoint.latLng, {
-                        icon: marker_icon,
-                        title: marker_title,
-                        draggable: false
-                    });
-                },
-                lineOptions: {
-                    styles: [{
-                        color: 'blue',
-                        weight: 3,
-                        opacity: 0.7
-                    }]
+            $wire.on('trips-fetched', (trips) => {
+                if (trips.length > 0) {
+                    this.showWaypoints(Object.values(trips[0]));
                 }
             })
+
+            // Reset
+            $wire.on('geo-reset', () => this.removeGeofences())
+            $wire.on('trips-reset', () => this.removeWayPoints())
+
 
             // Update Live Location
             this.updateLocations($wire.deviceLocations);
             $wire.on('locationUpdated', () => this.updateLocations($wire.deviceLocations));
-            // setInterval(() => {
-            //     $wire.refreshMap();
-            //
-            //     this.updateLocations($wire.deviceLocations);
-            // }, 10000)
-
-            // let arrowButton = L.DomUtil.create('button', 'show-arrows-btn');
-            // arrowButton.innerHTML = 'نمایش جهت مسیر';
-            // document.querySelector('#map').appendChild(arrowButton);
-            //
-            // const self = this;
-            // arrowButton.addEventListener('click', function () {
-            //     self.isArrowVisible = !self.isArrowVisible;
-            //
-            //     if (self.isArrowVisible) {
-            //         self.control.getRouter().route(self.control.getWaypoints(), function (error, routes) {
-            //             if (!error && routes && routes[0]) {
-            //                 self.addArrowsToRoute(routes[0]);
-            //                 arrowButton.innerHTML = 'مخفی کردن جهت مسیر';
-            //             }
-            //         });
-            //     } else {
-            //         if (self.arrows.length) {
-            //             self.arrows.forEach(arrow => self.map.removeLayer(arrow));
-            //             self.arrows = [];
-            //         }
-            //         arrowButton.innerHTML = 'نمایش جهت مسیر';
-            //     }
-            // });
         },
-
+        // Handle The Devices live location
+        //-----------------------------------
         updateLocations(locations) {
             //remove Markers
             Object.keys(this.markers).forEach(deviceId => {
@@ -411,6 +350,8 @@
             return 'inactive';
         },
 
+        // Handle geofences
+        //-----------------------------------
         showGeofences(geoFences) {
             this.removeGeofences();
             geoFences.forEach(fence => {
@@ -461,72 +402,86 @@
             }
 
             return savedColors[geofenceId];
-        }
+        },
 
-        // addArrowsToRoute(route) {
-        //     this.arrows.forEach(arrow => this.map.removeLayer(arrow));
-        //     this.arrows = [];
-        //
-        //     if (!route || !route.coordinates) return;
-        //
-        //     const coordinates = route.coordinates;
-        //
-        //     for (let i = 0; i < coordinates.length - 1; i += Math.ceil(coordinates.length / 10)) {
-        //         const start = coordinates[i];
-        //         const end = coordinates[i + 1];
-        //         if (!end) continue;
-        //
-        //         const midPoint = L.latLng(
-        //             (start.lat + end.lat) / 2,
-        //             (start.lng + end.lng) / 2
-        //         );
-        //
-        //         const angle = Math.atan2(end.lat - start.lat, end.lng - start.lng) * 180 / Math.PI;
-        //
-        //         const arrow = L.divIcon({
-        //             className: 'route-arrow',
-        //             html: '→',
-        //             iconSize: [20, 20],
-        //             iconAnchor: [10, 10]
-        //         });
-        //
-        //         const marker = L.marker(midPoint, {
-        //             icon: arrow,
-        //             rotationAngle: angle
-        //         }).addTo(this.map);
-        //
-        //         const arrowElement = marker.getElement();
-        //         if (arrowElement) {
-        //             arrowElement.style.transform += ` rotate(${angle}deg)`;
-        //         }
-        //
-        //         this.arrows.push(marker);
-        //     }
-        // }
+        // Handle The Devices trips
+        //-----------------------------------
+        showWaypoints(trips) {
+            const startIcon = L.icon({
+                iconUrl: '{{ asset('assets/libs/leaflet-routing-machine/img/map-start.svg') }}',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+
+            const endIcon = L.icon({
+                iconUrl: '{{ asset('assets/libs/leaflet-routing-machine/img/map-end.svg') }}',
+                iconSize: [32, 32],
+                iconAnchor: [16, 32],
+                popupAnchor: [0, -32]
+            });
+
+            this.removeWayPoints();
+
+            trips.forEach((trip, i) => {
+                this.drawnWaypoints[i] = L.Routing.control({
+                    waypoints: [
+                        L.latLng(parseFloat(trip.start.lat), parseFloat(trip.start.long)),
+                        L.latLng(parseFloat(trip.end.lat), parseFloat(trip.end.long))
+                    ],
+                    routeWhileDragging: false,
+                    addWaypoints: false,
+                    draggableWaypoints: false,
+                    createMarker: function (i, waypoint, n) {
+                        let marker_icon = (i === 0) ? startIcon : endIcon;
+                        let marker_title = (i === 0) ? 'شروع' : 'پایان';
+                        return L.marker(waypoint.latLng, {
+                            icon: marker_icon,
+                            title: marker_title,
+                            draggable: false
+                        });
+                    },
+                    lineOptions: {
+                        styles: [{
+                            color: "#F50A0AFF",
+                            weight: 5,
+                            opacity: 0.9
+                        }]
+                    }
+                }).addTo(this.map);
+            })
+        },
+
+        removeWayPoints() {
+            Object.values(this.drawnWaypoints).forEach((route) => {
+                this.map.removeControl(route);
+            });
+            this.drawnWaypoints = {};
+        }
     }));
 
     // DatePicker (Enter Time)
     //------------------------------------------------------
     Alpine.data('dateTimeRange', (input) => ({
+        flatpickrInstance: null,
         disabled: true,
         placeholder: 'لطفا ابتدا دستگاه را انتخاب کنید!',
 
         init() {
+            this.initializeFlatpickr();
             this.updateInputState();
 
-            $wire.on('locationUpdated', () => this.updateInputState());
+            $wire.on('locationUpdated', () => {
+                this.updateInputState();
 
+                if (this.flatpickrInstance) {
+                    this.flatpickrInstance.destroy();
+                }
 
-            flatpickr(input, {
-                mode: "range",
-                enableTime: true,
-                time_24hr: true,
-                locale: "fa",
-                altInput: true,
-                altFormat: 'Y/m/d - H:i',
-                maxDate: "today",
-                disableMobile: true
+                this.initializeFlatpickr();
             });
+
+
         },
 
         updateInputState() {
@@ -535,8 +490,33 @@
                 this.placeholder = 'لطفا ابتدا دستگاه را انتخاب کنید!';
             } else {
                 this.disabled = false;
-                this.placeholder = 'انتخاب زمان و تاریخ';
+                this.placeholder = 'لطفا تاریخ و زمان را انتخاب کنید!';
             }
+
+            if (this.flatpickrInstance) {
+                const altInput = this.flatpickrInstance.altInput;
+                if (altInput) {
+                    altInput.disabled = this.disabled;
+                    altInput.placeholder = this.placeholder;
+                }
+                this.flatpickrInstance.input.disabled = this.disabled;
+                this.flatpickrInstance.input.placeholder = this.placeholder;
+            }
+        },
+
+        initializeFlatpickr() {
+            this.flatpickrInstance = flatpickr(input, {
+                mode: "range",
+                enableTime: true,
+                time_24hr: true,
+                locale: "fa",
+                altInput: true,
+                altFormat: 'Y/m/d - H:i',
+                maxDate: "today",
+                disableMobile: true,
+                disabled: this.disabled,
+                placeholder: this.placeholder
+            });
         }
     }));
 </script>

@@ -25,6 +25,8 @@
  <script src="{{ asset('assets/js/typeahead/typeahead.custom.js')}}"></script>
  <script src="{{ asset('assets/js/typeahead-search/handlebars.js')}}"></script>
  <script src="{{ asset('assets/js/typeahead-search/typeahead-custom.js')}}"></script>
+ <script src="{{ asset('assets/js/sweet-alert/sweetalert.min.js')}}"></script>
+ <x-livewire-alert::scripts />
  <!-- Plugins JS Ends-->
  <!-- Theme js-->
  <script src="{{ asset('assets/js/script.js')}}"></script>

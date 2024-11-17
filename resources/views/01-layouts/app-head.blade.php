@@ -26,6 +26,7 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/scrollbar.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/animate.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/prism.css')}}">
+    <link rel="stylesheet" href="{{ asset('assets/css/vendors/sweetalert2.min.css') }}">
     <!-- Plugins css Ends-->
     <!-- Bootstrap css-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/bootstrap.css')}}">
