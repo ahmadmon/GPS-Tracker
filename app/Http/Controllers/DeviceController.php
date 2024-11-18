@@ -139,19 +139,16 @@ class DeviceController extends Controller
             'apn' => $request->apn,
             'interval' => $request->interval,
             'password' => $request->password,
-            'phones' => ($device->brand == 'sinotrack' || count($request->phones) == 1) ? $request->phones[0] : implode(',', $request->phones)
+            'phones' => ($device->brand == 'sinotrack' || count($request->phones) == 1 || is_null($request->phones[1])) ? $request->phones[0] : implode(',', $request->phones)
         ];
-
-        if (isset($request->password)) {
-            $device->update(['password' => $request->password]);
-        }
 
         $deviceManager = new DeviceManager($device);
         $deviceBrand = $deviceManager->getDevice($device->brand->value);
         $command = $deviceBrand->getCommand($request->command, $params);
 
-        dd($command);
-
+        if (isset($request->password)) {
+            $device->update(['password' => $request->password]);
+        }
 
         $sms = new SmsService();
         $sms->setTo($device->phone_number);
@@ -161,7 +158,7 @@ class DeviceController extends Controller
         if ($res->getStatusCode() == 200) {
             return back()->with('success-alert', 'دستور با موفقیت برای دستگاه ارسال شد.');
         } else {
-            return back()->with('error-alert', "خطایی به وجود آمده است!\nلطفا بعد از چند لحظه دوباره امتحان کنید");
+            return back()->with('error-alert', "خطایی به وجود آمده است!\nلطفا بعد از چند لحظه دوباره امتحان کنید\nدر صورت مشاده دوباره این پیغام لطفا با پشتیبانی تماس بگیرید.");
         }
     }
 

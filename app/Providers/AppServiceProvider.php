@@ -2,7 +2,7 @@
 
 namespace App\Providers;
 
-use App\Http\Services\DeviceManager;
+use App\Models\Device;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 

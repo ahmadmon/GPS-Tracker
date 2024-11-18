@@ -35,8 +35,8 @@ class StoreGpsDataJob implements ShouldQueue
             $device = Device::where('serial', $this->data['device_id'])->first();
 
             if ($device) {
-                DB::transaction(function () use ($device) {
-                    Trip::create([
+                $trip = DB::transaction(function () use ($device) {
+                    return Trip::create([
                         'device_id' => $device->id,
                         'user_id' => $device->user_id,
                         'vehicle_id' => $device?->vehicle_id,
@@ -44,31 +44,16 @@ class StoreGpsDataJob implements ShouldQueue
                         'lat' => $this->data['lat'],
                         'long' => $this->data['long'],
                         'device_stats' => json_encode($this->data),
-                        'distance' => 0,
-                        'start_at' => null,
-                        'end_at' => null
                     ]);
                 });
+
+                CheckGeofenceStatusJob::dispatch($device, $trip);
+
             }
 
         } catch (\Exception $e) {
             Log::error('Error storing trips Data: ' . $e->getMessage());
         }
     }
-
-// calculating Distance between two points
-
-//   private function haversine($lat1, $lon1, $lat2, $lon2) {
-//        $earth_radius = 6371;
-//
-//        $dLat = deg2rad($lat2 - $lat1);
-//        $dLon = deg2rad($lon2 - $lon1);
-//
-//        $a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($lat1)) * cos(deg2rad($lat2)) * sin($dLon/2) * sin($dLon/2);
-//        $c = 2 * atan2(sqrt($a), sqrt(1-$a));
-//
-//        $distance = $earth_radius * $c;
-//        return $distance;
-//    }
 
 }

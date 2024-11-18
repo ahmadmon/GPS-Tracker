@@ -10,7 +10,8 @@
             <option value="2" @selected(old('command') == 2)>زمانبندی ارسال موقعیت</option>
             <option value="3" @selected(old('command') == 3)>تنظیم رمز عبور</option>
             <option value="4" @selected(old('command') == 4)>معرفی شماره ادمین</option>
-            <option value="5" @selected(old('command') == 5)>بازگردانی دستگاه به حالت کارخانه
+            <option value="5" @selected(old('command') == 5)>حذف شماره ادمین</option>
+            <option value="6" @selected(old('command') == 6)>بازگردانی دستگاه به حالت کارخانه
             </option>
         </select>
         <x-input-error :messages="$errors->get('command')" class="mt-2"/>
@@ -48,11 +49,11 @@
             <label class="form-label" for="selected-3">رمز عبور را وارد کنید
                 <sup class="text-danger">*</sup>
             </label>
-            <small class="text-muted d-block">رمز عبور باید شامل 4 کاراکتر باشد</small>
+            <small class="text-muted d-block">رمز عبور باید شامل 4 عدد باشد</small>
             <small class="text-muted d-block">رمز عبور بپیشفرض برابر است با: <strong
-                    class="text-danger">0000</strong></small>
+                    class="text-danger">رمز‌عبور ندارد.</strong></small>
             <input class="form-control" id="selected-3" name="password" type="number"
-                   value="{{ old('password') }}"
+                   value="{{ old('password') }}" @keypress="if($el.value.length > 3) $el.value = $el.value.slice(0,3) ;"
                    placeholder="برای مثال: 0000">
             <x-input-error :messages="$errors->get('password')" class="mt-2"/>
         </div>
@@ -79,6 +80,18 @@
 
             </div>
             <x-input-error :messages="$errors->get('phones')" class="mt-2"/>
+        </div>
+        <!-- Delete Admin Number -->
+        <div class="mb-3" x-cloak x-show="parseInt(selected) === 5">
+            <label class="form-label" for="selected-4">شماره تماس ادمین
+                <sup class="text-danger">*</sup>
+            </label>
+            <small class="text-muted d-block">در این بخش شما میتوانید شماره هایی را که به عنوان شماره های مدیر برای
+                دستگاه تعریف کرده اید را حذف کنید.</small>
+            <input class="form-control" id="selected-4" name="phones[0]" type="number"
+                   value="{{ old('phones.0') }}"
+                   placeholder="برای مثال: 09123456789">
+            <x-input-error :messages="$errors->get('phones.0')" class="mt-2"/>
         </div>
     </section>
 </div>

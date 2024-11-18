@@ -140,7 +140,7 @@
                                                    href="{{ route('device.edit', $device->id) }}">ویرایش</a>
                                                 <a href="javascript:void(0)" class="dropdown-item"
                                                    @click.prevent="show = true">حذف</a>
-                                                <a href="{{ route('device.device-connection', $device->id) }}"
+                                                <a href="{{ route('device.device-setting', $device->id) }}"
                                                    class="dropdown-item">دستورات دستگاه</a>
                                                 <a href="{{ route('device.show', $device->id) }}"
                                                    class="dropdown-item">نمایش موقعیت مکانی</a>

@@ -22,12 +22,12 @@ class StoreSmsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'command' => 'required|in:0,1,2,3,4,5',
+            'command' => 'required|in:0,1,2,3,4,5,6',
             'apn' => 'nullable|required_if:command,1|string',
             'interval' => 'nullable|required_if:command,2|numeric|min:10',
             'password' => 'nullable|required_if:command,3|numeric|digits:4',
-            'phones' => 'nullable|required_if:command,4|array|max:2',
-            'phones.0' => 'nullable|required_if:command,4|numeric|digits:11',
+            'phones' => 'nullable|required_if:command,4,5|array|max:2',
+            'phones.0' => 'nullable|required_if:command,4,5|numeric|digits:11',
             'phones.1' => 'nullable|numeric|digits:11',
         ];
     }
