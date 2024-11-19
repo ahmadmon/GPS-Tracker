@@ -119,4 +119,19 @@ class CompanyController extends Controller
 
         return back()->with('success-alert', "سازمان {$name} با موفقیت حذف گردید");
     }
+
+    /**
+     * add simple user to company
+     */
+    public function addSubsets(Company $company)
+    {
+        $users = User::where([['status', 1], ['user_type', 0]])->orderByDesc('created_at')->cursor();
+
+        return view('company.add-subsets', compact('users'));
+    }
+
+    public function storeSubsets()
+    {
+
+    }
 }

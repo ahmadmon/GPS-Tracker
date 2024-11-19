@@ -1,10 +1,13 @@
 @extends('01-layouts.master')
 
-@section('title', 'لیست کاربران')
+@section('title', 'افزودن زیر مجموعه')
 
 @push('styles')
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/jquery.dataTables.css') }}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/datatables.css') }}">
+    {{--    <link rel="stylesheet" type="text/css" href="{{ asset('assets/test/jquery.dataTables.css') }}">--}}
+    {{--    <link rel="stylesheet" type="text/css" href="{{ asset('assets/test/dataTables.bootstrap5.css') }}">--}}
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/test/select.bootstrap5.css') }}">
 @endpush
 
 @section('content')
@@ -21,7 +24,12 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item dana">کاربران</li>
+                        <li class="breadcrumb-item dana">
+                            <a href="{{ route('company.index') }}">
+                                لیست سازمان ها
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item dana">افزودن زیر مجموعه</li>
                     </ol>
                 </div>
             </div>
@@ -29,12 +37,11 @@
     </div>
 
 
-    <div class="container-fluid">
-        <x-partials.alert.success-alert/>
+    <form action="{{ route('company.store') }}" method="POST" class="row" autocomplete="off"
+          enctype="multipart/form-data">
+        @csrf
         <div class="row">
-            <!-- Zero Configuration  Starts-->
-            <div class="col-sm-12">
-                <a href="{{ route('user.create') }}" class="btn btn-primary mb-4">+ ثبت‌نام کاربر جدید</a>
+            <div class="col-12">
                 <div class="card">
                     <div class="card-header pb-0 card-no-border">
                         <h4>لیست کاربران</h4>
@@ -44,16 +51,16 @@
                             <table class="display" id="basic-1">
                                 <thead>
                                 <tr>
+                                    <th></th>
                                     <th>کاربر</th>
                                     <th>شماره تماس</th>
-                                    <th>وضعیت</th>
                                     <th>تاریخ عضویت</th>
-                                    <th>عملیات</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @forelse($users as $user)
                                     <tr>
+                                        <td></td>
                                         <td>
                                             <div class="d-flex flex-column">
                                                 <span class="fw-bold">{{ $user->name }}</span>
@@ -63,32 +70,7 @@
                                         </td>
                                         <td>{{ $user->phone }}</td>
                                         <td>
-                                            @if($user->status)
-                                                <span class="badge dana rounded-pill badge-success">فعال</span>
-                                            @else
-                                                <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
-                                            @endif
-                                        </td>
-                                        <td>
                                             <span class="text-muted">{{ jalaliDate($user->created_at) }}</span>
-                                        </td>
-                                        <td x-data="{ show: false }">
-                                            <div class="btn-group" x-cloak x-show="!show">
-                                                <button class="btn dropdown-toggle" type="button"
-                                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                                    <i class="icofont icofont-listing-box txt-dark"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-block text-center" style="">
-                                                    <a class="dropdown-item"
-                                                       href="{{ route('user.edit', $user->id) }}">ویرایش</a>
-                                                    <a href="javascript:void(0)" class="dropdown-item"
-                                                       @click="show = true">حذف</a>
-                                                    <a class="dropdown-item"
-                                                       href="{{ route('user.show', $user->id) }}">مشاهده جزئیات</a>
-                                                </ul>
-                                            </div>
-                                            <x-partials.btns.confirm-rmv-btn
-                                                url="{{ route('user.destroy', $user->id) }}"/>
                                         </td>
                                     </tr>
                                 @empty
@@ -102,22 +84,45 @@
                     </div>
                 </div>
             </div>
-            <!-- Zero Configuration  Ends-->
+
         </div>
-    </div>
+
+        <div class="col-12 mt-2">
+            <button class="btn btn-primary" type="submit">افزودن</button>
+        </div>
+    </form>
 
 @endsection
 
 @push('scripts')
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/js/datatable/datatables/dataTables1.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
+
+    {{--    <script src="{{ asset('assets/test/jquery.dataTables.min.js') }}"></script>--}}
+    {{--    <script src="{{ asset('assets/test/dataTables1.js')}}"></script>--}}
+    {{--    <script src="{{ asset('assets/test/dataTables.bootstrap5.js')}}"></script>--}}
+        <script src="{{ asset('assets/test/dataTables.select.js')}}"></script>
+        <script src="{{ asset('assets/test/select.bootstrap5.js')}}"></script>
 
     <script>
         $('#basic-1').DataTable({
+            columnDefs: [
+                {
+                    orderable: false,
+                    className: 'select-checkbox',
+                    targets: 0
+                }
+            ],
             order: [[3, 'asc']],
-            "language": {
-                "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
+            language: {
+                url: "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
+            },
+            select: {
+                style: 'os',
+                selector: 'td:first-child'
             }
         });
+
     </script>
 @endpush

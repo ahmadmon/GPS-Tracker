@@ -5,9 +5,10 @@
                 <div class="Typeahead Typeahead--twitterUsers">
                     <div class="u-posRelative">
                         <input class="demo-input Typeahead-input form-control-plaintext w-100" type="text"
-                            placeholder="Search Cuba .." name="q" title="" autofocus>
+                               placeholder="Search Cuba .." name="q" title="" autofocus>
                         <div class="spinner-border Typeahead-spinner" role="status"><span
-                                class="sr-only">Loading...</span></div><i class="close-search" data-feather="x"></i>
+                                class="sr-only">Loading...</span></div>
+                        <i class="close-search" data-feather="x"></i>
                     </div>
                     <div class="Typeahead-menu"></div>
                 </div>
@@ -16,7 +17,7 @@
         <div class="header-logo-wrapper col-auto p-0">
             <div class="logo-wrapper"><a href="{{ route('home') }}"><img class="img-fluid"
                                                                          src="{{ asset('assets/images/logo/logo.png') }}"
-                        alt=""></a></div>
+                                                                         alt=""></a></div>
             <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i>
             </div>
         </div>
@@ -71,27 +72,35 @@
                         <div class="flip-card">
                             <div class="flip-card-inner">
                                 <div class="front">
-                                    <h6 class="f-18 mb-0 dropdown-title">نشانک</h6>
+                                    <h6 class="f-18 mb-0 dropdown-title">دسترسی سریع</h6>
                                     <ul class="bookmark-dropdown">
                                         <li>
                                             <div class="row">
                                                 <div class="col-4 text-center">
                                                     <div class="bookmark-content">
-                                                        <div class="bookmark-icon"><i data-feather="file-text"></i>
-                                                        </div>
-                                                        <span>فرم ها</span>
+                                                        <a href="{{ route('map') }}">
+                                                            <div class="bookmark-icon"><i data-feather="map"></i>
+                                                            </div>
+                                                            <span class="dana text-dark">نقشه</span>
+                                                        </a>
                                                     </div>
                                                 </div>
                                                 <div class="col-4 text-center">
                                                     <div class="bookmark-content">
-                                                        <div class="bookmark-icon"><i data-feather="user"></i>
-                                                        </div><span>نمایه</span>
+                                                        <a href="{{ route('device.create') }}">
+                                                            <div class="bookmark-icon"><i data-feather="cpu"></i>
+                                                            </div>
+                                                            <span class="dana text-dark">ایجاد دستگاه</span>
+                                                        </a>
                                                     </div>
                                                 </div>
                                                 <div class="col-4 text-center">
                                                     <div class="bookmark-content">
-                                                        <div class="bookmark-icon"><i data-feather="server"></i></div>
-                                                        <span>جدول</span>
+                                                        <a href="{{ route('vehicle.create') }}">
+                                                            <div class="bookmark-icon"><i data-feather="truck"></i>
+                                                            </div>
+                                                            <span class="dana text-dark">ایجاد وسیله نقلیه</span>
+                                                        </a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -107,7 +116,7 @@
                                             </div>
                                         </li>
                                         <li><a class="f-w-700 d-block flip-back" id="flip-back"
-                                                href="javascript:void(0)">برگشت</a></li>
+                                               href="javascript:void(0)">برگشت</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -186,7 +195,8 @@
                     <div class="notification-box">
                         <svg>
                             <use href="{{ asset('assets/svg/icon-sprite.svg#notification') }}"></use>
-                        </svg><span class="badge rounded-pill badge-secondary">4 </span>
+                        </svg>
+                        <span class="badge rounded-pill badge-secondary">4 </span>
                     </div>
                     <div class="onhover-show-div notification-dropdown">
                         <h6 class="f-18 mb-0 dropdown-title">اعلان‌ها </h6>
@@ -209,14 +219,16 @@
                 </li>
                 <li class="profile-nav onhover-dropdown pe-0 py-0">
                     <div class="media profile-media"><img class="b-r-10"
-                                                          src="{{ asset('assets/images/dashboard/profile.png') }}"
-                            alt="">
+                                                          src="{{ asset('assets/images/avtar/user.png') }}"
+                                                          alt="">
                         <div class="media-body"><span>{{ auth()->user()?->name }}</span>
-                            <p class="mb-0">{{ auth()->user()->user_type ? 'ادمین' : 'کاربر' }}<i class="middle fa fa-angle-down"></i></p>
+                            <p class="mb-0">{{ auth()->user()->user_type ? 'ادمین' : 'کاربر' }}<i
+                                    class="middle fa fa-angle-down"></i></p>
                         </div>
                     </div>
                     <ul class="profile-dropdown onhover-show-div">
-                        <li><a href="{{ route('profile.index') }}"><i data-feather="user"></i><span>حساب </span></a></li>
+                        <li><a href="{{ route('profile.index') }}"><i data-feather="user"></i><span>حساب </span></a>
+                        </li>
                         <li>
                             <form action="{{ route('logout') }}" method="post" class="d-inline">
                                 @csrf
@@ -229,14 +241,24 @@
             </ul>
         </div>
         <script class="result-template" type="text/x-handlebars-template">
-    <div class="ProfileCard u-cf">
-    <div class="ProfileCard-avatar"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-airplay m-0"><path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path><polygon points="12 15 17 21 7 21 12 15"></polygon></svg></div>
-    <div class="ProfileCard-details">
-    <div class="ProfileCard-realName">name</div>
-    </div>
-    </div>
-  </script>
-        <script class="empty-template" type="text/x-handlebars-template"><div class="EmptyMessage">Your search turned up 0 results. This most likely means the backend is down, yikes!</div></script>
+            <div class="ProfileCard u-cf">
+                <div class="ProfileCard-avatar">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+                         class="feather feather-airplay m-0">
+                        <path d="M5 17H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-1"></path>
+                        <polygon points="12 15 17 21 7 21 12 15"></polygon>
+                    </svg>
+                </div>
+                <div class="ProfileCard-details">
+                    <div class="ProfileCard-realName">name</div>
+                </div>
+            </div>
+        </script>
+        <script class="empty-template" type="text/x-handlebars-template">
+            <div class="EmptyMessage">Your search turned up 0 results. This most likely means the backend is down,
+                yikes!
+            </div></script>
     </div>
 </div>
 

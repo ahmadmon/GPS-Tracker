@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -54,9 +55,17 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Vehicle::class, 'user_id');
     }
 
-    public function companies(): HasMany
+    // related to The users Company (Joined by Company)
+    public function companies(): BelongsToMany
     {
-        return $this->hasMany(Company::class);
+        return $this->belongsToMany(Company::class, 'companies_user');
     }
+
+    // related to The Company manager
+    public function managedCompanies(): HasMany
+    {
+        return $this->hasMany(Company::class, 'user_id');
+    }
+
 
 }

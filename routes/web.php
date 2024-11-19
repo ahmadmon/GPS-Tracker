@@ -26,6 +26,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('vehicle', VehicleController::class);
     Route::resource('user', UserController::class);
     Route::resource('company', CompanyController::class);
+    Route::get('company/add-subsets/{company}', [CompanyController::class, 'addSubsets'])->name('company.add-subsets');
+    Route::post('company/store-subsets', [CompanyController::class, 'storeSubsets'])->name('company.store-subsets');
     Route::resource('geofence', GeofenceController::class);
 
     Route::prefix('profile')->name('profile.')->group(function () {
