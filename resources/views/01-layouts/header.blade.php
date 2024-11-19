@@ -216,9 +216,7 @@
                         </div>
                     </div>
                     <ul class="profile-dropdown onhover-show-div">
-                        <li><a href="#"><i data-feather="user"></i><span>حساب </span></a></li>
-                        <li><a href="#"><i data-feather="mail"></i><span>صندوق ورودی</span></a></li>
-                        <li><a href="#"><i data-feather="settings"></i><span>تنظیمات</span></a></li>
+                        <li><a href="{{ route('profile.index') }}"><i data-feather="user"></i><span>حساب </span></a></li>
                         <li>
                             <form action="{{ route('logout') }}" method="post" class="d-inline">
                                 @csrf

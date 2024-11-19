@@ -5,13 +5,10 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\ProfileController;
 use App\Livewire\MapPage;
 use Illuminate\Support\Facades\Route;
 
-Route::post('/', function (Request $request) {
-    Log::info('Received tracker data: ', $request->all());
-});
 
 Route::middleware(['auth'])->group(function () {
 
@@ -30,6 +27,12 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('user', UserController::class);
     Route::resource('company', CompanyController::class);
     Route::resource('geofence', GeofenceController::class);
+
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/', [ProfileController::class, 'index'])->name('index');
+        Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('change-password');
+        Route::get('/forgot-password', [ProfileController::class, 'forgotPassword'])->name('forgot-password');
+    });
 
 });
 

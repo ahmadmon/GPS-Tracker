@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\Auth;
 
 trait VerificationCode
 {
-    public function generateOtp(string $mobile, $smsService)
+    public function generateOtp(string $mobile, $smsService, $existsUser = null)
     {
-        $user = User::where('phone', $mobile)->first();
+        $user = User::where('phone', $mobile)->first() ?? $existsUser;
 
         $verificationCode = OtpCode::where('user_id', $user->id)->latest()->first();
         $now = Carbon::now();
@@ -27,7 +27,7 @@ trait VerificationCode
             'expired_at' => $now->addMinutes(3)
         ]);
 
-        $smsService->setTo($user->phone);
+        $smsService->setTo($mobile);
         $smsService->setText("فناوری آرون ‌ردیاب\nرمز ورود: {$verificationCode->otp}\n");
         $smsService->fire();
 
