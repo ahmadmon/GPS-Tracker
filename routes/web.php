@@ -3,9 +3,9 @@
 use App\Http\Controllers\Admin\GeofenceController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DeviceController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
-use App\Http\Controllers\ProfileController;
 use App\Livewire\MapPage;
 use Illuminate\Support\Facades\Route;
 
@@ -26,8 +26,8 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('vehicle', VehicleController::class);
     Route::resource('user', UserController::class);
     Route::resource('company', CompanyController::class);
-    Route::get('company/add-subsets/{company}', [CompanyController::class, 'addSubsets'])->name('company.add-subsets');
-    Route::post('company/store-subsets', [CompanyController::class, 'storeSubsets'])->name('company.store-subsets');
+    Route::delete('company/remove-subsets/{company}/{id}', [CompanyController::class, 'removeSubsets'])->name('company.remove-subsets');
+    Route::get('company/manage-subsets/{company}', [CompanyController::class, 'manageSubsets'])->name('company.manage-subsets');
     Route::resource('geofence', GeofenceController::class);
 
     Route::prefix('profile')->name('profile.')->group(function () {

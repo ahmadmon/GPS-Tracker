@@ -54,7 +54,7 @@
                                                             </td>
                                                         </tr>
                                                         @forelse($devices as $key => $device)
-                                                            <tr>
+                                                            <tr wire:key="{{ $device->id }}">
                                                                 <td class="w-100 d-flex justify-content-between align-items-center">
                                                                     <div
                                                                         class="d-flex justify-content-start align-items-center me-3">

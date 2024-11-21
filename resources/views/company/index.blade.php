@@ -95,7 +95,7 @@
                                                     <a class="dropdown-item"
                                                        href="{{ route('company.show', $company->id) }}">مشاهده جزئیات</a>
                                                     <a class="dropdown-item"
-                                                       href="{{ route('company.add-subsets', $company->id) }}">افزودن زیرمجموعه</a>
+                                                       href="{{ route('company.manage-subsets', $company->id) }}">افزودن زیرمجموعه</a>
                                                 </ul>
                                             </div>
                                             <x-partials.btns.confirm-rmv-btn

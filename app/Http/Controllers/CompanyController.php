@@ -120,18 +120,14 @@ class CompanyController extends Controller
         return back()->with('success-alert', "سازمان {$name} با موفقیت حذف گردید");
     }
 
-    /**
-     * add simple user to company
-     */
-    public function addSubsets(Company $company)
+    public function manageSubsets(Company $company)
     {
-        $users = User::where([['status', 1], ['user_type', 0]])->orderByDesc('created_at')->cursor();
-
-        return view('company.add-subsets', compact('users'));
+        return view('company.manage-subsets', compact('company'));
     }
 
-    public function storeSubsets()
+    public function removeSubsets(Company $company, $userId)
     {
-
+        $company->users()->detach($userId);
+        return to_route('company.show', $company->id)->with('success-alert', 'کاربر با موفقیت از لیست زیرمجموعه هایتان حذف شد.');
     }
 }

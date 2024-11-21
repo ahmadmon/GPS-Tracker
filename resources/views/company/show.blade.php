@@ -53,7 +53,8 @@
                                 <div class="flex-grow-1">
                                     <h5 class="mb-1">{{ $company->name }}</h5>
                                     <strong class="text-muted">مدیر:
-                                        <a href="{{ route('user.show', $company->manager->id) }}" target="_blank">{{ $company->manager->name }}</a>
+                                        <a href="{{ route('user.show', $company->manager->id) }}"
+                                           target="_blank">{{ $company->manager->name }}</a>
                                     </strong>
                                 </div>
                             </div>
@@ -98,9 +99,14 @@
         </div>
 
         <div class="col-xl-8">
+            <x-partials.alert.success-alert />
             <div class="card">
                 <div class="card-header">
-                    <h4 class="card-title mb-0">زیرمجموعه های سازمان</h4>
+                    <div class="card-title mb-0 d-flex justify-content-between align-items-center">
+                        <h4>زیرمجموعه های سازمان</h4>
+                        <a href="{{ route('company.add-subsets', $company->id) }}" class="btn btn-sm btn-primary">+
+                            افزودن زیرمجموعه</a>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive custom-scrollbar text-nowrap">
@@ -121,7 +127,7 @@
                                         <div class="d-flex flex-column">
                                             <span class="fw-bold">{{ $user->name }}</span>
                                             <small
-                                                class="text-muted">{{ $user->user_type ? 'ادمین' : 'کاربر' }}</small>
+                                                    class="text-muted">{{ $user->user_type ? 'ادمین' : 'کاربر' }}</small>
                                         </div>
                                     </td>
                                     <td>{{ $user->phone }}</td>
@@ -137,21 +143,11 @@
                                     </td>
                                     <td x-data="{ show: false }">
                                         <div class="btn-group" x-cloak x-show="!show">
-                                            <button class="btn dropdown-toggle" type="button"
-                                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                                <i class="icofont icofont-listing-box txt-dark"></i>
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-block text-center" style="">
-                                                <a class="dropdown-item"
-                                                   href="{{ route('user.edit', $user->id) }}">ویرایش</a>
-                                                <a href="javascript:void(0)" class="dropdown-item"
-                                                   @click.prevent="show = true">حذف</a>
-                                                <a class="dropdown-item"
-                                                   href="{{ route('user.show', $user->id) }}">مشاهده جزئیات</a>
-                                            </ul>
+                                            <a href="javascript:void(0)" class="btn btn-sm btn-danger"
+                                               @click="show = true">حذف از لیست</a>
                                         </div>
                                         <x-partials.btns.confirm-rmv-btn
-                                            url="{{ route('user.destroy', $user->id) }}"/>
+                                                url="{{ route('company.remove-subsets', [$company->id,$user->id]) }}"/>
                                     </td>
                                 </tr>
                             @empty

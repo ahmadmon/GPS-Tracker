@@ -135,3 +135,10 @@ function getLastPacket($data): string
     return $lastPacket;
 }
 
+function maskPhoneNumber($phoneNumber): string
+{
+    if (strlen($phoneNumber) === 11) {
+        return substr_replace($phoneNumber, "***", -7, 3);
+    }
+}
+
