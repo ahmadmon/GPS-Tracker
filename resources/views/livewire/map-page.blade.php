@@ -75,8 +75,8 @@
                                                                     @if($device->lastLocation())
                                                                         <div
                                                                             class="d-flex justify-content-end align-items-center">
-                                                                            <span><strong
-                                                                                    class="text-success">{{ json_decode($device?->lastLocation()->device_stats)?->speed }}</strong> KM/H</span>
+                                                                            <span>KM/H <strong
+                                                                                    class="text-success">{{ json_decode($device?->lastLocation()->device_stats)?->speed }}</strong></span>
                                                                         </div>
                                                                     @endif
                                                                 </td>

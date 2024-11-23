@@ -25,16 +25,34 @@ class UserRequest extends FormRequest
             return [
                 'name' => 'required|min:3|max:255',
                 'phone' => 'required|numeric|digits:11|unique:users,phone',
-                'user_type' => 'required|in:0,1',
-                'status' => 'required|in:0,1'
+                'user_type' => 'required|in:0,1,2,3',
+                'status' => 'required|in:0,1',
+                'role' => 'required|integer|exists:roles,id',
+                'permissions' => 'required|array',
+                'permissions.*' => 'numeric|exists:permissions,id'
             ];
         }else{
             return [
                 'name' => 'required|min:3|max:255',
                 'phone' => 'required|numeric|digits:11|unique:users,phone,' . $this->user->id,
-                'user_type' => 'required|in:0,1',
-                'status' => 'required|in:0,1'
+                'user_type' => 'required|in:0,1,2,3',
+                'status' => 'required|in:0,1',
+                'role' => 'required|integer|exists:roles,id',
+                'permissions' => 'required|array',
+                'permissions.*' => 'numeric|exists:permissions,id'
             ];
         }
+    }
+
+
+    public function attributes(): array
+    {
+        return [
+            'phone' => 'شماره تماس',
+            'user_type' => 'نوع کاربر',
+            'role' => 'نقش',
+            'permissions' => 'دسترسی ها',
+            'permissions.*' => 'دسترسی ها',
+        ];
     }
 }

@@ -131,6 +131,7 @@
     <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
     <script>
         $('#basic-1').DataTable({
+            order: [[6, 'desc']],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
             }

@@ -4,7 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
 use App\Http\Services\Notify\SMS\SmsService;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
 {
@@ -14,7 +19,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        $users = User::cursor();
+        $users = User::orderByDesc('id')->cursor();
 
         return view('user.index', compact('users'));
     }
@@ -33,8 +38,23 @@ class UserController extends Controller
         }
         session(['generatedPass' => $randomString]);
 
+        $permissions = Cache::remember('permissions-lits', 60 * 60, fn() => Permission::all()
+            ->groupBy('groupName')
+            ->mapWithKeys(function ($permissions, $key) {
+                return [
+                    $key => $permissions->map(fn($permission): Collection => collect([
+                        'id' => $permission->id,
+                        'persian_name' => $permission->persian_name,
+                    ]))
+                ];
+            }));
+
+
+
         return view('user.create', [
-            'password' => $randomString
+            'password' => $randomString,
+            'roles' => Cache::remember('roles-list', 60 * 60, fn() => Role::all()),
+            'permissions' => $permissions
         ]);
     }
 
@@ -46,7 +66,11 @@ class UserController extends Controller
         $validated = $request->validated();
         $validated['password'] = session('generatedPass');
 
-        $user = User::create($validated);
+        $user = User::create(Arr::except($validated, ['permissions', 'role']));
+
+        $user->roles()->syncWithoutDetaching([$validated['role']]);
+        $user->permissions()->syncWithoutDetaching($validated['permissions']);
+        $user->clearPermissionCache();
 
         // Send Sms To User
         $smsService->setTo($user->phone);
@@ -76,7 +100,24 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        return view('user.edit', compact('user'));
+        $permissions = Cache::remember('permissions-lits', 60 * 60, fn() => Permission::all()
+            ->groupBy('groupName')
+            ->mapWithKeys(function ($permissions, $key) {
+                return [
+                    $key => $permissions->map(fn($permission): Collection => collect([
+                        'id' => $permission->id,
+                        'persian_name' => $permission->persian_name,
+                    ]))
+                ];
+            }));
+
+
+        return view('user.edit', [
+            'user' => $user->load(['permissions:id,persian_name', 'roles']),
+            'roles' => Cache::remember('roles-list', 60 * 60, fn() => Role::all()),
+            'permissions' => $permissions,
+            'userPermissions' => $user->permissions->pluck('id')->toArray()
+        ]);
     }
 
     /**
@@ -86,7 +127,11 @@ class UserController extends Controller
     {
         $validated = $request->validated();
 
-        $user->update($validated);
+        $user->update(Arr::except($validated, ['permissions', 'role']));
+
+        $user->roles()->sync([$validated['role']]);
+        $user->permissions()->sync($validated['permissions']);
+        $user->clearPermissionCache();
 
         return to_route('user.index')->with('success-alert', "کاربر '{$user->name}' با موفقیت ویرایش شد.");
     }

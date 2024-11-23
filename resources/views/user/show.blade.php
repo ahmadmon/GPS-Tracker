@@ -67,7 +67,7 @@
                             <label class="form-label" for="user_type">نوع کاربر
                             </label>
                             <input class="form-control" id="user_type"
-                                   value="{{ $user->user_type ? 'ادمین' : 'کاربر' }}"
+                                   value="{{ $user->type['name'] }}"
                                    type="text" disabled>
                         </div>
 

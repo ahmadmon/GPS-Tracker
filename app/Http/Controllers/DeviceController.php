@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Acl;
 use App\Http\Requests\DeviceRequest;
 use App\Http\Requests\StoreSmsRequest;
 use App\Http\Services\DeviceManager;
@@ -18,6 +19,8 @@ class DeviceController extends Controller
      */
     public function index()
     {
+        Acl::authorize('devices-list');
+
         $devices = Device::with(['user:id,name'])->orderByDesc('created_at')->cursor();
 
         return view('devices.index', compact('devices'));

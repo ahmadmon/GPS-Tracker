@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Traits\HasPermissions;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-class User extends Authenticatable implements MustVerifyEmail
+class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasPermissions;
 
     /**
      * The attributes that are mass assignable.
@@ -42,6 +42,33 @@ class User extends Authenticatable implements MustVerifyEmail
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function hasUserType($type): bool
+    {
+        $userType = match ($type) {
+            'user' => 0,
+            'admin' => 1,
+            'super-admin' => 2,
+            'manager' => 3
+        };
+
+        return $this->user_type == $userType;
+    }
+
+    protected function type(): Attribute
+    {
+        return Attribute::make(
+            get: function (): array {
+                return match ((int)$this->user_type) {
+                    0 => ['color' => 'danger', 'name' => 'کاربر'],
+                    1 => ['color' => 'success', 'name' => 'ادمین'],
+                    2 => ['color' => 'warning', 'name' => 'سوپر ادمین'],
+                    3 => ['color' => 'primary', 'name' => 'مدیر سازمان'],
+                    default => ['color' => '', 'name' => '']
+                };
+            }
+        );
     }
 
 

@@ -48,7 +48,7 @@
                                     <th>مدیر</th>
                                     <th>شماره تماس</th>
                                     <th>وضعیت</th>
-                                    <th>تاریخ عضویت</th>
+                                    <th>تاریخ ایجاد</th>
                                     <th>عملیات</th>
                                 </tr>
                                 </thead>
@@ -95,7 +95,7 @@
                                                     <a class="dropdown-item"
                                                        href="{{ route('company.show', $company->id) }}">مشاهده جزئیات</a>
                                                     <a class="dropdown-item"
-                                                       href="{{ route('company.manage-subsets', $company->id) }}">افزودن زیرمجموعه</a>
+                                                       href="{{ route('company.manage-subsets', $company->id) }}">مدیریت زیرمجموعه ها</a>
                                                 </ul>
                                             </div>
                                             <x-partials.btns.confirm-rmv-btn

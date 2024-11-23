@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Models\Device;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Auth::loginUsingId(1);
+        Auth::loginUsingId(3);
 
 //        $data = '78781f122c0610060408cc03d40c1c05811f3024146c01b02315860114fe121224540d0a'; //concox Eslami - check ptN = 12
 //        $data = '78782222180b030f1507c903d38ba405833b1823147101b0237ebe007aaa00020000144e0b0d0a'; //concox AT4 - check ptN = 22

@@ -127,7 +127,7 @@
                                         <div class="d-flex flex-column">
                                             <span class="fw-bold">{{ $user->name }}</span>
                                             <small
-                                                    class="text-muted">{{ $user->user_type ? 'ادمین' : 'کاربر' }}</small>
+                                                    class="text-muted">{{ $user->type['name'] }}</small>
                                         </div>
                                     </td>
                                     <td>{{ $user->phone }}</td>

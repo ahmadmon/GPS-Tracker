@@ -7,7 +7,7 @@
                         <input class="demo-input Typeahead-input form-control-plaintext w-100" type="text"
                                placeholder="Search Cuba .." name="q" title="" autofocus>
                         <div class="spinner-border Typeahead-spinner" role="status"><span
-                                class="sr-only">Loading...</span></div>
+                                class="sr-only">درحال بارگذاری...</span></div>
                         <i class="close-search" data-feather="x"></i>
                     </div>
                     <div class="Typeahead-menu"></div>
@@ -24,12 +24,7 @@
         <div class="left-header col-xxl-5 col-xl-6 col-lg-5 col-md-4 col-sm-3 p-0">
             <div class="notification-slider">
                 <div class="d-flex h-100"><img src="{{ asset('assets/images/giftools.gif') }}" alt="gif">
-                    <h6 class="mb-0 f-w-400"><span class="font-primary"> Ahmad is your best feriend!!: </span><span
-                            class="f-light">Dont Forget!</span></h6><i class="icon-arrow-top-right f-light"></i>
-                </div>
-                <div class="d-flex h-100"><img src="{{ asset('assets/images/giftools.gif') }}" alt="gif">
-                    <h6 class="mb-0 f-w-400"><span class="f-light">I will find you! </span>
-                    </h6><a class="ms-1" href="https://1.envato.market/3GVzd" target="_blank">Gps!</a>
+                    <h6 class="mb-0 f-w-400"><span class="f-light">سامانه در حال تست میباشد!</span></h6>
                 </div>
             </div>
         </div>
@@ -62,11 +57,11 @@
                 </li> --}}
                 <li> <span class="header-search">
                         <svg>
-                            <use href="../assets/svg/icon-sprite.svg#search"></use>
+                            <use href="{{ asset('assets/svg/icon-sprite.svg#search') }}"></use>
                         </svg></span></li>
                 <li class="onhover-dropdown">
                     <svg>
-                        <use href="../assets/svg/icon-sprite.svg#star"></use>
+                        <use href="{{ asset('assets/svg/icon-sprite.svg#star') }}"></use>
                     </svg>
                     <div class="onhover-show-div bookmark-flip">
                         <div class="flip-card">
@@ -222,7 +217,7 @@
                                                           src="{{ asset('assets/images/avtar/user.png') }}"
                                                           alt="">
                         <div class="media-body"><span>{{ auth()->user()?->name }}</span>
-                            <p class="mb-0">{{ auth()->user()->user_type ? 'ادمین' : 'کاربر' }}<i
+                            <p class="mb-0">{{ auth()->user()->roles->first()?->persian_name }}<i
                                     class="middle fa fa-angle-down"></i></p>
                         </div>
                     </div>
