@@ -27,7 +27,7 @@
                 <ul class="sidebar-links" id="simple-bar">
                     <li class="back-btn">
                         <div class="mobile-back text-end"><span>بازگشت</span><i
-                                    class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
+                                class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
                     </li>
                     <li class="pin-title sidebar-main-title">
                         <div>
@@ -36,8 +36,8 @@
                     </li>
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>
                         <a
-                                class="sidebar-link sidebar-title" href="{{ route('home') }}"
-                                target="_blank">
+                            class="sidebar-link sidebar-title" href="{{ route('home') }}"
+                            target="_blank">
                             <svg class="stroke-icon">
                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
                             </svg>
@@ -57,49 +57,62 @@
                             </div>
                         </a>
                     </li>
-                    <li class="sidebar-list">
-                        <i class="fa-solid fa-thumbtack"></i>
-                        <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('device.*')]) href="{{ route('device.index') }}">
-                            <i data-feather="cpu"></i>
-                            <span>دستگاه ها</span>
-                            <div class="according-menu">
-                                <i class="fa-solid fa-angle-right"></i>
-                            </div>
-                        </a>
-                    </li>
+                    @if(can('devices-list'))
+                        <li class="sidebar-list">
+                            <i class="fa-solid fa-thumbtack"></i>
+                            <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('device.*')]) href="{{ route('device.index') }}">
+                                <i data-feather="cpu"></i>
+                                <span>دستگاه ها</span>
+                                <div class="according-menu">
+                                    <i class="fa-solid fa-angle-right"></i>
+                                </div>
+                            </a>
+                        </li>
+                    @endif
 
-                    <li class="sidebar-list">
-                        <i class="fa-solid fa-thumbtack"></i>
-                        <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('vehicle.*')]) href="{{ route('vehicle.index') }}">
-                            <i data-feather="truck"></i>
-                            <span>وسایل نقلیه</span>
-                            <div class="according-menu">
-                                <i class="fa-solid fa-angle-right"></i>
-                            </div>
-                        </a>
-                    </li>
+                    @if(can('vehicles-list'))
+                        <li class="sidebar-list">
+                            <i class="fa-solid fa-thumbtack"></i>
+                            <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('vehicle.*')]) href="{{ route('vehicle.index') }}">
+                                <i data-feather="truck"></i>
+                                <span>وسایل نقلیه</span>
+                                <div class="according-menu">
+                                    <i class="fa-solid fa-angle-right"></i>
+                                </div>
+                            </a>
+                        </li>
+                    @endif
 
-                    <li class="sidebar-list">
-                        <i class="fa fa-thumb-tack"></i>
-                        <a class="sidebar-link sidebar-title" href="#">
-                            <i data-feather="users"></i>
-                            <span>کاربران</span></a>
-                        <ul class="sidebar-submenu">
-                            <li><a href="{{ route('user.index') }}"><span>لیست کاربران</span></a></li>
-                            <li><a href="{{ route('user.create') }}"><span>ایجاد کاربر جدید</span></a></li>
-                        </ul>
-                    </li>
+                    @notRole(['user'])
+                    @if(can('users-list'))
+                        <li class="sidebar-list">
+                            <i class="fa fa-thumb-tack"></i>
+                            <a class="sidebar-link sidebar-title" href="#">
+                                <i data-feather="users"></i>
+                                <span>کاربران</span></a>
+                            <ul class="sidebar-submenu">
+                                <li><a href="{{ route('user.index') }}"><span>لیست کاربران</span></a></li>
+                                @if(can('create-company'))
+                                    <li><a href="{{ route('user.create') }}"><span>ایجاد کاربر جدید</span></a></li>
+                                @endif
+                            </ul>
+                        </li>
+                    @endif
+                    @endnotRole
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>
                         <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('company.*')]) href="#">
                             <i data-feather="life-buoy"></i>
                             <span>سازمان</span></a>
                         <ul class="sidebar-submenu" @style(['display: block' => Route::is('company.index', 'company.create')])>
-                            <li><a @class(['active' => Route::is('company.index')]) href="{{ route('company.index') }}"><span>لیست سازمان ها</span></a></li>
-                            <li><a @class(['active' => Route::is('company.create')]) href="{{ route('company.create') }}"><span>ایجاد سازمان جدید</span></a></li>
+                            <li><a @class(['active' => Route::is('company.index')]) href="{{ route('company.index') }}"><span>لیست سازمان ها</span></a>
+                            </li>
+                            <li>
+                                <a @class(['active' => Route::is('company.create')]) href="{{ route('company.create') }}"><span>ایجاد سازمان جدید</span></a>
+                            </li>
                         </ul>
                     </li>
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
-                                class="sidebar-link sidebar-title" href="#">
+                            class="sidebar-link sidebar-title" href="#">
                             <i data-feather="octagon"></i>
                             <span>حصار جغرافیایی</span></a>
                         <ul class="sidebar-submenu">

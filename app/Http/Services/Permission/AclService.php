@@ -14,22 +14,29 @@ class AclService
         $this->user = auth()->user();
     }
 
-    public function authorize(string $permission)
+    public function authorize(string $permission, $entity = null)
     {
-        if ($this->user->hasPermissionTo($permission)) {
+        if ($this->user->hasAccessTo($permission, $entity)) {
             return true;
         } else {
             abort(403, 'دسترسی شما به این بخش از سامانه محدود شده است.');
         }
     }
 
-
-    public function hasRole(string $role)
+    public function hasPermission(string $permission): bool
     {
-        if ($this->user->hasRole([$role])) {
-            return true;
-        } else {
-            abort(403, 'دسترسی شما به این بخش از سیستم محدود شده است.');
-        }
+        return $this->user->hasPermissionTo($permission);
+    }
+
+
+    public function hasRole(array $roles): bool
+    {
+
+        return $this->user->hasRole($roles);
+    }
+
+    public static function getRole()
+    {
+        return auth()->user()->roles()?->first()?->title;
     }
 }

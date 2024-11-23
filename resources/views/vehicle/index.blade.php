@@ -34,7 +34,9 @@
         <div class="row">
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
-                <a href="{{ route('vehicle.create') }}" class="btn btn-primary mb-4">+ ایجاد وسیله نقلیه</a>
+                @if(can('create-vehicle'))
+                    <a href="{{ route('vehicle.create') }}" class="btn btn-primary mb-4">+ ایجاد وسیله نقلیه</a>
+                @endif
                 <div class="card">
                     <div class="card-header pb-0 card-no-border">
                         <h4>لیست وسایل نقلیه</h4>
@@ -46,7 +48,10 @@
                                 <tr>
                                     <th>وسیله نقلیه</th>
                                     <th>پلاک</th>
+                                    <th>دستگاه</th>
+                                    @notRole(['user'])
                                     <th>راننده</th>
+                                    @endnotRole
                                     <th>وضعیت</th>
                                     <th>عملیات</th>
                                 </tr>
@@ -60,7 +65,10 @@
                                             </div>
                                         </td>
                                         <td>{{ $vehicle->license_plate }}</td>
+                                        <td>{{ $vehicle?->device?->name ?? 'تعریف نشده' }}</td>
+                                        @notRole(['user'])
                                         <td>{{ $vehicle?->user?->name }}</td>
+                                        @endnotRole
                                         <td>
                                             @if($vehicle->status)
                                                 <span class="badge dana rounded-pill badge-success">فعال</span>
@@ -75,20 +83,28 @@
                                                     <i class="icofont icofont-listing-box txt-dark"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-block text-center" style="">
-                                                    <a class="dropdown-item "
-                                                       href="{{ route('vehicle.edit', $vehicle->id) }}">ویرایش</a>
-                                                    <a href="javascript:void(0)" class="dropdown-item"
-                                                       @click.prevent="show = true">حذف</a>
-                                                    <a class="dropdown-item" href="#">نمایش موقعیت</a>
+                                                    @if(can('edit-vehicle'))
+                                                        <a class="dropdown-item "
+                                                           href="{{ route('vehicle.edit', $vehicle->id) }}">ویرایش</a>
+                                                    @endif
+
+                                                    @if(can('delete-vehicle'))
+                                                        <a href="javascript:void(0)" class="dropdown-item"
+                                                           @click.prevent="show = true">حذف</a>
+                                                    @endif
+                                                    {{--                                                    <a class="dropdown-item" href="#">نمایش موقعیت</a>--}}
                                                 </ul>
                                             </div>
-                                            <x-partials.btns.confirm-rmv-btn
-                                                url="{{ route('vehicle.destroy', $vehicle->id) }}"/>
+
+                                            @if(can('delete-vehicle'))
+                                                <x-partials.btns.confirm-rmv-btn
+                                                    url="{{ route('vehicle.destroy', $vehicle->id) }}"/>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="5" class="text-center">داده ای یافت نشد.</td>
+                                        <td colspan="6" class="text-center">داده ای یافت نشد.</td>
                                     </tr>
                                 @endforelse
                                 </tbody>

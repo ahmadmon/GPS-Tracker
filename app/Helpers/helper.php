@@ -2,13 +2,14 @@
 
 use Carbon\Carbon;
 use Morilog\Jalali\Jalalian;
+use App\Facades\Acl;
 
 function jalaliDate($date, $time = false, $format = "%d %B %Y", $ago = false)
 {
     if ($ago) {
         return Jalalian::forge($date)->ago();
     } else {
-        if($time){
+        if ($time) {
             $format = "%d %B %Y H:i";
         }
         return Jalalian::forge($date)->format($format); // جمعه، 23 اسفند 97
@@ -140,5 +141,15 @@ function maskPhoneNumber($phoneNumber): string
     if (strlen($phoneNumber) === 11) {
         return substr_replace($phoneNumber, "***", -7, 3);
     }
+}
+
+function can(string $permission): bool
+{
+    return Acl::hasPermission($permission);
+}
+
+function cannot(string $permission): bool
+{
+    return !Acl::hasPermission($permission);
 }
 

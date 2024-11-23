@@ -41,7 +41,10 @@
                 <div class="card-header">
                     <div class="card-title mb-0 d-flex justify-content-between align-items-center">
                         <h5>اطلاعات کلی</h5>
-                        <a href="{{ route('company.edit', $company->id) }}" class="btn btn-sm btn-primary">ویرایش</a>
+                        @if(can('edit-company'))
+                            <a href="{{ route('company.edit', $company->id) }}"
+                               class="btn btn-sm btn-primary">ویرایش</a>
+                        @endif
                     </div>
                 </div>
                 <div class="card-body">
@@ -50,6 +53,7 @@
                             <div class="d-flex">
                                 <img class="img-70 rounded me-2 object-fit-cover" alt=""
                                      src="{{ asset($company->logo ?? 'assets/images/custom/workplace-64px.png') }}">
+                                @notRole(['manager'])
                                 <div class="flex-grow-1">
                                     <h5 class="mb-1">{{ $company->name }}</h5>
                                     <strong class="text-muted">مدیر:
@@ -57,6 +61,7 @@
                                            target="_blank">{{ $company->manager->name }}</a>
                                     </strong>
                                 </div>
+                                @endnotRole
                             </div>
                         </div>
                     </div>
@@ -99,13 +104,16 @@
         </div>
 
         <div class="col-xl-8">
-            <x-partials.alert.success-alert />
+            <x-partials.alert.success-alert/>
             <div class="card">
                 <div class="card-header">
                     <div class="card-title mb-0 d-flex justify-content-between align-items-center">
                         <h4>زیرمجموعه های سازمان</h4>
-                        <a href="{{ route('company.add-subsets', $company->id) }}" class="btn btn-sm btn-primary">+
-                            افزودن زیرمجموعه</a>
+                        @if(can('manage-subsets'))
+                            <a href="{{ route('company.manage-subsets', $company->id) }}"
+                               class="btn btn-sm btn-primary">
+                                مدیریت زیرمجموعه ها</a>
+                        @endif
                     </div>
                 </div>
                 <div class="card-body">
@@ -117,7 +125,9 @@
                                 <th>شماره تماس</th>
                                 <th>وضعیت</th>
                                 <th>تاریخ عضویت</th>
-                                <th>عملیات</th>
+                                @if(can('manage-subsets'))
+                                    <th>عملیات</th>
+                                @endif
                             </tr>
                             </thead>
                             <tbody>
@@ -126,8 +136,10 @@
                                     <td>
                                         <div class="d-flex flex-column">
                                             <span class="fw-bold">{{ $user->name }}</span>
+                                            @notRole(['manager'])
                                             <small
-                                                    class="text-muted">{{ $user->type['name'] }}</small>
+                                                class="text-muted">{{ $user->type['name'] }}</small>
+                                            @endnotRole
                                         </div>
                                     </td>
                                     <td>{{ $user->phone }}</td>
@@ -141,14 +153,16 @@
                                     <td>
                                         <span class="text-muted">{{ jalaliDate($user->created_at) }}</span>
                                     </td>
-                                    <td x-data="{ show: false }">
-                                        <div class="btn-group" x-cloak x-show="!show">
-                                            <a href="javascript:void(0)" class="btn btn-sm btn-danger"
-                                               @click="show = true">حذف از لیست</a>
-                                        </div>
-                                        <x-partials.btns.confirm-rmv-btn
+                                    @if(can('manage-subsets'))
+                                        <td x-data="{ show: false }">
+                                            <div class="btn-group" x-cloak x-show="!show">
+                                                <a href="javascript:void(0)" class="btn btn-sm btn-danger"
+                                                   @click="show = true">حذف از لیست</a>
+                                            </div>
+                                            <x-partials.btns.confirm-rmv-btn
                                                 url="{{ route('company.remove-subsets', [$company->id,$user->id]) }}"/>
-                                    </td>
+                                        </td>
+                                    @endif
                                 </tr>
                             @empty
                                 <tr class="bg-transparent">

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Facades\Acl;
 use Illuminate\Foundation\Http\FormRequest;
 
 class CompanyRequest extends FormRequest
@@ -23,26 +24,32 @@ class CompanyRequest extends FormRequest
     {
         if ($this->routeIs('company.store')) {
 
-            return [
+            $rules = [
                 'name' => 'required|string|min:3|max:255',
                 'bio' => 'nullable|string|min:10',
                 'contact_number' => 'required|numeric|digits:11|unique:companies',
                 'logo' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:2048',
                 'address' => 'required|string|min:10',
-                'user_id' => 'required|numeric|exists:users,id',
                 'status' => 'required|numeric|in:0,1'
             ];
         } else {
-            return [
+            $rules = [
                 'name' => 'required|string|min:3|max:255',
                 'bio' => 'nullable|string|min:10',
                 'contact_number' => 'required|numeric|digits:11|unique:companies,contact_number,' . $this->company->id,
                 'logo' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:2048',
                 'address' => 'required|string|min:10',
-                'user_id' => 'required|numeric|exists:users,id',
                 'status' => 'required|numeric|in:0,1'
             ];
         }
+
+        if (Acl::hasRole(['manager'])) {
+            $rules['user_id'] = 'nullable';
+        } else {
+            $rules['user_id'] = 'required|numeric|exists:users,id';
+        }
+
+        return $rules;
     }
 
 
@@ -51,6 +58,7 @@ class CompanyRequest extends FormRequest
         return [
             'bio' => 'بیو (توضیحات)',
             'contact_number' => 'شماره تماس',
+            'user_id' => 'مدیر سازمان'
         ];
     }
 }

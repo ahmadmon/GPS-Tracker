@@ -12,7 +12,7 @@ use App\Models\Trip;
 use App\Models\User;
 use Exception;
 
-class DeviceController extends Controller
+class DeviceController extends BaseController
 {
     /**
      * Display a listing of the resource.
@@ -21,7 +21,23 @@ class DeviceController extends Controller
     {
         Acl::authorize('devices-list');
 
-        $devices = Device::with(['user:id,name'])->orderByDesc('created_at')->cursor();
+        if ($this->role === 'user') {
+            $devices = Device::where('user_id', $this->user->id)
+                ->orderByDesc('created_at')
+                ->cursor();
+
+        } elseif ($this->role === 'manager') {
+            $devices = Device::whereIn('user_id', $this->userCompaniesSubsetsId->merge([$this->user->id]))
+                ->with(['user:id,name'])
+                ->orderByDesc('created_at')
+                ->cursor();
+
+        } else {
+            $devices = Device::with(['user:id,name'])
+                ->orderByDesc('created_at')
+                ->cursor();
+        }
+
 
         return view('devices.index', compact('devices'));
     }
@@ -31,8 +47,17 @@ class DeviceController extends Controller
      */
     public function create()
     {
+        Acl::authorize('create-device');
+
+        if ($this->role === 'manager') {
+            $users = User::where('status', 1)->whereIn('id', $this->userCompaniesSubsetsId)->cursor();
+        } else {
+            $users = User::where('status', 1)->cursor();
+        }
+
+
         return view('devices.create', [
-            'users' => User::where([['status', 1], ['user_type', 0]])->cursor()
+            'users' => $users
         ]);
     }
 
@@ -41,7 +66,10 @@ class DeviceController extends Controller
      */
     public function store(DeviceRequest $request)
     {
+        Acl::authorize('create-device');
+
         $validated = $request->validated();
+        $validated['user_id'] = $this->role === 'user' ? auth()->id() : $request->user_id;
 
         // Store the device record
         Device::create($validated);
@@ -54,13 +82,13 @@ class DeviceController extends Controller
      */
     public function show(string $id)
     {
-        $device = Device::find($id);
-        $lastLocation = Trip::where('device_id', $device->id)->orderByDesc('id')->first();
-
-        return view('devices.map', [
-            'device' => $device,
-            'lastLocation' => $lastLocation,
-        ]);
+        abort(404);
+//        $device = Device::find($id);
+//
+//        return view('devices.map', [
+//            'device' => $device,
+//            'lastLocation' => $device->lastLocation(),
+//        ]);
     }
 
     public function location(string $id)
@@ -92,8 +120,16 @@ class DeviceController extends Controller
      */
     public function edit(Device $device)
     {
+        Acl::authorize('edit-device', $device);
+
+        if ($this->role === 'manager') {
+            $users = User::where('status', 1)->whereIn('id', $this->userCompaniesSubsetsId)->cursor();
+        } else {
+            $users = User::where('status', 1)->cursor();
+        }
+
         return view('devices.edit', [
-            'users' => User::where([['status', 1], ['user_type', 0]])->cursor(),
+            'users' => $users,
             'device' => $device,
         ]);
     }
@@ -103,7 +139,10 @@ class DeviceController extends Controller
      */
     public function update(DeviceRequest $request, Device $device)
     {
+        Acl::authorize('edit-device', $device);
+
         $validated = $request->validated();
+        $validated['user_id'] = $this->role === 'user' ? auth()->id() : $request->user_id;
 
         $device->update($validated);
 
@@ -116,16 +155,20 @@ class DeviceController extends Controller
      */
     public function destroy(string $id)
     {
-        if (!auth()->check() && auth()->user()->user_type != 1) {
-            return false;
-        }
-        Device::destroy($id);
+        $device = Device::findOrFail($id);
+
+        Acl::authorize('delete-device', $device);
+
+        $device->delete();
+
         return back()->with('success-alert', 'دستگاه با موفقیت حذف گردید.');
     }
 
 
     public function deviceSetting(Device $device)
     {
+        Acl::authorize('device-settings', $device);
+
         return view('devices.device-setting', [
             'device' => $device
         ]);
@@ -136,6 +179,8 @@ class DeviceController extends Controller
      */
     public function storeSMS(StoreSmsRequest $request, Device $device)
     {
+        Acl::authorize('device-settings', $device);
+
         $request->validated();
 
         $params = [

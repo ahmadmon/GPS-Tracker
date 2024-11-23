@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Collection;
 
 class User extends Authenticatable
 {
@@ -83,13 +84,22 @@ class User extends Authenticatable
     }
 
     // related to The users Company (Joined by Company)
-    public function companies(): BelongsToMany
+    public function subsets(): Collection
+    {
+        if (!$this->hasUserType('manager')) {
+            return collect([]);
+        }
+
+        return $this->companies->flatMap(fn($company) => $company->users);
+    }
+
+    public function joinedCompanies(): BelongsToMany
     {
         return $this->belongsToMany(Company::class, 'companies_user');
     }
 
     // related to The Company manager
-    public function managedCompanies(): HasMany
+    public function companies(): HasMany
     {
         return $this->hasMany(Company::class, 'user_id');
     }

@@ -2,18 +2,33 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Acl;
 use App\Http\Requests\VehicleRequest;
 use App\Models\User;
 use App\Models\Vehicle;
 
-class VehicleController extends Controller
+class VehicleController extends BaseController
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $vehicles = Vehicle::with('user')->cursor();
+        Acl::authorize('vehicles-list');
+
+        if ($this->role === 'user') {
+            $vehicles = Vehicle::where('user_id', $this->user->id)
+                ->with('device:id,name')
+                ->cursor();
+
+        } elseif ($this->role === 'manager') {
+            $vehicles = Vehicle::with('user', 'device:id,name')
+                ->whereIn('user_id', $this->userCompaniesSubsetsId->merge([$this->user->id]))
+                ->cursor();
+
+        } else {
+            $vehicles = Vehicle::with('user', 'device:id,name')->cursor();
+        }
 
         return view('vehicle.index', compact('vehicles'));
     }
@@ -23,8 +38,16 @@ class VehicleController extends Controller
      */
     public function create()
     {
+        Acl::authorize('create-vehicle');
+
+        if ($this->role === 'manager') {
+            $users = User::where('status', 1)->whereIn('id', $this->userCompaniesSubsetsId)->cursor();
+        } else {
+            $users = User::where('status', 1)->cursor();
+        }
+
         return view('vehicle.create', [
-            'users' => User::where([['status', 1], ['user_type', 0]])->cursor()
+            'users' => $users
         ]);
     }
 
@@ -33,6 +56,8 @@ class VehicleController extends Controller
      */
     public function store(VehicleRequest $request)
     {
+        Acl::authorize('create-vehicle');
+
         $validated = $request->validated();
 
         $validated['user_id'] = !isset($request->user_id) ? auth()->id() : $request->user_id;
@@ -47,7 +72,7 @@ class VehicleController extends Controller
      */
     public function show(string $id)
     {
-        //
+        abort(404);
     }
 
     /**
@@ -55,9 +80,17 @@ class VehicleController extends Controller
      */
     public function edit(Vehicle $vehicle)
     {
+        Acl::authorize('edit-vehicle', $vehicle);
+
+        if ($this->role === 'manager') {
+            $users = User::where('status', 1)->whereIn('id', $this->userCompaniesSubsetsId)->cursor();
+        } else {
+            $users = User::where('status', 1)->cursor();
+        }
+
         return view('vehicle.edit', [
             'vehicle' => $vehicle,
-            'users' => User::where([['status', 1], ['user_type', 0]])->cursor()
+            'users' => $users
         ]);
     }
 
@@ -66,6 +99,8 @@ class VehicleController extends Controller
      */
     public function update(VehicleRequest $request, Vehicle $vehicle)
     {
+        Acl::authorize('edit-vehicle', $vehicle);
+
         $validated = $request->validated();
         $validated['user_id'] = !isset($request->user_id) ? auth()->id() : $request->user_id;
 
@@ -79,7 +114,11 @@ class VehicleController extends Controller
      */
     public function destroy(string $id)
     {
-        Vehicle::destroy($id);
+        $vehicle = Vehicle::findOrFail($id);
+        Acl::authorize('delete-vehicle', $vehicle);
+
+        $vehicle->delete();
+
 
         return back()->with('success-alert', 'وسیله نقلیه با موفقیت حذف گردید.');
     }

@@ -2,20 +2,31 @@
 
 namespace App\Http\Controllers;
 
+use App\Facades\Acl;
 use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
 use App\Models\User;
 use Illuminate\Support\Facades\File;
 use Intervention\Image\Laravel\Facades\Image;
 
-class CompanyController extends Controller
+class CompanyController extends BaseController
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        $companies = Company::with(['users', 'manager'])->orderByDesc('id')->cursor();
+        Acl::authorize('companies-list');
+
+        if ($this->role === 'manager') {
+            $companies = Company::where('user_id', $this->user->id)
+                ->with(['users', 'manager'])
+                ->orderByDesc('id')
+                ->cursor();
+        } else {
+            $companies = Company::with(['users', 'manager'])->orderByDesc('id')->cursor();
+        }
+
 
         return view('company.index', compact('companies'));
     }
@@ -25,7 +36,9 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        $managers = User::where('status', 1)->whereIn('user_type', [1, 2])->cursor();
+        Acl::authorize('create-company');
+
+        $managers = User::where('status', 1)->whereIn('user_type', 3)->cursor();
 
         return view('company.create', compact('managers'));
     }
@@ -35,7 +48,10 @@ class CompanyController extends Controller
      */
     public function store(CompanyRequest $request)
     {
+        Acl::authorize('create-company');
+
         $validated = $request->validated();
+        $validated['user_id'] = is_null($request->user_id) ? $this->user->id : $request->user_id;
 
         if ($request->hasFile('logo')) {
             $imageName = uniqid() . '-' . pathinfo($request->file('logo')->getClientOriginalName(), PATHINFO_FILENAME) . '.webp';
@@ -61,6 +77,8 @@ class CompanyController extends Controller
     {
         $company = Company::where('id', $id)->with(['manager', 'users'])->first();
 
+        Acl::authorize('show-company', $company);
+
         return view('company.show', compact('company'));
     }
 
@@ -69,7 +87,9 @@ class CompanyController extends Controller
      */
     public function edit(Company $company)
     {
-        $managers = User::where('status', 1)->whereIn('user_type', [1, 2])->cursor();
+        Acl::authorize('edit-company', $company);
+
+        $managers = User::where('status', 1)->where('user_type', 3)->cursor();
 
         return view('company.edit', compact('managers', 'company'));
     }
@@ -79,7 +99,10 @@ class CompanyController extends Controller
      */
     public function update(CompanyRequest $request, Company $company)
     {
+        Acl::authorize('edit-company', $company);
+
         $validated = $request->validated();
+        $validated['user_id'] = is_null($request->user_id) ? $this->user->id : $request->user_id;
 
         if ($request->hasFile('logo')) {
             //Remove  existing file
@@ -111,6 +134,8 @@ class CompanyController extends Controller
      */
     public function destroy(Company $company)
     {
+        Acl::authorize('delete-company', $company);
+
         if (File::exists($company->logo)) {
             File::delete($company->logo);
         }
@@ -122,11 +147,15 @@ class CompanyController extends Controller
 
     public function manageSubsets(Company $company)
     {
+        Acl::authorize('manage-subsets', $company);
+
         return view('company.manage-subsets', compact('company'));
     }
 
     public function removeSubsets(Company $company, $userId)
     {
+        Acl::authorize('manage-subsets', $company);
+
         $company->users()->detach($userId);
         return to_route('company.show', $company->id)->with('success-alert', 'کاربر با موفقیت از لیست زیرمجموعه هایتان حذف شد.');
     }

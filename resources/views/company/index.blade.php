@@ -34,7 +34,9 @@
         <div class="row">
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
+                @if(can('create-company'))
                 <a href="{{ route('company.create') }}" class="btn btn-primary mb-4">+ ایجاد سازمان جدید</a>
+                @endif
                 <div class="card">
                     <div class="card-header pb-0 card-no-border">
                         <h4>لیست سازمان ها</h4>
@@ -45,7 +47,9 @@
                                 <thead>
                                 <tr>
                                     <th>سازمان</th>
+                                    @notRole(['manager'])
                                     <th>مدیر</th>
+                                    @endnotRole
                                     <th>شماره تماس</th>
                                     <th>وضعیت</th>
                                     <th>تاریخ ایجاد</th>
@@ -58,18 +62,25 @@
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
                                                 <div class="currency-icon warning">
-                                                    <img class="img-fluid" width="32" height="32" src="{{ $company->logo ?? asset('assets/images/custom/workplace-64px.png') }}" alt="">
+                                                    <img class="img-fluid" width="32" height="32"
+                                                         src="{{ $company->logo ?? asset('assets/images/custom/workplace-64px.png') }}"
+                                                         alt="">
                                                 </div>
-                                                <div> <a class="f-14 mb-0 f-w-500 c-light" href="{{ route('company.show', $company->id) }}">{{ $company->name }}</a>
-                                                    <p class="c-o-light text-muted">{{ str($company?->address)->limit(35) }}</p>
+                                                <div><a class="f-14 mb-0 f-w-500 c-light"
+                                                        href="{{ route('company.show', $company->id) }}">{{ $company->name }}</a>
+                                                    <p class="c-o-light text-muted cursor-pointer"
+                                                       data-bs-toggle="tooltip" data-bs-placement="top"
+                                                       data-bs-title="{{ $company?->address }}">{{ str($company?->address)->limit(35) }}</p>
                                                 </div>
                                             </div>
                                         </td>
+                                        @notRole(['manager'])
                                         <td>
                                             <a href="{{ route('user.show', $company->manager->id) }}" target="_blank">
                                                 {{ $company->manager->name }}
                                             </a>
                                         </td>
+                                        @endnotRole
                                         <td>{{ $company->contact_number }}</td>
                                         <td>
                                             @if($company->status)
@@ -88,14 +99,24 @@
                                                     <i class="icofont icofont-listing-box txt-dark"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-block text-center" style="">
-                                                    <a class="dropdown-item"
-                                                       href="{{ route('company.edit', $company->id) }}">ویرایش</a>
-                                                    <a href="javascript:void(0)" class="dropdown-item"
-                                                       @click.prevent="show = true">حذف</a>
-                                                    <a class="dropdown-item"
-                                                       href="{{ route('company.show', $company->id) }}">مشاهده جزئیات</a>
-                                                    <a class="dropdown-item"
-                                                       href="{{ route('company.manage-subsets', $company->id) }}">مدیریت زیرمجموعه ها</a>
+                                                    @if(can('edit-company'))
+                                                        <a class="dropdown-item"
+                                                           href="{{ route('company.edit', $company->id) }}">ویرایش</a>
+                                                    @endif
+                                                    @if(can('delete-company'))
+                                                        <a href="javascript:void(0)" class="dropdown-item"
+                                                           @click.prevent="show = true">حذف</a>
+                                                    @endif
+                                                    @if(can('show-company'))
+                                                        <a class="dropdown-item"
+                                                           href="{{ route('company.show', $company->id) }}">مشاهده
+                                                            جزئیات</a>
+                                                    @endif
+                                                    @if(can('manage-subsets'))
+                                                        <a class="dropdown-item"
+                                                           href="{{ route('company.manage-subsets', $company->id) }}">مدیریت
+                                                            زیرمجموعه ها</a>
+                                                    @endif
                                                 </ul>
                                             </div>
                                             <x-partials.btns.confirm-rmv-btn

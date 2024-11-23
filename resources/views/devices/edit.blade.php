@@ -68,14 +68,16 @@
                         <x-input-error :messages="$errors->get('phone_number')" class="mt-2"/>
                     </div>
 
+                    @notRole(['user'])
                     <div class="col-md-6 mb-3">
-                        <label class="form-label" for="user_id">خریدار
+                        <label class="form-label" for="user_id">کاربر
                             <sup class="text-danger">*</sup>
                         </label>
                         <x-partials.alpine.input.select-option :options="$users->pluck('name', 'id')->toArray()"
                                                                name="user_id" :value="$device->user_id"/>
                         <x-input-error :messages="$errors->get('user_id')" class="mt-2"/>
                     </div>
+                    @endnotRole
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label" for="brand">برند

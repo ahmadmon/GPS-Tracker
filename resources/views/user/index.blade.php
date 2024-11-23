@@ -31,6 +31,7 @@
 
     <div class="container-fluid">
         <x-partials.alert.success-alert/>
+        <x-partials.alert.error-alert/>
         <div class="row">
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
@@ -56,9 +57,13 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex flex-column">
-                                                <span class="fw-bold">{{ $user->name }}</span>
+                                                <a href="{{ route('user.show', $user->id) }}">
+                                                    <span class="fw-bold">{{ $user->name }}</span>
+                                                </a>
+                                                @notRole(['manager'])
                                                 <small
-                                                    class="text-muted">{{ $user->type['name'] }}</small>
+                                                        class="text-muted">{{ $user->type['name'] }}</small>
+                                                @endnotRole
                                             </div>
                                         </td>
                                         <td>{{ $user->phone }}</td>
@@ -79,16 +84,24 @@
                                                     <i class="icofont icofont-listing-box txt-dark"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-block text-center" style="">
-                                                    <a class="dropdown-item"
-                                                       href="{{ route('user.edit', $user->id) }}">ویرایش</a>
-                                                    <a href="javascript:void(0)" class="dropdown-item"
-                                                       @click="show = true">حذف</a>
-                                                    <a class="dropdown-item"
-                                                       href="{{ route('user.show', $user->id) }}">مشاهده جزئیات</a>
+                                                    @if(can('edit-user'))
+                                                        <a class="dropdown-item"
+                                                           href="{{ route('user.edit', $user->id) }}">ویرایش</a>
+                                                    @endif
+                                                    @if(can('delete-user'))
+                                                        <a href="javascript:void(0)" class="dropdown-item"
+                                                           @click="show = true">حذف</a>
+                                                    @endif
+                                                    @if(can('show-user'))
+                                                        <a class="dropdown-item"
+                                                           href="{{ route('user.show', $user->id) }}">مشاهده جزئیات</a>
+                                                    @endif
                                                 </ul>
                                             </div>
-                                            <x-partials.btns.confirm-rmv-btn
-                                                url="{{ route('user.destroy', $user->id) }}"/>
+                                            @if(can('delete-user'))
+                                                <x-partials.btns.confirm-rmv-btn
+                                                        url="{{ route('user.destroy', $user->id) }}"/>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty

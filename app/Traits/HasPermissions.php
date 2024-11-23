@@ -2,8 +2,11 @@
 
 namespace App\Traits;
 
+use App\Models\Company;
 use App\Models\Permission;
 use App\Models\Role;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Cache;
 
@@ -68,6 +71,15 @@ trait HasPermissions
         return $this->hasPermission($permission) || $this->hasPermissionThroughRole($permission);
     }
 
+    public function hasAccessTo(string $permission, $entity = null): bool
+    {
+        if (!$this->hasPermissionTo($permission)) return false;
+
+        if (is_null($entity)) return true;
+
+        return $this->canManageEntity($entity);
+    }
+
     public function hasRole(array $roles): bool
     {
         foreach ($roles as $role) {
@@ -75,6 +87,25 @@ trait HasPermissions
                 return true;
         }
         return false;
+    }
+
+
+    protected function canManageEntity(Model $entity): bool
+    {
+        if (get_class($entity) === Company::class) {
+            return $entity->user_id === $this->id;
+        }
+
+        if ($this->hasRole(['manager'])) {
+            return $this->subsets()->contains('id', get_class($entity) == User::class ? $entity->id : $entity->user_id);
+
+        } elseif ($this->hasRole(['user'])) {
+
+            return $entity->user_id === $this->id;
+
+        }
+
+        return true;
     }
 
 }

@@ -24,9 +24,9 @@ class DeviceRequest extends FormRequest
         return [
             'name' => 'required|string|min:3|max:255',
             'model' => 'required|string|min:3|max:255',
-            'serial' => 'required|numeric|min:10|unique',
+            'serial' => 'required|numeric|min:10|unique:devices,serial',
             'phone_number' => 'nullable|numeric|digits:11',
-            'user_id' => 'required|numeric|exists:users,id',
+            'user_id' => 'nullable|numeric|exists:users,id',
             'password'=> 'nullable',
             'brand'=> 'required|string|in:sinotrack,wanway,concox',
 //            'vehicle_id' => 'required|numeric|exists:vehicles,id',

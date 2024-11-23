@@ -44,7 +44,9 @@
                         <i data-feather="user" style="width: 20px; padding-bottom: 5px" class="me-1"></i>
                         <span>اطلاعات کاربر</span>
                     </h5>
-                    <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-primary">ویرایش</a>
+                    @if(can('edit-user'))
+                        <a href="{{ route('user.edit', $user->id) }}" class="btn btn-sm btn-primary">ویرایش</a>
+                    @endif
                 </div>
                 <div class="card-body">
                     <div class="card-wrapper border rounded-3">
@@ -64,12 +66,22 @@
 
 
                         <div class="col-12 mb-3">
+                            <label class="form-label" for="user_type">سازمان
+                            </label>
+                            <input class="form-control" id="user_type"
+                                   value="{{ implode(' - ',$user->joinedCompanies()->pluck('name')->toArray()) }}"
+                                   type="text" disabled>
+                        </div>
+
+                        @notRole(['manager'])
+                        <div class="col-12 mb-3">
                             <label class="form-label" for="user_type">نوع کاربر
                             </label>
                             <input class="form-control" id="user_type"
                                    value="{{ $user->type['name'] }}"
                                    type="text" disabled>
                         </div>
+                        @endnotRole
 
 
                         <div class="col-12 mb-3">
@@ -93,8 +105,10 @@
                             <i data-feather="cpu" style="width: 20px; padding-bottom: 5px" class="me-1"></i>
                             <span>دستگاه های کاربر</span>
                         </div>
-                        <a href="{{ route('device.create') }}" class="btn btn-sm btn-primary">+ ایجاد دستگاه
-                            جدید</a>
+                        @if(can('create-device'))
+                            <a href="{{ route('device.create') }}" class="btn btn-sm btn-primary">+ ایجاد دستگاه
+                                جدید</a>
+                        @endif
                     </h5>
                 </div>
                 <div class="card-body">
@@ -136,19 +150,28 @@
                                                 <i class="icofont icofont-listing-box txt-dark"></i>
                                             </button>
                                             <ul class="dropdown-menu dropdown-block text-center" style="">
-                                                <a class="dropdown-item "
-                                                   href="{{ route('device.edit', $device->id) }}">ویرایش</a>
-                                                <a href="javascript:void(0)" class="dropdown-item"
-                                                   @click.prevent="show = true">حذف</a>
-                                                <a href="{{ route('device.device-setting', $device->id) }}"
-                                                   class="dropdown-item">دستورات دستگاه</a>
-                                                <a href="{{ route('device.show', $device->id) }}"
-                                                   class="dropdown-item">نمایش موقعیت مکانی</a>
+                                                @if(can('edit-device'))
+                                                    <a class="dropdown-item "
+                                                       href="{{ route('device.edit', $device->id) }}">ویرایش</a>
+                                                @endif
+                                                @if(can('delete-device'))
+                                                    <a href="javascript:void(0)" class="dropdown-item"
+                                                       @click.prevent="show = true">حذف</a>
+                                                @endif
+                                                @if(can('device-settings'))
+
+                                                    <a href="{{ route('device.device-setting', $device->id) }}"
+                                                       class="dropdown-item">دستورات دستگاه</a>
+                                                @endif
+                                                {{--                                                <a href="{{ route('device.show', $device->id) }}"--}}
+                                                {{--                                                   class="dropdown-item">نمایش موقعیت مکانی</a>--}}
 
                                             </ul>
                                         </div>
-                                        <x-partials.btns.confirm-rmv-btn
-                                            url="{{ route('device.destroy', $device->id) }}"/>
+                                        @if(can('delete-device'))
+                                            <x-partials.btns.confirm-rmv-btn
+                                                url="{{ route('device.destroy', $device->id) }}"/>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty
@@ -167,10 +190,12 @@
                     <h5 class="d-flex justify-content-between align-items-center">
                         <div class="d-flex justify-content-between align-items-center">
                             <i data-feather="truck" style="width: 20px; padding-bottom: 5px" class="me-1"></i>
-                            <span>وسایل نقلیه های کاربر</span>
+                            <span>وسایل نقلیه کاربر</span>
                         </div>
-                        <a href="{{ route('vehicle.create') }}" class="btn btn-sm btn-primary">+ ایجاد وسیله نقلیه
-                            جدید</a>
+                        @if(can('create-vehicle'))
+                            <a href="{{ route('vehicle.create') }}" class="btn btn-sm btn-primary">+ ایجاد وسیله نقلیه
+                                جدید</a>
+                        @endif
                     </h5>
                 </div>
                 <div class="card-body">
@@ -207,14 +232,20 @@
                                                 <i class="icofont icofont-listing-box txt-dark"></i>
                                             </button>
                                             <ul class="dropdown-menu dropdown-block text-center" style="">
-                                                <a class="dropdown-item "
-                                                   href="{{ route('vehicle.edit', $vehicle->id) }}">ویرایش</a>
-                                                <a href="javascript:void(0)" class="dropdown-item"
-                                                   @click.prevent="show = true">حذف</a>
+                                                @if(can('edit-vehicle'))
+                                                    <a class="dropdown-item "
+                                                       href="{{ route('vehicle.edit', $vehicle->id) }}">ویرایش</a>
+                                                @endif
+                                                @if(can('delete-vehicle'))
+                                                    <a href="javascript:void(0)" class="dropdown-item"
+                                                       @click.prevent="show = true">حذف</a>
+                                                @endif
                                             </ul>
                                         </div>
-                                        <x-partials.btns.confirm-rmv-btn
-                                            url="{{ route('vehicle.destroy', $vehicle->id) }}"/>
+                                        @if(can('delete-vehicle'))
+                                            <x-partials.btns.confirm-rmv-btn
+                                                url="{{ route('vehicle.destroy', $vehicle->id) }}"/>
+                                        @endif
                                     </td>
                                 </tr>
                             @empty

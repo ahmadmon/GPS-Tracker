@@ -100,6 +100,7 @@
                                 <x-input-error :messages="$errors->get('address')" class="mt-2"/>
                             </div>
 
+                            @notRole(['manager'])
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" for="user_id">مدیر سازمان
                                     <sup class="text-danger">*</sup>
@@ -107,6 +108,7 @@
                                 <x-partials.alpine.input.select-option name="user_id" :options="$managers->pluck('name' , 'id')->toArray()" :value="$company->user_id"/>
                                 <x-input-error :messages="$errors->get('user_id')" class="mt-2"/>
                             </div>
+                            @endnotRole
 
                             <div class="col-md-6 mb-3">
                                 <label class="form-label" for="status">وضعیت

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Facades\Acl;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UserRequest extends FormRequest
@@ -22,26 +23,41 @@ class UserRequest extends FormRequest
     public function rules(): array
     {
         if ($this->routeIs('user.store')) {
-            return [
+            $rules = [
                 'name' => 'required|min:3|max:255',
                 'phone' => 'required|numeric|digits:11|unique:users,phone',
-                'user_type' => 'required|in:0,1,2,3',
                 'status' => 'required|in:0,1',
-                'role' => 'required|integer|exists:roles,id',
-                'permissions' => 'required|array',
-                'permissions.*' => 'numeric|exists:permissions,id'
+                'company_id' => 'required|numeric|exists:companies,id'
             ];
-        }else{
-            return [
+        } else {
+            $rules = [
                 'name' => 'required|min:3|max:255',
                 'phone' => 'required|numeric|digits:11|unique:users,phone,' . $this->user->id,
-                'user_type' => 'required|in:0,1,2,3',
                 'status' => 'required|in:0,1',
-                'role' => 'required|integer|exists:roles,id',
-                'permissions' => 'required|array',
-                'permissions.*' => 'numeric|exists:permissions,id'
+                'company_id' => 'required|numeric|exists:companies,id'
             ];
         }
+
+        if (Acl::hasRole(['manager'])) {
+            $rules['user_type'] = 'nullable';
+
+        } else {
+            $rules['user_type'] = 'required|in:0,1,2,3';
+
+        }
+
+        if (can('user-permissions')) {
+            $rules['role'] = 'required|integer|exists:roles,id';
+            $rules['permissions'] = 'required|array';
+
+        } else {
+
+            $rules['role'] = 'nullable|integer|exists:roles,id';
+            $rules['permissions'] = 'nullable|array';
+        }
+        $rules['permissions.*'] = 'numeric|exists:permissions,id';
+
+        return $rules;
     }
 
 
@@ -53,6 +69,7 @@ class UserRequest extends FormRequest
             'role' => 'نقش',
             'permissions' => 'دسترسی ها',
             'permissions.*' => 'دسترسی ها',
+            'company_id' => 'سازمان'
         ];
     }
 }

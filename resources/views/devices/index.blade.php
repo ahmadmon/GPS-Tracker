@@ -34,7 +34,10 @@
         <div class="row">
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
-                <a href="{{ route('device.create') }}" class="btn btn-primary mb-4">+ ایجاد دستگاه</a>
+                @if(can('create-device'))
+                    <a href="{{ route('device.create') }}" class="btn btn-primary mb-4">+ ایجاد دستگاه</a>
+                @endif
+
                 <div class="card">
                     <div class="card-header pb-0 card-no-border">
                         <h4>لیست دستگاه ها</h4>
@@ -48,7 +51,9 @@
                                     <th>مدل</th>
                                     <th>برند</th>
                                     <th>شماره سیم کارت</th>
+                                    @notRole(['user'])
                                     <th>خریدار</th>
+                                    @endnotRole
                                     <th>وضعیت</th>
                                     <th>متصل شده در</th>
                                     <th>عملیات</th>
@@ -74,11 +79,13 @@
                                             </span>
                                         </td>
                                         <td>{{ $device?->phone_number }}</td>
+                                        @notRole(['user'])
                                         <td>
                                             <a href="{{ route('user.show', $device->user_id) }}" target="_blank">
                                                 {{ $device->user->name }}
                                             </a>
                                         </td>
+                                        @endrole
                                         <td>
                                             @if($device->status)
                                                 <span class="badge dana rounded-pill badge-success">فعال</span>
@@ -94,19 +101,28 @@
                                                     <i class="icofont icofont-listing-box txt-dark"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-block text-center" style="">
-                                                    <a class="dropdown-item "
-                                                       href="{{ route('device.edit', $device->id) }}">ویرایش</a>
-                                                    <a href="javascript:void(0)" class="dropdown-item"
-                                                       @click.prevent="show = true">حذف</a>
-                                                    <a href="{{ route('device.device-setting', $device->id) }}"
-                                                       class="dropdown-item">تنظیمات دستگاه</a>
-                                                    <a href="{{ route('device.show', $device->id) }}"
-                                                       class="dropdown-item">نمایش موقعیت مکانی</a>
+                                                    @if(can('edit-device'))
+                                                        <a class="dropdown-item "
+                                                           href="{{ route('device.edit', $device->id) }}">ویرایش</a>
+                                                    @endif
+                                                    @if(can('delete-device'))
+                                                        <a href="javascript:void(0)" class="dropdown-item"
+                                                           @click.prevent="show = true">حذف</a>
+                                                    @endif
+                                                    @if(can('device-settings'))
+
+                                                        <a href="{{ route('device.device-setting', $device->id) }}"
+                                                           class="dropdown-item">تنظیمات دستگاه</a>
+                                                    @endif
+                                                    {{--                                                    <a href="{{ route('device.show', $device->id) }}"--}}
+                                                    {{--                                                       class="dropdown-item">نمایش موقعیت مکانی</a>--}}
 
                                                 </ul>
                                             </div>
-                                            <x-partials.btns.confirm-rmv-btn
-                                                url="{{ route('device.destroy', $device->id) }}"/>
+                                            @if(can('delete-device'))
+                                                <x-partials.btns.confirm-rmv-btn
+                                                    url="{{ route('device.destroy', $device->id) }}"/>
+                                            @endif
                                         </td>
                                     </tr>
                                 @empty
