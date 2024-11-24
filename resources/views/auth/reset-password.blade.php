@@ -8,12 +8,15 @@
         <div class="col-xl-5 p-0">
             <div class="login-card login-dark">
                 <div>
-                    <div>
-                        <a class="logo text-start" href="#">
-                            <img class="img-fluid for-light" width="65" src="{{ asset('assets/images/logo/aron.webp') }}"
+                    <div class="d-flex justify-content-start align-items-center">
+                        <a class="logo text-start me-2" href="javascript:void(0)">
+                            <img class="img-fluid for-light" width="50"
+                                 src="{{ asset('assets/images/logo/samfa-logo.png') }}"
                                  alt="صفحه ورود">
-                            <img class="img-fluid for-dark" src="{{ asset('assets/images/logo/logo_dark.png') }}"
-                                 alt="صفحه ورود"></a>
+                            <img class="img-fluid for-dark" width="50" src="{{ asset('assets/images/logo/samfa-logo.png') }}"
+                                 alt="صفحه ورود">
+                        </a>
+                        <h3 class="fw-bold pb-4">سَمـفـا</h3>
                     </div>
                     <div class="login-main">
                         <form action="{{ route('password.store') }}" class="theme-form" method="POST">

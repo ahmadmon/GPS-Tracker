@@ -70,7 +70,8 @@
                                                                                 دستگاه {{ str($device->name)->replace('دستگاه', '') }}</h6>
                                                                             <small
                                                                                 class="project_name_0 text-muted d-block">{{ $device->serial }}</small>
-                                                                            <small class="project_name_0 text-muted d-block">{{ $device->user?->name }}</small>
+                                                                            <small
+                                                                                class="project_name_0 text-muted d-block">{{ $device->user?->name }}</small>
                                                                         </label>
                                                                     </div>
                                                                     @if($device->lastLocation())
@@ -143,6 +144,7 @@
 <!-- // Leaflet JS assets  -->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/libs/leaflet/leaflet.css') }}">
 <script src="{{ asset('assets/libs/leaflet/leaflet.js') }}"></script>
+<script src="{{ asset('assets/libs/leaflet/leaflet-map-layers.js') }}"></script>
 
 <!-- // Leaflet Geoman for Geofence assets  -->
 <link
@@ -166,8 +168,8 @@
 <script src="{{ asset('assets/js/flat-pickr/l10n/fa-jdate.js') }}"></script>
 
 <!-- // Waypoint assets  -->
-<link rel="stylesheet" href="{{ asset('assets/libs/leaflet-routing-machine/css/leaflet-routing-machine.css') }}">
-<script src="{{ asset('assets/libs/leaflet-routing-machine/js/leaflet-routing-machine.js') }}"></script>
+{{--<link rel="stylesheet" href="{{ asset('assets/libs/leaflet-routing-machine/css/leaflet-routing-machine.css') }}">--}}
+{{--<script src="{{ asset('assets/libs/leaflet-routing-machine/js/leaflet-routing-machine.js') }}"></script>--}}
 
 
 <style>
@@ -232,27 +234,31 @@
         drownGeofences: {},
         drawnWaypoints: {},
         circleMarkers: [],
+        CheckedProvider: '',
 
         init() {
+            let self = this;
             // Initializing The Map
             this.map = L.map(el, {
                 pmIgnore: false,
                 fullscreenControl: true,
             }).setView(this.mapCenter, 11);
 
-            let layers = {
-                "تصویر ماهواره ای": L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-                    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-                }),
-                "تصویر خیابانی گوگل": L.tileLayer('http://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}', {
-                    maxZoom: 20,
-                    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-                }),
-            }
 
-            L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 35,
-            }).addTo(this.map);
+            OSMBase.addTo(this.map);
+            L.control.layers(baseMaps, overlayMaps, {position: 'topright', collapsed: true}).addTo(this.map);
+
+            setTimeout(function() {
+                self.setTitleControl();
+            }, 1000);
+
+            $('body').on('click', 'section.leaflet-control-layers-list div.leaflet-control-layers-base div.TileProviderName', function (e) {
+                let MainProvider = $(this).data('tpn');
+                if ($(this).parent().find('label.TPN_' + MainProvider).is(":hidden")) {
+                    $(this).parent().find('label').hide(400);
+                    $(this).parent().find('label.TPN_' + MainProvider).show(800);
+                }
+            });
 
             // Fixing Popup when zooming
             L.Popup.prototype._animateZoom = function (e) {
@@ -262,7 +268,6 @@
                 L.DomUtil.setPosition(this._container, pos.add(anchor));
             }
 
-            L.control.layers(null, layers).addTo(this.map);
 
             this.map.pm.setLang("fa");
 
@@ -286,6 +291,67 @@
             this.updateLocations($wire.deviceLocations);
             $wire.on('locationUpdated', () => this.updateLocations($wire.deviceLocations));
         },
+
+        // Handle The Map Layers
+        //-----------------------------------
+        setTitleControl() {
+            let CheckedProvider = '';
+            let self = this;
+
+            let TitleProviders = $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label > div > span');
+            let TilePCounts = TitleProviders.length;
+            let PrevTitleProvider = null;
+            let FoundProvider = 0;
+            // $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label').hide();
+
+            $.each(TitleProviders, function (TPindex, TPdata) {
+                let TPLabel = this.trim($(this).html());
+                let SplittedLabel = TPLabel.split(/(?<=^\S+)\s/);
+                if (typeof SplittedLabel[1] === "undefined") {
+                    SplittedLabel[1] = TPLabel;
+                }
+
+                if (TPindex == 0) {
+                    $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(1)').find('div > span').html(' ' + SplittedLabel[1]);
+                    $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(1)').before('<div class="TileProviderName" data-tpn="' + SplittedLabel[0] + '">' + SplittedLabel[0] + '</div>').addClass('TPN_' + SplittedLabel[0]);
+                    CheckedProvider = SplittedLabel[0];
+                }
+                let AddBefore = ((TPindex + FoundProvider) + 0);
+                let AddCurrent = (TPindex + FoundProvider + 1);
+                if (TPindex > 0) {
+                    $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(' + AddCurrent + ')').find('div > span').text(' ' + SplittedLabel[1]);
+                    $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(' + AddCurrent + ')').addClass('TPN_' + SplittedLabel[0]);
+                }
+                if (PrevTitleProvider !== SplittedLabel[0]) {
+                    if (TPindex > 0) {
+                        $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(' + AddBefore + ')').after('<div class="TileProviderName" data-tpn="' + SplittedLabel[0] + '">' + SplittedLabel[0] + '</div>');
+                        $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(' + AddBefore + ')').addClass('TileProviderBorderBottom');
+                    }
+                    FoundProvider++;
+                }
+                PrevTitleProvider = SplittedLabel[0];
+
+                if ((TPindex + 1) === TilePCounts) {
+                    $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(' + AddCurrent + ')').addClass('TileProviderBorderBottom');
+                }
+
+                let Checked = $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(' + (TPindex + 1 + FoundProvider) + ')').children().children('input[type=radio]:checked');
+                let isChecked = Checked.length;
+                if (isChecked > 0) {
+                    CheckedProvider = SplittedLabel[0];
+                }
+            });
+            $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label.TPN_' + this.CheckedProvider).show();
+            $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready)').addClass('TPSet_Ready');
+        },
+
+        trim(str) {
+            if (typeof str == "string") {
+                return str.replace(/^\s+|\s+$/, '');
+            }
+            return str;
+        },
+
 
         // Handle The Devices live location
         //-----------------------------------
@@ -332,7 +398,8 @@
                     duration: 1
                 });
             }
-        },
+        }
+        ,
 
         createCustomIcon(status = 'active', degree) {
             const markerIcons = {
@@ -349,7 +416,8 @@
                 iconAnchor: [16, 32],
                 popupAnchor: [0, -32]
             });
-        },
+        }
+        ,
 
         createPopupContent(data, distance = null) {
             return `
@@ -386,7 +454,8 @@
                 : ''
             }
         `;
-        },
+        }
+        ,
 
         getMarkerStatus(data) {
             const lastUpdate = new Date(data.created_at);
@@ -396,7 +465,8 @@
             if (diffMinutes < 5) return 'active';
             if (diffMinutes < 15) return 'warning';
             return 'inactive';
-        },
+        }
+        ,
 
         // Handle geofences
         //-----------------------------------
@@ -426,7 +496,8 @@
                     console.error("Invalid geometry format:", error);
                 }
             });
-        },
+        }
+        ,
 
         removeGeofences() {
             Object.values(this.drownGeofences).forEach(({polygon, label}) => {
@@ -436,7 +507,8 @@
                 }
             });
             this.drownGeofences = {};
-        },
+        }
+        ,
 
         getColorForGeofence(geofenceId) {
             const colors = [
@@ -450,7 +522,8 @@
             }
 
             return savedColors[geofenceId];
-        },
+        }
+        ,
 
         // Handle The Devices trips
         //-----------------------------------
@@ -527,9 +600,8 @@
                 this.drawnWaypoints[i] = polyline;
                 this.drawnWaypoints[i].markers = {startMarker, endMarker};
             });
-
-            console.log(this.drawnWaypoints);
-        },
+        }
+        ,
 
         removeWayPoints() {
             Object.values(this.drawnWaypoints).forEach((route) => {
@@ -548,7 +620,8 @@
 
             this.drawnWaypoints = {};
             this.circleMarkers = [];
-        },
+        }
+        ,
 
 
         showWayPointWithRouteMachineLibrary(trips) {
@@ -599,7 +672,6 @@
 
                 control.on('routesfound', (e) => {
                     const route = e.routes[0];
-                    console.log(route.coordinates)
                     const totalDistance = route.summary.totalDistance;
                     // route.coordinates.forEach
                     trip.forEach((coord) => {
@@ -609,7 +681,6 @@
                             color: "#3388ff",
                             fillOpacity: 0.5
                         }).addTo(this.map);
-                        console.log(trip)
 
                         // Add click event for displaying trip info
                         circle.on('click', (event) => {
@@ -638,7 +709,8 @@
 
                 this.drawnWaypoints[i] = control;
             });
-        },
+        }
+        ,
 
         removeWayPointWithRouteMachineLibrary() {
             Object.values(this.drawnWaypoints).forEach((route) => {

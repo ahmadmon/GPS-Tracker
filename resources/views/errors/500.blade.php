@@ -1,5 +1,5 @@
 @extends('errors::minimal')
 
-@section('title', __('Server Error'))
+@section('title', "خطای داخلی سرور")
 @section('code', '500')
-@section('message', __('Server Error'))
+@section('message', "متاسفانه، در حال حاضر مشکلی در سرور سایت رخ داده است. لطفا بعداً مجدداً تلاش نمایید.")

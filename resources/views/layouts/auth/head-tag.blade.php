@@ -2,13 +2,16 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description"
-      content="Cuba admin is super flexible, powerful, clean &amp; modern responsive bootstrap 5 admin template with unlimited possibilities.">
+      content="سمفا یک سامانه جامع و قدرتمند برای ردیابی و مدیریت دستگاه‌های GPS است. با استفاده از سمفا، می‌توانید به صورت آنلاین و دقیق موقعیت دستگاه‌های خود را ردیابی کرده و از آن‌ها مدیریت کنید.">
 <meta name="keywords"
-      content="admin template, Cuba admin template, dashboard template, flat admin template, responsive admin template, web app">
-<meta name="author" content="pixelstrap">
-<link rel="icon" href="{{ asset('assets/images/favicon.png') }}" type="image/x-icon">
-<link rel="shortcut icon" href="{{ asset('assets/images/favicon.png') }}" type="image/x-icon">
-<title>@yield('title', 'احراز هویت')</title>
+      content="سامانه ردیابی GPS, ردیابی خودرو, ردیابی آنلاین, مدیریت ناوگان, GPS, سمفا, ردیابی دستگاه, نظارت بر ناوگان, افزایش بهره‌وری, امنیت ناوگان, سامانه سازمانی, نرم افزار ردیابی, اپلیکیشن ردیابی">
+<meta property="og:title" content="سمفا - سامانه هوشمند ردیابی GPS">
+<meta property="og:description" content="سمفا یک سامانه جامع و قدرتمند برای ردیابی و مدیریت دستگاه‌های GPS است.">
+{{--<meta property="og:url" content="https://samfatrack.ir">--}}
+<meta lang="fa">
+<link rel="icon" href="{{ asset('assets/images/logo/favicon.ico') }}" type="image/x-icon">
+<link rel="shortcut icon" href="{{ asset('assets/images/logo/favicon.ico') }}" type="image/x-icon">
+<title>@yield('title', 'سمفا - احراز هویت')</title>
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/font-awesome.css') }}">
 <!-- ico-font-->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/icofont.css') }}">
@@ -28,4 +31,4 @@
 <!-- Responsive css-->
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/responsive.css') }}">
 <!-- Custom css-->
-<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/daniel.css')}}">
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/css/custom-style.css')}}">

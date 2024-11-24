@@ -3,9 +3,9 @@
         <div class="logo-wrapper">
             <a href="{{ route('home') }}">
                 <img class="img-fluid for-light"
-                     src="{{ asset('assets/images/logo/logo.png') }}" alt="">
+                     src="{{ asset('assets/images/logo/samfa-logo.png') }}" width="50px" alt="سمفا - سامانه هوشمند ردیابی GPS">
                 <img class="img-fluid for-dark"
-                     src="{{ asset('assets/images/logo/logo_dark.png') }}" alt="">
+                     src="{{ asset('assets/images/logo/samfa-logo.png') }}" width="50px" alt="سمفا - سامانه هوشمند ردیابی GPS">
             </a>
             <div class="back-btn">
                 <i class="fa fa-angle-left"></i>
@@ -18,7 +18,7 @@
         <div class="logo-icon-wrapper">
             <a href="{{ route('home') }}">
                 <img class="img-fluid"
-                     src="{{ asset('assets/images/logo/logo-icon.png') }}" alt="">
+                     src="{{ asset('assets/images/logo/samfa-logo.png') }}" width="50px" alt="">
             </a>
         </div>
         <nav class="sidebar-main">
@@ -29,15 +29,9 @@
                         <div class="mobile-back text-end"><span>بازگشت</span><i
                                     class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
                     </li>
-                    <li class="pin-title sidebar-main-title">
-                        <div>
-                            <h6>پین شده</h6>
-                        </div>
-                    </li>
-                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>
+                    <li class="sidebar-list">
                         <a
-                                class="sidebar-link sidebar-title" href="{{ route('home') }}"
-                                target="_blank">
+                                @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('home')]) href="{{ route('home') }}">
                             <svg class="stroke-icon">
                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
                             </svg>
@@ -47,8 +41,8 @@
                             <span>داشبورد</span>
                         </a>
                     </li>
+                    @if(can('show-map'))
                     <li class="sidebar-list">
-                        <i class="fa-solid fa-thumbtack"></i>
                         <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('map')]) href="{{ route('map') }}">
                             <i data-feather="map"></i>
                             <span>نقشه</span>
@@ -57,9 +51,9 @@
                             </div>
                         </a>
                     </li>
+                    @endif
                     @if(can('devices-list'))
                         <li class="sidebar-list">
-                            <i class="fa-solid fa-thumbtack"></i>
                             <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('device.*')]) href="{{ route('device.index') }}">
                                 <i data-feather="cpu"></i>
                                 <span>دستگاه ها</span>
@@ -72,7 +66,6 @@
 
                     @if(can('vehicles-list'))
                         <li class="sidebar-list">
-                            <i class="fa-solid fa-thumbtack"></i>
                             <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('vehicle.*')]) href="{{ route('vehicle.index') }}">
                                 <i data-feather="truck"></i>
                                 <span>وسایل نقلیه</span>
@@ -86,7 +79,6 @@
                     @notRole(['user'])
                     @if(can('users-list'))
                         <li class="sidebar-list">
-                            <i class="fa fa-thumb-tack"></i>
                             <a @class(['sidebar-link sidebar-title', 'active' => Route::is('user.*')]) href="javascript:void(0)">
                                 <i data-feather="users"></i>
                                 <span>کاربران</span></a>
@@ -101,7 +93,7 @@
                     @endnotRole
                     @notRole(['user'])
                     @if(can('companies-list'))
-                        <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>
+                        <li class="sidebar-list">
                             <a @class(['sidebar-link sidebar-title', 'active' => Route::is('company.*')]) href="javascript:void(0)">
                                 <i data-feather="life-buoy"></i>
                                 <span>سازمان</span></a>
@@ -119,8 +111,8 @@
                     @endif
                     @endnotRole
                     @if(can('geofences-list'))
-                        <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
-                                    @class(['sidebar-link sidebar-title', 'active' => Route::is('geofence.*')]) href="javascript:void(0)">
+                        <li class="sidebar-list">
+                            <a @class(['sidebar-link sidebar-title', 'active' => Route::is('geofence.*')]) href="javascript:void(0)">
                                 <i data-feather="octagon"></i>
                                 <span>حصار جغرافیایی</span></a>
                             <ul class="sidebar-submenu">
@@ -132,7 +124,6 @@
                             </ul>
                         </li>
                     @endif
-
                 </ul>
             </div>
             <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>

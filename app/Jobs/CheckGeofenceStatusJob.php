@@ -32,7 +32,7 @@ class CheckGeofenceStatusJob implements ShouldQueue
     public function handle(): void
     {
         $geofences = Geofence::where('device_id', $this->device->id)->where('status', 1)->get();
-        dd($geofences);
+//        dd($geofences);
         foreach ($geofences as $fence) {
 
             if ($fence->isGeofenceActive()) continue;
@@ -57,7 +57,7 @@ class CheckGeofenceStatusJob implements ShouldQueue
 
                 }
             }
-            dd('hi');
+//            dd('hi');
 
             DB::table('device_geofence')->insert([
                 'device_id' => $this->device->id,

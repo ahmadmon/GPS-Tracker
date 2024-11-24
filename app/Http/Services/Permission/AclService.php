@@ -19,7 +19,7 @@ class AclService
         if ($this->user->hasAccessTo($permission, $entity)) {
             return true;
         } else {
-            abort(403, 'دسترسی شما به این بخش از سامانه محدود شده است.');
+            abort(403, 'شما مجوز دسترسی به این بخش از سامانه را ندارید. لطفا با مدیر سامانه تماس بگیرید.');
         }
     }
 

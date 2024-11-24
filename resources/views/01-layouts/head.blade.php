@@ -3,13 +3,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-          content="Cuba admin is super flexible, powerful, clean &amp; modern responsive bootstrap 5 admin template with unlimited possibilities.">
+          content="سمفا یک سامانه جامع و قدرتمند برای ردیابی و مدیریت دستگاه‌های GPS است. با استفاده از سمفا، می‌توانید به صورت آنلاین و دقیق موقعیت دستگاه‌های خود را ردیابی کرده و از آن‌ها مدیریت کنید.">
     <meta name="keywords"
-          content="admin template, Cuba admin template, dashboard template, flat admin template, responsive admin template, web app">
-    <meta name="author" content="pixelstrap">
-    <link rel="icon" href="{{ asset('assets/images/favicon.png" type="image/x-icon')}}">
-    <link rel="shortcut icon" href="{{ asset('assets/images/favicon.png" type="image/x-icon')}}">
-    <title>@yield('title' , "عنوان صفحه")</title>
+          content="سامانه ردیابی GPS, ردیابی خودرو, ردیابی آنلاین, مدیریت ناوگان, GPS, سمفا, ردیابی دستگاه, نظارت بر ناوگان, افزایش بهره‌وری, امنیت ناوگان, سامانه سازمانی, نرم افزار ردیابی, اپلیکیشن ردیابی">
+    <meta property="og:title" content="سمفا - سامانه هوشمند ردیابی GPS">
+    <meta property="og:description" content="سمفا یک سامانه جامع و قدرتمند برای ردیابی و مدیریت دستگاه‌های GPS است.">
+    {{--<meta property="og:url" content="https://samfatrack.ir">--}}
+    <meta lang="fa_IR">
+    <link rel="icon" href="{{ asset('assets/images/logo/favicon.ico') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('assets/images/logo/favicon.ico') }}" type="image/x-icon">
+    <title>@yield('title', 'سمفا - سامانه هوشمند ردیابی GPS')</title>
     <!-- Google font-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/font-awesome.css')}}">
     <!-- ico-font-->
@@ -24,7 +27,6 @@
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/slick.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/slick-theme.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/scrollbar.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/animate.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/prism.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/vendors/sweetalert2.min.css') }}">
     <!-- Plugins css Ends-->
@@ -35,7 +37,7 @@
     <link id="color" rel="stylesheet" href="{{ asset('assets/css/color-1.css')}}" media="screen">
     <!-- Responsive css-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/responsive.css')}}">
-    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/daniel.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/custom-style.css')}}">
     @if(!isset($loadAlpineJs) || $loadAlpineJs !== false)
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @endif

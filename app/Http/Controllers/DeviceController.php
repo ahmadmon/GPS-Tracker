@@ -202,11 +202,12 @@ class DeviceController extends BaseController
         $sms->setTo($device->phone_number);
         $sms->setText($command);
         $res = $sms->api();
+        dd($res);
 
         if ($res->getStatusCode() == 200) {
             return back()->with('success-alert', 'دستور با موفقیت برای دستگاه ارسال شد.');
         } else {
-            return back()->with('error-alert', "خطایی به وجود آمده است!\nلطفا بعد از چند لحظه دوباره امتحان کنید\nدر صورت مشاده دوباره این پیغام لطفا با پشتیبانی تماس بگیرید.");
+            return back()->with('error-alert', "خطایی به وجود آمده است!\nلطفا بعد از چند لحظه دوباره امتحان کنید.\nدر صورت مشاهده دوباره این پیغام لطفا با پشتیبانی تماس بگیرید.");
         }
     }
 

@@ -28,7 +28,7 @@ trait VerificationCode
         ]);
 
         $smsService->setTo($mobile);
-        $smsService->setText("فناوری آرون ‌ردیاب\nرمز ورود: {$verificationCode->otp}\n");
+        $smsService->setText("سمفا - سامانه هوشمند ردیابی GPS\nرمز ورود: {$verificationCode->otp}\n");
         $smsService->fire();
 
 
