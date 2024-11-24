@@ -38,7 +38,7 @@ class CompanyController extends BaseController
     {
         Acl::authorize('create-company');
 
-        $managers = User::where('status', 1)->whereIn('user_type', 3)->cursor();
+        $managers = User::where('status', 1)->where('user_type', 3)->cursor();
 
         return view('company.create', compact('managers'));
     }

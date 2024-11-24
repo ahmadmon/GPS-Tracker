@@ -51,11 +51,12 @@
                                     <th>مدل</th>
                                     <th>برند</th>
                                     <th>شماره سیم کارت</th>
+                                    <th>وسیله نقلیه</th>
                                     @notRole(['user'])
-                                    <th>خریدار</th>
+                                    <th>کاربر</th>
                                     @endnotRole
                                     <th>وضعیت</th>
-                                    <th>متصل شده در</th>
+                                    <th>تاریخ ایجاد</th>
                                     <th>عملیات</th>
                                 </tr>
                                 </thead>
@@ -79,6 +80,19 @@
                                             </span>
                                         </td>
                                         <td>{{ $device?->phone_number }}</td>
+                                        <td>
+                                            @if(can('edit-vehicle'))
+                                            <a href="{{ route('vehicle.edit', $device?->vehicle_id) }}" target="_blank">
+                                                {{ $device->vehicle?->name }}
+                                                <small class="text-muted d-block">{{ $device->vehicle?->license_plate }}</small>
+                                            </a>
+                                            @else
+                                                <span>
+                                                    {{ $device->vehicle?->name }}
+                                                    <small class="text-muted d-block">{{ $device->vehicle?->license_plate }}</small>
+                                                </span>
+                                            @endif
+                                        </td>
                                         @notRole(['user'])
                                         <td>
                                             <a href="{{ route('user.show', $device->user_id) }}" target="_blank">
@@ -93,7 +107,7 @@
                                                 <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
                                             @endif
                                         </td>
-                                        <td>{{ jalaliDate($device?->connected_at,time:true) }}</td>
+                                        <td>{{ jalaliDate($device?->created_at,time:true) }}</td>
                                         <td x-data="{ show: false }">
                                             <div class="btn-group" x-cloak x-show="!show">
                                                 <button class="btn dropdown-toggle" type="button"
@@ -147,7 +161,7 @@
     <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
     <script>
         $('#basic-1').DataTable({
-            order: [[6, 'desc']],
+            order: [[7, 'desc']],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
             }

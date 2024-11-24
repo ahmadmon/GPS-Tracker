@@ -50,9 +50,10 @@
                                     <th>پلاک</th>
                                     <th>دستگاه</th>
                                     @notRole(['user'])
-                                    <th>راننده</th>
+                                    <th>کاربر</th>
                                     @endnotRole
                                     <th>وضعیت</th>
+                                    <th>تاریخ ایجاد</th>
                                     <th>عملیات</th>
                                 </tr>
                                 </thead>
@@ -76,6 +77,7 @@
                                                 <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
                                             @endif
                                         </td>
+                                        <td>{{ jalaliDate($vehicle?->created_at) }}</td>
                                         <td x-data="{ show: false }">
                                             <div class="btn-group" x-cloak x-show="!show">
                                                 <button class="btn dropdown-toggle" type="button"
@@ -125,6 +127,7 @@
 
     <script>
         $('#basic-1').DataTable({
+            order: [[5, 'desc']],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
             }

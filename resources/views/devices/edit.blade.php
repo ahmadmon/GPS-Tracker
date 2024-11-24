@@ -4,7 +4,7 @@
 @section('title', 'ویرایش دستگاه')
 
 @section('content')
-
+{{--@dd($errors->all())--}}
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
@@ -78,6 +78,18 @@
                         <x-input-error :messages="$errors->get('user_id')" class="mt-2"/>
                     </div>
                     @endnotRole
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="user_id">مختص به وسیله نقلیه
+                            <sup class="text-danger">*</sup>
+                        </label>
+                        @php
+                            $options = $vehicles->mapWithKeys(fn($item) => [$item->id => implode(' - ', [$item->name , $item->license_plate])])->toArray();
+                        @endphp
+                        <x-partials.alpine.input.select-option :$options
+                                                               name="vehicle_id" :value="$device->vehicle_id"/>
+                        <x-input-error :messages="$errors->get('vehicle_id')" class="mt-2"/>
+                    </div>
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label" for="brand">برند

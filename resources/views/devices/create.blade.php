@@ -69,7 +69,7 @@
 
                     @notRole(['user'])
                     <div class="col-md-6 mb-3">
-                        <label class="form-label" for="user_id">خریدار
+                        <label class="form-label" for="user_id">کاربر
                             <sup class="text-danger">*</sup>
                         </label>
                         <x-partials.alpine.input.select-option :options="$users->pluck('name', 'id')->toArray()"
@@ -77,6 +77,18 @@
                         <x-input-error :messages="$errors->get('user_id')" class="mt-2"/>
                     </div>
                     @endnotRole
+
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label" for="user_id">مختص به وسیله نقلیه
+                            <sup class="text-danger">*</sup>
+                        </label>
+                        @php
+                            $options = $vehicles->mapWithKeys(fn($item) => [$item->id => implode(' - ', [$item->name , $item->license_plate])])->toArray();
+                        @endphp
+                        <x-partials.alpine.input.select-option :$options
+                                                               name="vehicle_id"/>
+                        <x-input-error :messages="$errors->get('vehicle_id')" class="mt-2"/>
+                    </div>
 
                     <div class="col-md-6 mb-3">
                         <label class="form-label" for="brand">برند

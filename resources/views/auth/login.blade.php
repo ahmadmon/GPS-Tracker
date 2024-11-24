@@ -9,19 +9,19 @@
 @section('content')
     <div class="row m-0">
         <div class="col-xl-7 p-0">
-            <img class="bg-img-cover bg-center" src="{{ asset('assets/images/login/2.jpg') }}" alt="صفحه ورود"></div>
+            <img class="bg-img-cover bg-center" src="{{ asset('assets/images/login/police-amiat-eghtesadi.webp') }}" alt="صفحه ورود"></div>
         <div class="col-xl-5 p-0">
             <div class="login-card login-dark">
                 <div>
                     <div class="d-flex justify-content-start align-items-center">
                         <a class="logo text-start me-2" href="javascript:void(0)">
                             <img class="img-fluid for-light" width="50"
-                                 src="{{ asset('assets/images/logo/samfa-logo.png') }}"
+                                 src="{{ asset('assets/images/logo/Economic_Security_Police_of_Iran-logo.png') }}"
                                  alt="صفحه ورود">
-                            <img class="img-fluid for-dark" width="50" src="{{ asset('assets/images/logo/samfa-logo.png') }}"
+                            <img class="img-fluid for-dark" width="50" src="{{ asset('assets/images/logo/Economic_Security_Police_of_Iran-logo.png') }}"
                                  alt="صفحه ورود">
                         </a>
-                        <h3 class="fw-bold pb-4">سَمـفـا</h3>
+                        <h3 class="fw-bold pb-4">سَمـفـا - پلیس امنیت اقتصادی</h3>
                     </div>
                     <div class="login-main">
                         <form action="{{ route('login') }}" class="theme-form" method="POST" autocomplete="off"
@@ -66,29 +66,22 @@
                                 <button class="btn btn-primary btn-block dana w-100" type="submit">ورود به حساب
                                 </button>
 
-                                <a
+{{--                                <a--}}
 
-                                    :href="phone.length === 11 ? `/otp/verification/${phone}` : 'javascript:void(0)'"
-                                    @click="if(phone.length !== 11) error = true"
-                                    class="btn btn-outline-primary btn-block dana w-100 mt-3">
-                                    ورود با رمز یک‌بار مصرف
-                                    <i class="fa fa-regular fa-chevron-left ms-1" style="font-size: 12px"></i>
-                                </a>
+{{--                                    :href="phone.length === 11 ? `/otp/verification/${phone}` : 'javascript:void(0)'"--}}
+{{--                                    @click="if(phone.length !== 11) error = true"--}}
+{{--                                    class="btn btn-outline-primary btn-block dana w-100 mt-3">--}}
+{{--                                    ورود با رمز یک‌بار مصرف--}}
+{{--                                    <i class="fa fa-regular fa-chevron-left ms-1" style="font-size: 12px"></i>--}}
+{{--                                </a>--}}
                             </div>
-{{--                            <h6 class="text-muted mt-4 or fw-bolder">یا ورود کنید با</h6>--}}
-{{--                            <div class="social mt-4">--}}
-{{--                                <div class="btn-showcase">--}}
-{{--                                    <a class="btn btn-light w-100 dana" href="{{ route('social-login', 'google') }}">--}}
-{{--                                        <i class="txt-google-plus" data-feather="at-sign"></i> حساب گوگل--}}
-{{--                                    </a>--}}
-{{--                                </div>--}}
-{{--                            </div>--}}
-                            <p class="mt-4 mb-0 text-center">حساب کاربری ندارید؟
-                                <a class="ms-2" href="{{ route('register') }}">ثبت نام کنید</a>
-                            </p>
-                            <p class="mt-3 mb-0 text-center">گذرواژه را فراموش کرده اید؟
-                                <a class="ms-2" href="{{ route('password.request') }}">بازیابی گذرواژه</a>
-                            </p>
+
+{{--                            <p class="mt-4 mb-0 text-center">حساب کاربری ندارید؟--}}
+{{--                                <a class="ms-2" href="{{ route('register') }}">ثبت نام کنید</a>--}}
+{{--                            </p>--}}
+{{--                            <p class="mt-3 mb-0 text-center">گذرواژه را فراموش کرده اید؟--}}
+{{--                                <a class="ms-2" href="{{ route('password.request') }}">بازیابی گذرواژه</a>--}}
+{{--                            </p>--}}
                         </form>
                     </div>
                 </div>

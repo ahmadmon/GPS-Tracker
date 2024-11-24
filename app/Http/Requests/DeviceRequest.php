@@ -21,17 +21,32 @@ class DeviceRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'name' => 'required|string|min:3|max:255',
-            'model' => 'required|string|min:3|max:255',
-            'serial' => 'required|numeric|min:10|unique:devices,serial',
-            'phone_number' => 'nullable|numeric|digits:11',
-            'user_id' => 'nullable|numeric|exists:users,id',
-            'password'=> 'nullable',
-            'brand'=> 'required|string|in:sinotrack,wanway,concox',
-//            'vehicle_id' => 'required|numeric|exists:vehicles,id',
-            'status' => 'required|numeric|in:0,1'
-        ];
+        if($this->routeIs('device.store')){
+            return [
+                'name' => 'required|string|min:3|max:255',
+                'model' => 'required|string|min:3|max:255',
+                'serial' => 'required|numeric|min:10|unique:devices,serial',
+                'phone_number' => 'nullable|numeric|digits:11',
+                'user_id' => 'nullable|numeric|exists:users,id',
+                'password'=> 'nullable',
+                'brand'=> 'required|string|in:sinotrack,wanway,concox,qbit',
+                'vehicle_id' => 'required|numeric|exists:vehicles,id',
+                'status' => 'required|numeric|in:0,1'
+            ];
+        }else{
+            return [
+                'name' => 'required|string|min:3|max:255',
+                'model' => 'required|string|min:3|max:255',
+                'serial' => 'required|numeric|min:10|unique:devices,serial,' . $this->device->id,
+                'phone_number' => 'nullable|numeric|digits:11',
+                'user_id' => 'nullable|numeric|exists:users,id',
+                'password'=> 'nullable',
+                'brand'=> 'required|string|in:sinotrack,wanway,concox,qbit',
+                'vehicle_id' => 'required|numeric|exists:vehicles,id',
+                'status' => 'required|numeric|in:0,1'
+            ];
+        }
+
     }
 
     public function attributes(): array

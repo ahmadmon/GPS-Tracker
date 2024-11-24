@@ -10,6 +10,7 @@ use App\Http\Services\Notify\SMS\SmsService;
 use App\Models\Device;
 use App\Models\Trip;
 use App\Models\User;
+use App\Models\Vehicle;
 use Exception;
 
 class DeviceController extends BaseController
@@ -23,17 +24,18 @@ class DeviceController extends BaseController
 
         if ($this->role === 'user') {
             $devices = Device::where('user_id', $this->user->id)
+                ->with('vehicle:id,name,license_plate')
                 ->orderByDesc('created_at')
                 ->cursor();
 
         } elseif ($this->role === 'manager') {
             $devices = Device::whereIn('user_id', $this->userCompaniesSubsetsId->merge([$this->user->id]))
-                ->with(['user:id,name'])
+                ->with(['user:id,name', 'vehicle:id,name,license_plate'])
                 ->orderByDesc('created_at')
                 ->cursor();
 
         } else {
-            $devices = Device::with(['user:id,name'])
+            $devices = Device::with(['user:id,name', 'vehicle:id,name,license_plate'])
                 ->orderByDesc('created_at')
                 ->cursor();
         }
@@ -51,13 +53,16 @@ class DeviceController extends BaseController
 
         if ($this->role === 'manager') {
             $users = User::where('status', 1)->whereIn('id', $this->userCompaniesSubsetsId)->cursor();
+            $vehicles = Vehicle::where('status', 1)->whereIn('user_id', $this->userCompaniesSubsetsId)->cursor();
         } else {
             $users = User::where('status', 1)->cursor();
+            $vehicles = Vehicle::where('status', 1)->cursor();
         }
 
 
         return view('devices.create', [
-            'users' => $users
+            'users' => $users,
+            'vehicles' => $vehicles
         ]);
     }
 
@@ -124,13 +129,16 @@ class DeviceController extends BaseController
 
         if ($this->role === 'manager') {
             $users = User::where('status', 1)->whereIn('id', $this->userCompaniesSubsetsId)->cursor();
+            $vehicles = Vehicle::where('status', 1)->whereIn('user_id', $this->userCompaniesSubsetsId)->cursor();
         } else {
             $users = User::where('status', 1)->cursor();
+            $vehicles = Vehicle::where('status', 1)->cursor();
         }
 
         return view('devices.edit', [
             'users' => $users,
             'device' => $device,
+            'vehicles' => $vehicles
         ]);
     }
 
