@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 use App\Models\Company;
+use App\Models\Geofence;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
@@ -92,16 +93,22 @@ trait HasPermissions
 
     protected function canManageEntity(Model $entity): bool
     {
-        if (get_class($entity) === Company::class) {
-            return $entity->user_id === $this->id;
-        }
+        $entityId = match (get_class($entity)) {
+            User::class => $entity->id,
+            Geofence::class => $entity->user->id,
+            default => $entity->user_id,
+        };
 
         if ($this->hasRole(['manager'])) {
-            return $this->subsets()->contains('id', get_class($entity) == User::class ? $entity->id : $entity->user_id);
+            if (get_class($entity) === Company::class) {
+                return $this->id === $entityId;
+            }
+
+            return $this->subsets()->contains('id', $entityId);
 
         } elseif ($this->hasRole(['user'])) {
 
-            return $entity->user_id === $this->id;
+            return $this->id === $entityId;
 
         }
 

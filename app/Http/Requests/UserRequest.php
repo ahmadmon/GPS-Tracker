@@ -27,14 +27,14 @@ class UserRequest extends FormRequest
                 'name' => 'required|min:3|max:255',
                 'phone' => 'required|numeric|digits:11|unique:users,phone',
                 'status' => 'required|in:0,1',
-                'company_id' => 'required|numeric|exists:companies,id'
+                'company_id' => 'sometimes|required|numeric|exists:companies,id'
             ];
         } else {
             $rules = [
                 'name' => 'required|min:3|max:255',
                 'phone' => 'required|numeric|digits:11|unique:users,phone,' . $this->user->id,
                 'status' => 'required|in:0,1',
-                'company_id' => 'required|numeric|exists:companies,id'
+                'company_id' => 'sometimes|required|numeric|exists:companies,id'
             ];
         }
 

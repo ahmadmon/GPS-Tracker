@@ -35,7 +35,9 @@
         <div class="row">
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
-                <a href="{{ route('geofence.create') }}" class="btn btn-primary mb-4">+ ایجاد حصار جدید</a>
+                @if(can('create-geofence'))
+                    <a href="{{ route('geofence.create') }}" class="btn btn-primary mb-4">+ ایجاد حصار جدید</a>
+                @endif
                 <div class="card">
                     <div class="card-header pb-0 card-no-border">
                         <h4>لیست حصارهای جغرافیایی</h4>
@@ -47,7 +49,9 @@
                                 <tr>
                                     <th>نام</th>
                                     <th>نوع</th>
+                                    @notRole(['user'])
                                     <th>مختص به کاربر</th>
+                                    @endnotRole
                                     <th>مختص به دستگاه</th>
                                     <th>وضعیت</th>
                                     <th>زمان فعالیت حصار</th>
@@ -60,10 +64,15 @@
                                     <tr>
                                         <td>
                                             <div>
-                                                <a class="f-14 mb-0 f-w-500 c-light"
-                                                   href="{{ route('geofence.edit', $geofence->id) }}">{{ $geofence->name }}</a>
+                                                @if(can('edit-geofence'))
+                                                    <a class="f-14 mb-0 f-w-500 c-light"
+                                                       href="{{ route('geofence.edit', $geofence->id) }}">{{ $geofence->name }}</a>
+                                                @else
+                                                    <span class="f-14 mb-0 f-w-500 c-light">{{ $geofence->name }}</span>
+                                                @endif
                                                 <p class="c-o-light text-muted"
-                                                   data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="{{ $geofence?->description }}"
+                                                   data-bs-toggle="tooltip" data-bs-placement="top"
+                                                   data-bs-title="{{ $geofence?->description }}"
                                                 >{{ str($geofence?->description)->limit(35) }}</p>
                                             </div>
                                         </td>
@@ -74,11 +83,13 @@
                                                 <span class="badge dana rounded-pill badge-warning">خروج</span>
                                             @endif
                                         </td>
+                                        @notRole(['user'])
                                         <td>
                                             <a href="{{ route('user.show', $geofence?->user->id) }}" target="_blank">
                                                 {{ $geofence?->user->name ?? '-' }}
                                             </a>
                                         </td>
+                                        @endnotRole
                                         <td>
                                             <a href="{{ route('device.show', $geofence->device->id) }}" target="_blank">
                                                 {{ $geofence->device->name }}
@@ -93,7 +104,8 @@
                                         </td>
                                         <td>
                                             @if(isset($geofence->start_time) && isset($geofence->end_time))
-                                                از {{ Carbon::parse($geofence?->start_time)->format('H:i') }} الی {{ Carbon::parse($geofence?->end_time)->format('H:i') }}
+                                                از {{ Carbon::parse($geofence?->start_time)->format('H:i') }}
+                                                الی {{ Carbon::parse($geofence?->end_time)->format('H:i') }}
                                             @else
                                                 فاقد محدودیت زمانی
                                             @endif
@@ -108,10 +120,16 @@
                                                     <i class="icofont icofont-listing-box txt-dark"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-block text-center" style="">
-                                                    <a class="dropdown-item"
-                                                       href="{{ route('geofence.edit', $geofence->id) }}">ویرایش</a>
-                                                    <a href="javascript:void(0)" class="dropdown-item"
-                                                       @click.prevent="show = true">حذف</a>
+                                                    @if(can('edit-geofence'))
+
+                                                        <a class="dropdown-item"
+                                                           href="{{ route('geofence.edit', $geofence->id) }}">ویرایش</a>
+                                                    @endif
+
+                                                    @if(can('delete-geofence'))
+                                                        <a href="javascript:void(0)" class="dropdown-item"
+                                                           @click.prevent="show = true">حذف</a>
+                                                    @endif
                                                 </ul>
                                             </div>
                                             <x-partials.btns.confirm-rmv-btn
@@ -133,6 +151,10 @@
         </div>
     </div>
 
+    @php
+        $sort = auth()->user()->hasRole(['user']) ? 5 : 6;
+    @endphp
+
 @endsection
 
 @push('scripts')
@@ -141,7 +163,7 @@
 
     <script>
         $('#basic-1').DataTable({
-            order: [[6, 'asc']],
+            order: [[{{ $sort }}, 'asc']],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
             }

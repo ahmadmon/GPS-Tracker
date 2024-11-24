@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
@@ -75,7 +76,7 @@ class User extends Authenticatable
 
     public function devices(): HasMany
     {
-        return $this->hasMany(Device::class, 'user_id');
+        return $this->hasMany(Device::class, 'user_id')->where('status', 1);
     }
 
     public function vehicles(): HasMany
@@ -102,6 +103,11 @@ class User extends Authenticatable
     public function companies(): HasMany
     {
         return $this->hasMany(Company::class, 'user_id');
+    }
+
+    public function geofences(): HasManyThrough
+    {
+        return $this->hasManyThrough(Geofence::class, Device::class);
     }
 
 

@@ -205,12 +205,11 @@ class UserController extends BaseController
             $user->permissions()->sync($validated['permissions']);
             $user->clearPermissionCache();
         }
-
+        if (isset($request->company_id))
         Company::find($request->company_id)->users()->sync([$user->id]);
 
 
-        return back();
-//        return to_route('user.index')->with('success-alert', "کاربر '{$user->name}' با موفقیت ویرایش شد.");
+        return to_route('user.index')->with('success-alert', "کاربر '{$user->name}' با موفقیت ویرایش شد.");
     }
 
     /**

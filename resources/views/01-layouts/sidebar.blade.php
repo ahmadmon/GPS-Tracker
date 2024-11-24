@@ -27,7 +27,7 @@
                 <ul class="sidebar-links" id="simple-bar">
                     <li class="back-btn">
                         <div class="mobile-back text-end"><span>بازگشت</span><i
-                                class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
+                                    class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
                     </li>
                     <li class="pin-title sidebar-main-title">
                         <div>
@@ -36,8 +36,8 @@
                     </li>
                     <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>
                         <a
-                            class="sidebar-link sidebar-title" href="{{ route('home') }}"
-                            target="_blank">
+                                class="sidebar-link sidebar-title" href="{{ route('home') }}"
+                                target="_blank">
                             <svg class="stroke-icon">
                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
                             </svg>
@@ -87,7 +87,7 @@
                     @if(can('users-list'))
                         <li class="sidebar-list">
                             <i class="fa fa-thumb-tack"></i>
-                            <a class="sidebar-link sidebar-title" href="#">
+                            <a @class(['sidebar-link sidebar-title', 'active' => Route::is('user.*')]) href="javascript:void(0)">
                                 <i data-feather="users"></i>
                                 <span>کاربران</span></a>
                             <ul class="sidebar-submenu">
@@ -99,27 +99,39 @@
                         </li>
                     @endif
                     @endnotRole
-                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>
-                        <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('company.*')]) href="#">
-                            <i data-feather="life-buoy"></i>
-                            <span>سازمان</span></a>
-                        <ul class="sidebar-submenu" @style(['display: block' => Route::is('company.index', 'company.create')])>
-                            <li><a @class(['active' => Route::is('company.index')]) href="{{ route('company.index') }}"><span>لیست سازمان ها</span></a>
-                            </li>
-                            <li>
-                                <a @class(['active' => Route::is('company.create')]) href="{{ route('company.create') }}"><span>ایجاد سازمان جدید</span></a>
-                            </li>
-                        </ul>
-                    </li>
-                    <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
-                            class="sidebar-link sidebar-title" href="#">
-                            <i data-feather="octagon"></i>
-                            <span>حصار جغرافیایی</span></a>
-                        <ul class="sidebar-submenu">
-                            <li><a href="{{ route('geofence.index') }}"><span>لیست حصار‌های جغرافیایی</span></a></li>
-                            <li><a href="{{ route('geofence.create') }}"><span>ایجاد حصار جدید</span></a></li>
-                        </ul>
-                    </li>
+                    @notRole(['user'])
+                    @if(can('companies-list'))
+                        <li class="sidebar-list"><i class="fa fa-thumb-tack"></i>
+                            <a @class(['sidebar-link sidebar-title', 'active' => Route::is('company.*')]) href="javascript:void(0)">
+                                <i data-feather="life-buoy"></i>
+                                <span>سازمان</span></a>
+                            <ul class="sidebar-submenu" @style(['display: block' => Route::is('company.index', 'company.create')])>
+                                <li>
+                                    <a @class(['active' => Route::is('company.index')]) href="{{ route('company.index') }}"><span>لیست سازمان ها</span></a>
+                                </li>
+                                @if(can('create-company'))
+                                    <li>
+                                        <a @class(['active' => Route::is('company.create')]) href="{{ route('company.create') }}"><span>ایجاد سازمان جدید</span></a>
+                                    </li>
+                                @endif
+                            </ul>
+                        </li>
+                    @endif
+                    @endnotRole
+                    @if(can('geofences-list'))
+                        <li class="sidebar-list"><i class="fa fa-thumb-tack"></i><a
+                                    @class(['sidebar-link sidebar-title', 'active' => Route::is('geofence.*')]) href="javascript:void(0)">
+                                <i data-feather="octagon"></i>
+                                <span>حصار جغرافیایی</span></a>
+                            <ul class="sidebar-submenu">
+                                <li><a href="{{ route('geofence.index') }}"><span>لیست حصار‌های جغرافیایی</span></a>
+                                </li>
+                                @if(can('create-geofence'))
+                                    <li><a href="{{ route('geofence.create') }}"><span>ایجاد حصار جدید</span></a></li>
+                                @endif
+                            </ul>
+                        </li>
+                    @endif
 
                 </ul>
             </div>

@@ -42,10 +42,17 @@
                                 </div>
                                 <div class="d-flex align-items-center gap-2 justify-content-center">
                                     <div>
-                                        <h6 class="pb-1">{{ $user->name }}</h6>
+                                        <h6 class="pb-1">
+                                            @role(['manager'])
+                                            {{ $user->name }}
+                                            @else
+                                             <a href="{{ route('user.show', $user->id) }}" target="_blank" class="text-dark cursor-pointer">{{ $user->name }}</a>
+                                            @endrole
+                                        </h6>
                                         <ul class="task-icons">
                                             <li><span class="text-muted"
-                                                      dir="ltr">{{ $user->phone }}</span></li>
+                                                      dir="ltr">{{ auth()->user()->hasRole(['manager']) ? maskPhoneNumber($user->phone) : $user->phone }}</span>
+                                            </li>
                                             <li class="f-light flex-wrap" wire:ignore>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="17px" height="17px"
                                                      viewBox="0 0 256 256"

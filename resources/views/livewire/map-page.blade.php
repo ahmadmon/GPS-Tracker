@@ -69,7 +69,8 @@
                                                                             <h6 class="task_title_0">
                                                                                 دستگاه {{ str($device->name)->replace('دستگاه', '') }}</h6>
                                                                             <small
-                                                                                class="project_name_0 text-muted">{{ $device->serial }}</small>
+                                                                                class="project_name_0 text-muted d-block">{{ $device->serial }}</small>
+                                                                            <small class="project_name_0 text-muted d-block">{{ $device->user?->name }}</small>
                                                                         </label>
                                                                     </div>
                                                                     @if($device->lastLocation())

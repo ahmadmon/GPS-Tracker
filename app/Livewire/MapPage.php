@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Facades\Acl;
 use App\Models\Device;
 use App\Models\Geofence;
 use App\Models\Trip;
@@ -51,6 +52,8 @@ class MapPage extends Component
 
     public function mount(Request $request): void
     {
+        Acl::authorize('show-map');
+
         $this->trips = collect([]);
 
         $this->search = $request->query('q') ?? '';
@@ -58,20 +61,50 @@ class MapPage extends Component
 
     public function render(): View
     {
-        $devices = Device::with(['vehicle', 'user'])
-            ->where('status', 1)
-            ->when($this->search !== '', function ($q) {
-                $q->whereLike('name', "%{$this->search}%")->orWhereLike('serial', "%{$this->search}%");
-            })
-            ->orderByDesc('connected_at')
-            ->take($this->take)
-            ->cursor();;
-
         $this->updateDeviceLocation();
 
         return view('livewire.map-page', [
-            'devices' => $devices
+            'devices' => $this->getDevices()
         ]);
+    }
+
+    protected function getDevices()
+    {
+        $user = auth()->user();
+        $role = Acl::getRole();
+        if ($role === 'user') {
+            return $user->devices()
+                ->with(['user', 'vehicle'])
+                ->where('status', 1)
+                ->when($this->search !== '', function ($q) {
+                    $q->whereLike('name', "%{$this->search}%")
+                        ->orWhereLike('serial', "%{$this->search}%");
+                })
+                ->orderByDesc('connected_at')
+                ->take($this->take)
+                ->cursor();
+
+        } elseif ($role === 'manager') {
+            return Device::whereIn('user_id', $user->subsets()->pluck('id')->merge([$user->id]))
+                ->with(['user', 'vehicle'])
+                ->where('status', 1)
+                ->when($this->search !== '', function ($q) {
+                    $q->whereLike('name', "%{$this->search}%")
+                        ->orWhereLike('serial', "%{$this->search}%");
+                })
+                ->orderByDesc('connected_at')
+                ->take($this->take)
+                ->cursor();
+        } else {
+            return Device::with(['vehicle', 'user'])
+                ->where('status', 1)
+                ->when($this->search !== '', function ($q) {
+                    $q->whereLike('name', "%{$this->search}%")->orWhereLike('serial', "%{$this->search}%");
+                })
+                ->orderByDesc('connected_at')
+                ->take($this->take)
+                ->cursor();
+        }
     }
 
     public function refreshMap(): void
