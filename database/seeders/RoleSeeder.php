@@ -17,11 +17,11 @@ class RoleSeeder extends Seeder
         DB::table('roles')->delete();
 
         $roles = [
-            ['title' => 'user', 'persian_name' => 'کاربر عادی', 'description' => 'کاربر ساده ای که میتواند از امکانات پایه سامانه استفاده کند.', 'created_at' => now()],
-            ['title' => 'admin', 'persian_name' => 'ادمین', 'description' => 'کاربری که دسترسی های مدیریتی را داراست.', 'created_at' => now()],
-            ['title' => 'super-admin', 'persian_name' => 'سوپر ادمین', 'description' => 'مدیر کلی که همه دسترسی ها برای اون باز است.', 'created_at' => now()],
-            ['title' => 'manager', 'persian_name' => 'مدیر سازمان', 'description' => 'کاربر مدیرتی که دسترسی مدیریت سازمان های خود و همچنین زیرمجموعه های خود را دارد.', 'created_at' => now()],
-            ['title' => 'developer', 'persian_name' => 'توسعه دهنده', 'description' => 'مدیر فنی سامانه که همه دسترسی ها را داراست.', 'created_at' => now()],
+            ['title' => 'user', 'persian_name' => 'کاربر عادی', 'description' => 'کاربری است که به صورت محدود به برخی از امکانات پایه سامانه دسترسی دارد.', 'created_at' => now()],
+            ['title' => 'admin', 'persian_name' => 'ادمین', 'description' => 'کاربری است که مسئولیت مدیریت کاربران، دستگاه ها و برخی از تنظیمات سامانه را بر عهده دارد.', 'created_at' => now()],
+            ['title' => 'super-admin', 'persian_name' => 'سوپر ادمین', 'description' => 'دسترسی نامحدود به تمامی بخش‌های سامانه.', 'created_at' => now()],
+            ['title' => 'manager', 'persian_name' => 'مدیر سازمان', 'description' => "کاربری است که مسئولیت مدیریت یک سازمان یا مجموعه مشخص از خودروها را بر عهده دارد.\nدسترسی کامل به اطلاعات و تنظیمات مربوط به سازمان خود و زیرمجموعه‌های آن.", 'created_at' => now()],
+            ['title' => 'developer', 'persian_name' => 'توسعه دهنده', 'description' => 'کاربری است که مسئولیت توسعه و نگهداری سامانه را بر عهده دارد.', 'created_at' => now()],
         ];
 
         DB::table('roles')->insert($roles);

@@ -188,13 +188,13 @@ class DeviceController extends BaseController
     public function storeSMS(StoreSmsRequest $request, Device $device)
     {
         Acl::authorize('device-settings', $device);
-
         $request->validated();
 
         $params = [
             'apn' => $request->apn,
             'interval' => $request->interval,
             'password' => $request->password,
+            'passStatus' => $request->passStatus ? 'on' : 'off',
             'phones' => ($device->brand == 'sinotrack' || count($request->phones) == 1 || is_null($request->phones[1])) ? $request->phones[0] : implode(',', $request->phones)
         ];
 
@@ -202,17 +202,21 @@ class DeviceController extends BaseController
         $deviceBrand = $deviceManager->getDevice($device->brand->value);
         $command = $deviceBrand->getCommand($request->command, $params);
 
-        if (isset($request->password)) {
-            $device->update(['password' => $request->password]);
-        }
-
         $sms = new SmsService();
         $sms->setTo($device->phone_number);
         $sms->setText($command);
         $res = $sms->api();
-        dd($res);
 
         if ($res->getStatusCode() == 200) {
+            if ((isset($request->passStatus) && (bool)$request->passStatus === true) || isset($request->password)) {
+                $pass = is_null($device->password) ? '000000' : $request->password;
+                $device->update(['password' => $pass]);
+            }elseif ((isset($request->passStatus) && (bool)$request->passStatus === false)){
+                $device->update(['password' => null]);
+            }
+
+
+
             return back()->with('success-alert', 'دستور با موفقیت برای دستگاه ارسال شد.');
         } else {
             return back()->with('error-alert', "خطایی به وجود آمده است!\nلطفا بعد از چند لحظه دوباره امتحان کنید.\nدر صورت مشاهده دوباره این پیغام لطفا با پشتیبانی تماس بگیرید.");

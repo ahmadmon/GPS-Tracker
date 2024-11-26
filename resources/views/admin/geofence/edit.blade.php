@@ -104,8 +104,15 @@
                             <label class="form-label" for="user_id">مختص به دستگاه
                                 <sup class="text-danger">*</sup>
                             </label>
+                            @php
+                                if($role === 'user'){
+                                    $options = $devices->mapWithKeys(fn($item) => [$item->id => implode(' - ', [$item->name , $item?->serial])])->toArray();
+                                }else{
+                                    $options = $devices->mapWithKeys(fn($item) => [$item->id => implode(' - ', [$item->name , $item?->user->name])])->toArray();
+                                }
+                            @endphp
                             <x-partials.alpine.input.select-option name="device_id" :value="$geofence->device_id"
-                                                                   :options="$devices->pluck('name' , 'id')->toArray()"/>
+                                                                   :$options/>
                             <x-input-error :messages="$errors->get('device_id')" class="mt-2"/>
                         </div>
 

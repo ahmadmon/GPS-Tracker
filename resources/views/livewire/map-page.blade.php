@@ -19,6 +19,9 @@
         </div>
     </div>
 
+    <section wire:ignore>
+        <x-partials.alert.warning-alert/>
+    </section>
     <div class="row">
         <div class="row">
             <div class="col-md-4">
@@ -39,7 +42,14 @@
                                                 <x-input-error :messages="$errors->get('search')" class="mt-1"/>
                                             </div>
                                             <div class="taskadd visible-scroll">
-                                                <div class="table-responsive text-nowrap">
+                                                <div class="table-responsive text-nowrap" x-data="{
+                                                        scrollToMap(){
+                                                            const mapEl= document.getElementById('map');
+                                                            if (mapEl){
+                                                                mapEl.scrollIntoView({ behavior:'smooth', block: 'center' });
+                                                            }
+                                                        }
+                                                }">
                                                     <table class="table">
                                                         <tbody>
                                                         <tr>
@@ -54,7 +64,7 @@
                                                             </td>
                                                         </tr>
                                                         @forelse($devices as $key => $device)
-                                                            <tr wire:key="{{ $device->id }}">
+                                                            <tr wire:key="{{ $device->id }}" @click="scrollToMap()">
                                                                 <td class="w-100 d-flex justify-content-between align-items-center">
                                                                     <div
                                                                         class="d-flex justify-content-start align-items-center me-3">
@@ -246,11 +256,7 @@
 
 
             OSMBase.addTo(this.map);
-            L.control.layers(baseMaps, overlayMaps, {position: 'topright', collapsed: true}).addTo(this.map);
-
-            setTimeout(function() {
-                self.setTitleControl();
-            }, 1000);
+            L.control.layers(baseMaps, overlayMaps, {position: 'topright'}).addTo(this.map);
 
             $('body').on('click', 'section.leaflet-control-layers-list div.leaflet-control-layers-base div.TileProviderName', function (e) {
                 let MainProvider = $(this).data('tpn');
@@ -290,68 +296,10 @@
 
             this.updateLocations($wire.deviceLocations);
             $wire.on('locationUpdated', () => this.updateLocations($wire.deviceLocations));
+            setTimeout(function () {
+                self.updateLocations($wire.deviceLocations);
+            }, 10000);
         },
-
-        // Handle The Map Layers
-        //-----------------------------------
-        setTitleControl() {
-            let CheckedProvider = '';
-            let self = this;
-
-            let TitleProviders = $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label > div > span');
-            let TilePCounts = TitleProviders.length;
-            let PrevTitleProvider = null;
-            let FoundProvider = 0;
-            // $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label').hide();
-
-            $.each(TitleProviders, function (TPindex, TPdata) {
-                let TPLabel = this.trim($(this).html());
-                let SplittedLabel = TPLabel.split(/(?<=^\S+)\s/);
-                if (typeof SplittedLabel[1] === "undefined") {
-                    SplittedLabel[1] = TPLabel;
-                }
-
-                if (TPindex == 0) {
-                    $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(1)').find('div > span').html(' ' + SplittedLabel[1]);
-                    $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(1)').before('<div class="TileProviderName" data-tpn="' + SplittedLabel[0] + '">' + SplittedLabel[0] + '</div>').addClass('TPN_' + SplittedLabel[0]);
-                    CheckedProvider = SplittedLabel[0];
-                }
-                let AddBefore = ((TPindex + FoundProvider) + 0);
-                let AddCurrent = (TPindex + FoundProvider + 1);
-                if (TPindex > 0) {
-                    $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(' + AddCurrent + ')').find('div > span').text(' ' + SplittedLabel[1]);
-                    $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(' + AddCurrent + ')').addClass('TPN_' + SplittedLabel[0]);
-                }
-                if (PrevTitleProvider !== SplittedLabel[0]) {
-                    if (TPindex > 0) {
-                        $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(' + AddBefore + ')').after('<div class="TileProviderName" data-tpn="' + SplittedLabel[0] + '">' + SplittedLabel[0] + '</div>');
-                        $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(' + AddBefore + ')').addClass('TileProviderBorderBottom');
-                    }
-                    FoundProvider++;
-                }
-                PrevTitleProvider = SplittedLabel[0];
-
-                if ((TPindex + 1) === TilePCounts) {
-                    $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(' + AddCurrent + ')').addClass('TileProviderBorderBottom');
-                }
-
-                let Checked = $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label:nth-child(' + (TPindex + 1 + FoundProvider) + ')').children().children('input[type=radio]:checked');
-                let isChecked = Checked.length;
-                if (isChecked > 0) {
-                    CheckedProvider = SplittedLabel[0];
-                }
-            });
-            $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready) > label.TPN_' + this.CheckedProvider).show();
-            $('section.leaflet-control-layers-list > div.leaflet-control-layers-base:not(.TPSet_Ready)').addClass('TPSet_Ready');
-        },
-
-        trim(str) {
-            if (typeof str == "string") {
-                return str.replace(/^\s+|\s+$/, '');
-            }
-            return str;
-        },
-
 
         // Handle The Devices live location
         //-----------------------------------

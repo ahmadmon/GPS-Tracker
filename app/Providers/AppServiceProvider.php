@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
         // 3 -> user
         // 155 -> manager
         // 156 -> developer
-//        Auth::loginUsingId(1);
+        Auth::loginUsingId(1);
 
     }
 }

@@ -3,9 +3,9 @@
         <div class="logo-wrapper">
             <a href="{{ route('home') }}">
                 <img class="img-fluid for-light"
-                     src="{{ asset('assets/images/logo/samfa-logo.png') }}" width="50px" alt="سمفا - سامانه هوشمند ردیابی GPS">
+                     src="{{ asset('assets/images/logo/Economic_Security_Police_of_Iran-logo.png') }}" width="40" alt="سمفا - سامانه هوشمند ردیابی GPS">
                 <img class="img-fluid for-dark"
-                     src="{{ asset('assets/images/logo/samfa-logo.png') }}" width="50px" alt="سمفا - سامانه هوشمند ردیابی GPS">
+                     src="{{ asset('assets/images/logo/Economic_Security_Police_of_Iran-logo.png') }}" width="40" alt="سمفا - سامانه هوشمند ردیابی GPS">
             </a>
             <div class="back-btn">
                 <i class="fa fa-angle-left"></i>
@@ -18,7 +18,7 @@
         <div class="logo-icon-wrapper">
             <a href="{{ route('home') }}">
                 <img class="img-fluid"
-                     src="{{ asset('assets/images/logo/samfa-logo.png') }}" width="50px" alt="">
+                     src="{{ asset('assets/images/logo/Economic_Security_Police_of_Iran-logo.png') }}" width="40" alt="">
             </a>
         </div>
         <nav class="sidebar-main">

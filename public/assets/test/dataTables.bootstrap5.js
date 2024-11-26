@@ -79,7 +79,7 @@ $.extend( true, DataTable.ext.classes, {
 
 
 /* Bootstrap paging button renderer */
-DataTable.ext.renderer.pagingButton.bootstrap = function (settings, buttonType, content, active, disabled) {
+    DataTable.ext.renderer.pagingButton.bootstrap = function (buttonType, content, active, disabled) {
 	var btnClasses = ['dt-paging-button', 'page-item'];
 
 	if (active) {
@@ -104,11 +104,11 @@ DataTable.ext.renderer.pagingButton.bootstrap = function (settings, buttonType, 
 	};
 };
 
-DataTable.ext.renderer.pagingContainer.bootstrap = function (settings, buttonEls) {
+    DataTable.ext.renderer.pagingContainer.bootstrap = function (buttonEls) {
 	return $('<ul/>').addClass('pagination').append(buttonEls);
 };
 
-DataTable.ext.renderer.layout.bootstrap = function ( settings, container, items ) {
+    DataTable.ext.renderer.layout.bootstrap = function (container, items) {
 	var row = $( '<div/>', {
 			"class": items.full ?
 				'row mt-2 justify-content-md-center' :

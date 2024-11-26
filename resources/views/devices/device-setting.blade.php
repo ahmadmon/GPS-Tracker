@@ -29,15 +29,15 @@
         </div>
     </div>
 
-    @csrf
-
         <!-- DEVICE INFO -->
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5>اطلاعات دستگاه {{ $device->name }}</h5>
+                @if(can('edit-device'))
                 <div>
                     <a href="{{ route('device.edit', $device->id) }}" class="btn btn-sm btn-primary">ویرایش</a>
                 </div>
+                @endif
             </div>
             <div class="card-body">
                 <div class="card-wrapper border row rounded-3">
@@ -97,7 +97,7 @@
         </div>
         <div class="card-body">
             <div class="card-wrapper border rounded-3">
-                <form action="{{ route('device.store-sms', $device->id) }}" method="POST">
+                <form action="{{ route('device.store-sms', $device->id) }}" method="POST" id="form">
                     @csrf
 
                     @includeWhen($device->brand === DeviceBrand::SINOTRACK,'devices.partials.sinotrack-settings')

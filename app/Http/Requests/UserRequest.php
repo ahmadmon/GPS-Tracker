@@ -22,27 +22,30 @@ class UserRequest extends FormRequest
      */
     public function rules(): array
     {
-        if ($this->routeIs('user.store')) {
+        $isStoreRoute = $this->routeIs('user.store');
+        if ($isStoreRoute) {
             $rules = [
                 'name' => 'required|min:3|max:255',
+                'password' => 'required|min:8',
                 'phone' => 'required|numeric|digits:11|unique:users,phone',
                 'status' => 'required|in:0,1',
-                'company_id' => 'sometimes|required|numeric|exists:companies,id'
             ];
         } else {
             $rules = [
                 'name' => 'required|min:3|max:255',
                 'phone' => 'required|numeric|digits:11|unique:users,phone,' . $this->user->id,
+                'password' => 'nullable|min:8',
                 'status' => 'required|in:0,1',
-                'company_id' => 'sometimes|required|numeric|exists:companies,id'
             ];
         }
 
         if (Acl::hasRole(['manager'])) {
-            $rules['user_type'] = 'nullable';
+            $rules['user_type'] = 'required|numeric|in:0,1,3';
+            $rules['company_id'] = $isStoreRoute ? 'required|numeric|exists:companies,id' : 'nullable|numeric|exists:companies,id';
 
         } else {
-            $rules['user_type'] = 'required|in:0,1,2,3';
+            $rules['user_type'] = 'required|numeric|in:0,1,2,3';
+            $rules['company_id'] = $isStoreRoute ? 'required_if:user_type,0|required_if:user_type,1|required_if:user_type,3|numeric|exists:companies,id' : 'nullable|numeric|exists:companies,id';
 
         }
 
@@ -70,6 +73,18 @@ class UserRequest extends FormRequest
             'permissions' => 'دسترسی ها',
             'permissions.*' => 'دسترسی ها',
             'company_id' => 'سازمان'
+        ];
+    }
+
+    /**
+     * Get the error messages for the defined validation rules.
+     *
+     * @return array<string, string>
+     */
+    public function messages(): array
+    {
+        return [
+            'company_id.required_if' => "فیلد :attribute زمانی که فیلد نوع کاربر برابر با کاربر باشد الزامی است.",
         ];
     }
 }

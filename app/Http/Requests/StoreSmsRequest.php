@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\DeviceBrand;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreSmsRequest extends FormRequest
@@ -21,15 +22,23 @@ class StoreSmsRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
-            'command' => 'required|in:0,1,2,3,4,5,6',
+        $rules = [
+            'command' => 'required|in:0,1,2,3,4,5,6,7',
             'apn' => 'nullable|required_if:command,1|string',
             'interval' => 'nullable|required_if:command,2|numeric|min:10',
-            'password' => 'nullable|required_if:command,3|numeric|digits:4',
-            'phones' => 'nullable|required_if:command,4,5|array|max:2',
-            'phones.0' => 'nullable|required_if:command,4,5|numeric|digits:11',
+            'passStatus' => 'nullable|in:false,on',
+//            'password' => 'nullable|required_if:command,4|numeric',
+            'phones' => 'nullable|required_if:command,5|required_if:command,6|array|max:2',
+            'phones.0' => 'nullable|required_if:command,5|required_if:command,6|numeric|digits:11',
             'phones.1' => 'nullable|numeric|digits:11',
         ];
+        if ($this->device->brand === DeviceBrand::SINOTRACK) {
+            $rules['password'] = 'nullable|required_if:command,4|numeric|digits:4';
+        } else {
+            $rules['password'] = 'nullable|required_if:command,4|numeric|digits:6';
+        }
+
+        return $rules;
     }
 
 
@@ -39,6 +48,7 @@ class StoreSmsRequest extends FormRequest
             'apn' => 'نقطه دستیابی (APN)',
             'interval' => 'زمان',
             'password' => 'رمز عبور',
+            'passStatus' => 'وضعیت رمزعبور',
             'phones' => 'شماره تماس ادمین',
             'phones.*' => 'شماره تماس ادمین'
         ];
@@ -55,6 +65,7 @@ class StoreSmsRequest extends FormRequest
             'apn.required_if' => "فیلد :attribute الزامی میباشد.",
             'interval.required_if' => "فیلد :attribute الزامی میباشد.",
             'password.required_if' => "فیلد :attribute الزامی میباشد.",
+            'passStatus.required_if' => "فیلد :attribute الزامی میباشد.",
             'phones.required_if' => "فیلد :attribute الزامی میباشد.",
             'phones.*.required_if' => "فیلد :attribute الزامی میباشد.",
         ];

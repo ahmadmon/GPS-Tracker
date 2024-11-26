@@ -54,6 +54,7 @@ class GeofenceController extends BaseController
         } elseif ($this->role === 'manager') {
             $devices = Device::where('status', 1)
                 ->whereIn('user_id', $this->userCompaniesSubsetsId->merge([$this->user->id]))
+                ->with('user:id,name')
                 ->cursor();
 
         } else {
@@ -62,7 +63,10 @@ class GeofenceController extends BaseController
         }
 
 
-        return view('admin.geofence.create', compact('devices'));
+        return view('admin.geofence.create', [
+            'devices' => $devices,
+            'role' => $this->role
+        ]);
     }
 
     /**
@@ -119,7 +123,11 @@ class GeofenceController extends BaseController
 
         }
 
-        return view('admin.geofence.edit', compact('geofence', 'devices'));
+        return view('admin.geofence.edit', [
+            'devices' => $devices,
+            'geofence' => $geofence,
+            'role' => $this->role
+        ]);
     }
 
     /**

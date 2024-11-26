@@ -13,7 +13,7 @@
         href="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.css"
     />
     <script src="https://unpkg.com/@geoman-io/leaflet-geoman-free@latest/dist/leaflet-geoman.js"></script>
-    <link rel="stylesheet" href="{{ asset('assets/js/leaflet/Control.FullScreen.css') }}">
+    <link rel="stylesheet" href="{{ asset('assets/libs/leaflet/fullscreen/Control.FullScreen.css') }}">
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css"/>
     <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
@@ -98,8 +98,18 @@
                             <label class="form-label" for="user_id">مختص به دستگاه
                                 <sup class="text-danger">*</sup>
                             </label>
-                            <x-partials.alpine.input.select-option name="device_id"
-                                                                   :options="$devices->pluck('name' , 'id')->toArray()"/>
+                            @php
+                                if($role === 'user'){
+                                    $options = $devices->mapWithKeys(fn($item) => [$item->id => implode(' - ', [$item->name , $item?->serial])])->toArray();
+                                    $value = count($devices) === 1 ? $devices->first()->id : null;
+
+                                }else{
+                                    $options = $devices->mapWithKeys(fn($item) => [$item->id => implode(' - ', [$item->name , $item?->user->name])])->toArray();
+                                    $value = null;
+                                }
+                            @endphp
+                            <x-partials.alpine.input.select-option name="device_id" :value="$value"
+                            :$options/>
                             <x-input-error :messages="$errors->get('device_id')" class="mt-2"/>
                         </div>
 
@@ -191,8 +201,9 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('assets/js/leaflet/Control.FullScreen.js') }}"></script>
+    <script src="{{ asset('assets/libs/leaflet/fullscreen/Control.FullScreen.js') }}"></script>
     <script src="{{ asset('assets/js/flat-pickr/flatpickr.js') }}"></script>
+    <script src="{{ asset('assets/libs/leaflet/leaflet-map-layers.js') }}"></script>
 
     <script>
         document.addEventListener('alpine:init', () => {
@@ -205,21 +216,8 @@
                         fullscreenControl: true,
                     }).setView([35.715298, 51.404343], 11);
 
-                    let layers = {
-                        "تصویر ماهواره ای": L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {subdomains: ['mt0', 'mt1', 'mt2', 'mt3']}),
-                        "تصویر خیابانی گوگل": L.tileLayer('http://{s}.google.com/vt?lyrs=m&x={x}&y={y}&z={z}', {
-                            maxZoom: 20,
-                            subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-                        }),
-                    }
-
-
-                    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        maxZoom: 35,
-                    }).addTo(map);
-
-
-                    L.control.layers(null, layers).addTo(map);
+                    OSMBase.addTo(map);
+                    L.control.layers(baseMaps, overlayMaps, {position: 'topleft', collapsed: true}).addTo(map);
 
                     map.pm.setLang("fa");
                     // add Leaflet-Geoman controls with some options to the map

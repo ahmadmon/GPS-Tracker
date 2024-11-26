@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends BaseController
 {
@@ -44,14 +45,14 @@ class UserController extends BaseController
 
         // generating random Password
         //----------------------------------------
-        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-        $charactersLength = strlen($characters);
-        $randomString = '';
-
-        for ($i = 0; $i < 8; $i++) {
-            $randomString .= $characters[rand(0, $charactersLength - 1)];
-        }
-        session(['generatedPass' => $randomString]);
+//        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+//        $charactersLength = strlen($characters);
+//        $randomString = '';
+//
+//        for ($i = 0; $i < 8; $i++) {
+//            $randomString .= $characters[rand(0, $charactersLength - 1)];
+//        }
+//        session(['generatedPass' => $randomString]);
 
 
         // getting Permissions and Role from DB
@@ -78,15 +79,15 @@ class UserController extends BaseController
         // Manager's Company and All Company
         //----------------------------------------
         if ($this->role === 'manager') {
-            $companies = Company::where('user_id', auth()->id())->orderByDesc('id')->cursor();
+            $companies = Company::where('user_id', auth()->id())->with('manager:id,name')->orderByDesc('id')->cursor();
 
         } else {
-            $companies = Company::orderByDesc('id')->cursor();
+            $companies = Company::orderByDesc('id')->with('manager:id,name')->cursor();
         }
 
 
         return view('user.create', [
-            'password' => $randomString,
+//            'password' => $randomString,
             'roles' => $roles,
             'permissions' => $permissions,
             'companies' => $companies
@@ -101,7 +102,9 @@ class UserController extends BaseController
         Acl::authorize('create-user');
 
         $validated = $request->validated();
-        $validated['password'] = session('generatedPass');
+        $validated['password'] = Hash::make($request->password);
+        $validated['last_login'] = null;
+//        $validated['password'] = session('generatedPass');
 
         $user = User::create(Arr::except($validated, ['permissions', 'role']));
 
@@ -115,14 +118,14 @@ class UserController extends BaseController
         Company::find($request->company_id)->users()->attach($user->id);
 
         // Send Sms To User
-        $smsService->setTo($user->phone);
-        $smsService->setText("{$user->name} عزیز به سمفا خوش آمدید\nنام کاربری شما: {$user->phone}\nرمز عبور موقت شما: {$validated['password']}\nبرای ورود و تغییر رمز، به سایت مراجعه کنید.");
-        $smsService->fire();
+//        $smsService->setTo($user->phone);
+//        $smsService->setText("{$user->name} عزیز به سمفا خوش آمدید\nنام کاربری شما: {$user->phone}\nرمز عبور موقت شما: {$validated['password']}\nبرای ورود و تغییر رمز، به سایت مراجعه کنید.");
+//        $smsService->fire();
 
         //removing The session
-        session()->forget('generatedPass');
+//        session()->forget('generatedPass');
 
-        return to_route('user.index')->with('success-alert', "کاربر جدید با موفقیت ثبت نام شد.\nنام کاربری و رمز‌ عبور برای کاربر ارسال شد.");
+        return to_route('user.index')->with('success-alert', "کاربر جدید با موفقیت ثبت نام شد.");
     }
 
     /**
@@ -174,10 +177,10 @@ class UserController extends BaseController
         // Manager's Company and All Company
         //----------------------------------------
         if ($this->role === 'manager') {
-            $companies = Company::where('user_id', auth()->id())->orderByDesc('id')->cursor();
+            $companies = Company::where('user_id', auth()->id())->with('manager:id,name')->orderByDesc('id')->cursor();
 
         } else {
-            $companies = Company::orderByDesc('id')->cursor();
+            $companies = Company::orderByDesc('id')->with('manager:id,name')->cursor();
         }
 
         return view('user.edit', [
@@ -197,6 +200,7 @@ class UserController extends BaseController
         Acl::authorize('edit-user', $user);
 
         $validated = $request->validated();
+        $validated['password'] = isset($request->password) ? Hash::make($request->password) : $user->password;
 
         $user->update(Arr::except($validated, ['permissions', 'role']));
 

@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
-use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,7 +28,15 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        $user = $request->user();
+        if (is_null($user->last_login)) {
+            $user->last_login = now();
+            $user->save();
+            return redirect()->intended(route('home', absolute: false))->with('warning-alert', "کاربر عزیز خوش آمدید!\nبرای شروع کار با حساب کاربری جدید خود، لطفاً رمز عبور اولیه خود را با یک رمز عبور قوی و امن جایگزین کنید.\nبرای تغییر رمزعبور، می‌توانید به بخش مدیریت حساب خود مراجعه کنید.");
+        } else {
         return redirect()->intended(route('home', absolute: false));
+        }
+
     }
 
     /**

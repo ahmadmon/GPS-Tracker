@@ -60,7 +60,19 @@
                         <x-input-error :messages="$errors->get('phone')" class="mt-2"/>
                     </div>
 
-                    @notRole(['manager'])
+                    <div class="col-12 mb-3">
+                        <label class="form-label" for="password">رمز عبور</label>
+                        <div class="input-group" x-data="{ show: false }">
+                            <span class="input-group-text list-light-dark cursor-pointer" @click="show = !show"
+                                  x-text="show ? 'مخفی' : 'نمایش'">نمایش</span>
+                            <input class="form-control" dir="ltr" :type="show ? 'text' : 'password'"
+                                   value="{{ old('password') }}" name="password" autocomplete="new-password"
+                                   id="password">
+                        </div>
+                        <x-input-error :messages="$errors->get('password')" class="mt-2"/>
+                    </div>
+
+
                     <div class="col-12 mb-3">
                         <label class="form-label" for="user_type">نوع کاربر
                             <sup class="text-danger">*</sup>
@@ -68,19 +80,28 @@
                         <select class="form-select" name="user_type" id="user_type">
                             <option value="0" selected @selected(old('user_type', $user->user_type) == 0)>کاربر</option>
                             <option value="1" @selected(old('user_type', $user->user_type) == 1)>ادمین</option>
+                            @notRole(['manager'])
                             <option value="2" @selected(old('user_type', $user->user_type) == 2)>سوپر ادمین</option>
+                            @endnotRole
                             <option value="3" @selected(old('user_type', $user->user_type) == 3)>مدیر سازمان</option>
                         </select>
                         <x-input-error :messages="$errors->get('user_type')" class="mt-2"/>
+                        @if(can('user-permissions'))
+                            <div class="d-block">
+                                <small class="text-muted">لطفا نام کاربری و نقش را مشابه هم انتخاب کنید.</small>
+                            </div>
+                        @endif
                     </div>
-                    @endnotRole
 
                     @if($user->hasUserType('user'))
                         <div class="col-12 mb-3">
                             <label class="form-label" for="user_id">عضو سازمان
                                 <sup class="text-danger">*</sup>
                             </label>
-                            <x-partials.alpine.input.select-option :options="$companies->pluck('name', 'id')->toArray()"
+                            @php
+                                $options = $companies->mapWithKeys(fn($item) => [$item->id => implode(' - ', [$item->name , $item->manager->name])])->toArray();
+                            @endphp
+                            <x-partials.alpine.input.select-option :$options
                                                                    name="company_id"/>
                             <x-input-error :messages="$errors->get('company_id')" class="mt-2"/>
                         </div>
@@ -124,8 +145,14 @@
                             <div class="my-1">
                                 <x-input-error :messages="$errors->get('role')"/>
                             </div>
+                            @php
+                                if(\App\Facades\Acl::hasRole(['manager'])){
+                                    $roles = $roles->reject(fn($role) => in_array($role->title,['developer', 'super-admin']));
+                                }
+                                    $defaultRoleId = $roles->first()->id;
+                            @endphp
                             <div class="d-flex align-items-center justify-content-between flex-wrap"
-                                 x-data="{ role: @json( (int)old('role', $user->roles->first()->id ?? $roles->first()->id ) ) }">
+                                 x-data="{ role: @json( (int)old('role', $user->roles->first()->id ?? $defaultRoleId ) ) }">
                                 @foreach($roles as $role)
                                     <div class="form-check">
                                         <input class="form-check-input" id="role-{{ $role->id }}"
@@ -160,7 +187,7 @@
 
                             <div x-data="permissionsList" class="row">
                                 <div class="col-12"
-                                     @updated-role.window="['super-admin', 'developer'].includes($event.detail.roleName) ? selectAll() : deselectAll()">
+                                     @updated-role.window="handleDispatch($event.detail.roleName)">
                                     <x-input-error :messages="$errors->get('permissions')"/>
                                     <x-input-error :messages="$errors->get('permissions.*')"/>
                                 </div>
@@ -254,6 +281,10 @@
                     selectedPermissions: @json(old('permissions', $userPermissions)),
 
                     init() {
+                        if (this.selectedPermissions.length === 0) {
+                            this.handleDispatch('{{ $roles->firstWhere('id', old('role', $defaultRoleId))->title ?? null }}')
+                        }
+
                         if (this.selectedPermissions.length > 0) {
                             this.selectedPermissions = this.selectedPermissions.flat().map(item => parseInt(item));
                         }
@@ -283,6 +314,28 @@
                             this.selectedPermissions.push(id);
                         }
                     },
+
+                    handleDispatch($roleName) {
+                        switch ($roleName) {
+                            case 'super-admin':
+                                this.selectAll();
+                                break;
+                            case 'manager':
+                                this.selectAll();
+                                break;
+                            case 'developer':
+                                this.selectAll();
+                                break;
+                            case 'user':
+                                this.selectedPermissions = [32, 33, 37, 38, 39, 40, 41, 42, 44, 57, 58, 59, 60, 61, 62];
+                                break
+                            case 'admin':
+                                this.selectedPermissions = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 57, 58, 59, 60, 61, 62, 63];
+                                break;
+                            default:
+                                this.deselectAll();
+                        }
+                    }
 
                 }))
             })

@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 
 class PermissionServiceProvider extends ServiceProvider
@@ -28,9 +27,7 @@ class PermissionServiceProvider extends ServiceProvider
     {
         try {
             Gate::before(
-                fn(User $user): bool => $user->hasUserType('super-admin') ||
-                    $user->hasUserType('admin') ||
-                    $user->hasRole(['programmer']));
+                fn(User $user): bool => $user->hasUserType('super-admin') || $user->hasRole(['programmer']));
 
 
 //            Gate::define('has-permission', fn(User $user, string $permission): bool => $user->hasPermissionTo($permission));

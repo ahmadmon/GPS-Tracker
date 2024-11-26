@@ -37,18 +37,20 @@ class ConCox implements DeviceInterface
         // 0 => Server Setting
         // 1 => APN Setting
         // 2 => Upload Time
-        // 3 => Change device password
-        // 4 => set Admin Number
-        // 5 => delete Admin Number
-        // 6 => Hard Reset Factory
+        // 3 => Activate/Deactivate device password
+        // 4 => Change device password
+        // 5 => set Admin Number
+        // 6 => delete Admin Number
+        // 7 => Hard Reset Factory
         $commands = [
             '0' => $hasPass ? "SERVER,{$this->password},0,{$this->ip},{$this->port},0#" : "SERVER,0,{$this->ip},{$this->port},0#",
             '1' => $hasPass ? "APN,{$this->password},{apn}#" : "APN,{apn}#",
-            '2' => $hasPass ? "TIMER,{$this->password},{interval},3600#" : "TIMER,{interval},3600#",
-            '3' => $hasPass ? "PASSWORD,{$this->password},{password}" : "PASSWORD,{password}",
-            '4' => $hasPass ? "SOS,{$this->password},A,{phones},{$meliPayamakNumber}#" : "SOS,A,{phones},{$meliPayamakNumber}#",
-            '5' => $hasPass ? "SOS,{$this->password},D,{phones}#" : "SOS,D,{phones}#",
-            '6' => $hasPass ? "FACTORY,{$this->password},#" : "FACTORY#",
+            '2' => $hasPass ? "MODE,{$this->password},{interval},3600#" : "TIMER,{interval},3600#",
+            '3' => $hasPass ? "PWDSW,{$this->password},{passStatus}" : "PWDSW,{passStatus}",
+            '4' => $hasPass ? "PASSWORD,{$this->password},{password}#" : "PASSWORD,{password}#",
+            '5' => $hasPass ? "SOS,{$this->password},A,{phones},{$meliPayamakNumber}#" : "SOS,A,{phones},{$meliPayamakNumber}#",
+            '6' => $hasPass ? "SOS,{$this->password},D,{phones}#" : "SOS,D,{phones}#",
+            '7' => $hasPass ? "FACTORY,{$this->password},#" : "FACTORY#",
         ];
 
         $commandTemplate = $commands[$commandKey] ?? null;

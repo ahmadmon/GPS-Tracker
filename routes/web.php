@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\GeofenceController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
@@ -12,9 +13,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
 
-    Route::get('/', function () {
-        return view('admin');
-    })->name('home');
+
+    Route::get('/', [DashboardController::class, 'index'])->name('home');
+//    Route::get('/', function () {
+//        if (session('warning-alert')) {
+//            $user = Auth::user();
+//            return redirect('/map')->with('warning-alert', "{$user->name} عزیز خوش آمدید!\nبرای شروع کار با حساب کاربری جدید خود، لطفاً رمز عبور اولیه خود را با یک رمز عبور قوی و امن جایگزین کنید.\nبرای تغییر رمزعبور، می‌توانید به بخش مدیریت حساب خود مراجعه کنید.");
+//        } else {
+//            return redirect('/map');
+//        }
+//    })->name('home');
 
     Route::get('/map', MapPage::class)->name('map');
 
