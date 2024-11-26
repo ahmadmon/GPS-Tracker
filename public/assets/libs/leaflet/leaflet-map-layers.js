@@ -52,7 +52,6 @@ let Stadia_Outdoors = L.tileLayer('https://tiles.stadiamaps.com/tiles/outdoors/{
 });
 
 let baseMaps = {
-    "OSM": OSMBase,
     "OSM Terrain": OpenTopoMap,
     "OSM HOT": OpenStreetMap_HOT,
     "OSM CyclOSM": CyclOSM,

@@ -36,6 +36,8 @@ class MapPage extends Component
 
     public int $take = 10;
 
+    public bool $onlineMode = false;
+
     public function rules(): array
     {
         return [
@@ -209,5 +211,13 @@ class MapPage extends Component
     public function loadMore(): void
     {
         $this->take += 10;
+    }
+
+
+    public function changeMode(): void
+    {
+        $this->onlineMode = !$this->onlineMode;
+
+        $this->dispatch('mode-changed', $this->onlineMode);
     }
 }

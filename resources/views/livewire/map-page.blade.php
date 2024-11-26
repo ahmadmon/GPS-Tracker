@@ -31,8 +31,18 @@
                             <div class="tab-content">
                                 <div id="pills-created" role="tabpanel">
                                     <div class="card mb-0">
-                                        <div class="card-header d-flex">
+                                        <div class="card-header d-flex justify-content-between align-items-center">
                                             <h5>دستگاه ها</h5>
+                                            <div wire:ignore>
+                                                <ul class="tg-list common-flex">
+                                                    <li class="tg-list-item">
+                                                        <input class="tgl tgl-skewed" id="cb3" type="checkbox"
+                                                               wire:click="changeMode" @checked($onlineMode)>
+                                                        <label class="tgl-btn" data-tg-off="آفلاین" data-tg-on="آنلاین"
+                                                               for="cb3"></label>
+                                                    </li>
+                                                </ul>
+                                            </div>
                                         </div>
                                         <div class="card-body p-0 device-sidebar overflow-hidden">
                                             <div class="col-md-12">
@@ -177,9 +187,7 @@
 <script src="{{ asset('assets/js/flat-pickr/flatpickr-jdate.js') }}"></script>
 <script src="{{ asset('assets/js/flat-pickr/l10n/fa-jdate.js') }}"></script>
 
-<!-- // Waypoint assets  -->
-{{--<link rel="stylesheet" href="{{ asset('assets/libs/leaflet-routing-machine/css/leaflet-routing-machine.css') }}">--}}
-{{--<script src="{{ asset('assets/libs/leaflet-routing-machine/js/leaflet-routing-machine.js') }}"></script>--}}
+<!-- // track player assets  -->
 
 
 <style>
@@ -241,10 +249,12 @@
         mapCenter: [35.715298, 51.404343],
         control: null,
         markers: {},
+        savedMarkers: {},
         drownGeofences: {},
         drawnWaypoints: {},
         circleMarkers: [],
-        CheckedProvider: '',
+        currentLayer: null,
+
 
         init() {
             let self = this;
@@ -255,15 +265,23 @@
             }).setView(this.mapCenter, 11);
 
 
-            OSMBase.addTo(this.map);
-            L.control.layers(baseMaps, overlayMaps, {position: 'topright'}).addTo(this.map);
+            this.currentLayer = OSMBase.addTo(this.map);
+            L.control.layers(null, baseMaps, {position: 'topright'}).addTo(this.map);
 
-            $('body').on('click', 'section.leaflet-control-layers-list div.leaflet-control-layers-base div.TileProviderName', function (e) {
-                let MainProvider = $(this).data('tpn');
-                if ($(this).parent().find('label.TPN_' + MainProvider).is(":hidden")) {
-                    $(this).parent().find('label').hide(400);
-                    $(this).parent().find('label.TPN_' + MainProvider).show(800);
-                }
+            this.map.on('baselayerchange', (e) => {
+                console.log(e);
+                // ذخیره مارکرهای فعلی
+                this.savedMarkers = {...this.markers};
+
+                // حذف تمام مارکرهای فعلی
+                Object.values(this.markers).forEach(marker => marker.remove());
+                this.markers = {};
+
+                // اضافه کردن مارکرهای ذخیره شده به لایه جدید
+                Object.entries(this.savedMarkers).forEach(([deviceId, marker]) => {
+                    marker.addTo(this.map);
+                    this.markers[deviceId] = marker;
+                });
             });
 
             // Fixing Popup when zooming
@@ -296,18 +314,19 @@
 
             this.updateLocations($wire.deviceLocations);
             $wire.on('locationUpdated', () => this.updateLocations($wire.deviceLocations));
-            setTimeout(function () {
-                self.updateLocations($wire.deviceLocations);
-            }, 10000);
+
+            setInterval(() => {
+                if ($wire.onlineMode) {
+                    self.updateLocations($wire.deviceLocations);
+                }
+            }, 2000)
         },
 
         // Handle The Devices live location
         //-----------------------------------
         updateLocations(locations) {
             // Remove old Markers
-            Object.values(this.markers).forEach(marker => {
-                marker.remove();
-            });
+            Object.values(this.markers).forEach(marker => marker.remove());
             this.markers = {};
 
             let bounds = L.latLngBounds();
@@ -477,14 +496,14 @@
         //-----------------------------------
         showWaypoints(trips) {
             const startIcon = L.icon({
-                iconUrl: '{{ asset('assets/libs/leaflet-routing-machine/img/map-start.svg') }}',
+                iconUrl: '{{ asset('assets/libs/leaflet/images/map-start.svg') }}',
                 iconSize: [32, 32],
                 iconAnchor: [16, 32],
                 popupAnchor: [0, -32]
             });
 
             const endIcon = L.icon({
-                iconUrl: '{{ asset('assets/libs/leaflet-routing-machine/img/map-end.svg') }}',
+                iconUrl: '{{ asset('assets/libs/leaflet/images/map-end.svg') }}',
                 iconSize: [32, 32],
                 iconAnchor: [16, 32],
                 popupAnchor: [0, -32]
@@ -571,104 +590,6 @@
         }
         ,
 
-
-        showWayPointWithRouteMachineLibrary(trips) {
-            const startIcon = L.icon({
-                iconUrl: '{{ asset('assets/libs/leaflet-routing-machine/img/map-start.svg') }}',
-                iconSize: [32, 32],
-                iconAnchor: [16, 32],
-                popupAnchor: [0, -32]
-            });
-
-            const endIcon = L.icon({
-                iconUrl: '{{ asset('assets/libs/leaflet-routing-machine/img/map-end.svg') }}',
-                iconSize: [32, 32],
-                iconAnchor: [16, 32],
-                popupAnchor: [0, -32]
-            });
-
-            this.removeWayPoints();
-            this.circleMarkers = []; // Array to store circle markers
-
-            trips.forEach((trip, i) => {
-                const control = L.Routing.control({
-                    waypoints: [
-                        L.latLng(parseFloat(trip[0].lat), parseFloat(trip[0].long)),
-                        L.latLng(parseFloat(trip.at(-1).lat), parseFloat(trip.at(-1).long))
-                    ],
-                    routeWhileDragging: false,
-                    addWaypoints: false,
-                    draggableWaypoints: false,
-                    createMarker: function (i, waypoint, n) {
-                        let marker_icon = (i === 0) ? startIcon : endIcon;
-                        let marker_title = (i === 0) ? 'شروع' : 'پایان';
-                        return L.marker(waypoint.latLng, {
-                            icon: marker_icon,
-                            title: marker_title,
-                            draggable: false
-                        });
-                    },
-                    lineOptions: {
-                        styles: [{
-                            color: "#F50A0AFF",
-                            weight: 5,
-                            opacity: 0.9
-                        }]
-                    }
-                }).addTo(this.map);
-
-
-                control.on('routesfound', (e) => {
-                    const route = e.routes[0];
-                    const totalDistance = route.summary.totalDistance;
-                    // route.coordinates.forEach
-                    trip.forEach((coord) => {
-                        // Create a circle marker on each coordinate of the route
-                        const circle = L.circleMarker([coord.lat, coord.long], {
-                            radius: 5,
-                            color: "#3388ff",
-                            fillOpacity: 0.5
-                        }).addTo(this.map);
-
-                        // Add click event for displaying trip info
-                        circle.on('click', (event) => {
-                            const popupContent = this.createPopupContent(trip);
-                            L.popup()
-                                .setLatLng(event.latlng)
-                                .setContent(popupContent)
-                                .openOn(this.map);
-                        });
-
-                        this.circleMarkers.push(circle);
-                    });
-
-                    // Add zoom event to show/hide circles based on zoom level
-                    this.map.on('zoomend', () => {
-                        const currentZoom = this.map.getZoom();
-                        this.circleMarkers.forEach((circle) => {
-                            if (currentZoom >= 15) {
-                                circle.addTo(this.map); // Show circles
-                            } else {
-                                this.map.removeLayer(circle); // Hide circles
-                            }
-                        });
-                    });
-                });
-
-                this.drawnWaypoints[i] = control;
-            });
-        }
-        ,
-
-        removeWayPointWithRouteMachineLibrary() {
-            Object.values(this.drawnWaypoints).forEach((route) => {
-                this.map.removeControl(route);
-            });
-            this.circleMarkers.forEach((circle) => this.map.removeLayer(circle))
-
-            this.drawnWaypoints = {};
-            this.circleMarkers = [];
-        }
     }))
     ;
 
