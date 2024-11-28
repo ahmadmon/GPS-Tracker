@@ -164,4 +164,15 @@ class GeofenceController extends BaseController
 
         return back()->with('success-alert', "حصار جغرافیایی با موفقیت حذف گردید.");
     }
+
+
+    public function changeStatus(Geofence $geofence)
+    {
+        Acl::authorize('edit-geofence', $geofence);
+
+        $geofence->status = $geofence->status == 0 ? 1 : 0;
+        $geofence->save();
+
+        return response()->json(['status' => true, 'data' => (bool)$geofence->status]);
+    }
 }

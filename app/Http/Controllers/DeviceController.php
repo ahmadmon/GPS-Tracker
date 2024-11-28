@@ -223,5 +223,15 @@ class DeviceController extends BaseController
         }
     }
 
+    public function changeStatus(Device $device)
+    {
+        Acl::authorize('edit-device');
+
+        $device->status = $device->status == 0 ? 1 : 0;
+        $device->save();
+
+        return response()->json(['status' => true, 'data' => (bool)$device->status]);
+    }
+
 
 }

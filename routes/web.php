@@ -29,14 +29,22 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('device', DeviceController::class);
     Route::get('/device/device-setting/{device}', [DeviceController::class, 'deviceSetting'])->name('device.device-setting');
     Route::post('/device/store-sms/{device}', [DeviceController::class, 'storeSMS'])->name('device.store-sms');
+    Route::get('/device/change-status/{device}', [DeviceController::class, 'changeStatus'])->name('device.change-status');
 //    Route::get('/device/get-location/{id}', [DeviceController::class, 'location'])->name('device.get-location');
 
     Route::resource('vehicle', VehicleController::class);
+    Route::get('/vehicle/change-status/{vehicle}', [VehicleController::class, 'changeStatus'])->name('vehicle.change-status');
+
     Route::resource('user', UserController::class);
+    Route::get('/user/change-status/{user}', [UserController::class, 'changeStatus'])->name('user.change-status');
+
     Route::resource('company', CompanyController::class);
     Route::delete('company/remove-subsets/{company}/{id}', [CompanyController::class, 'removeSubsets'])->name('company.remove-subsets');
     Route::get('company/manage-subsets/{company}', [CompanyController::class, 'manageSubsets'])->name('company.manage-subsets');
+    Route::get('/company/change-status/{company}', [CompanyController::class, 'changeStatus'])->name('company.change-status');
+
     Route::resource('geofence', GeofenceController::class);
+    Route::get('/geofence/change-status/{geofence}', [GeofenceController::class, 'changeStatus'])->name('geofence.change-status');
 
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('index');

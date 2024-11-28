@@ -71,11 +71,7 @@
                                         <td>{{ $vehicle?->user?->name }}</td>
                                         @endnotRole
                                         <td>
-                                            @if($vehicle->status)
-                                                <span class="badge dana rounded-pill badge-success">فعال</span>
-                                            @else
-                                                <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
-                                            @endif
+                                            <x-partials.alpine.change-status :status="(bool)$vehicle->status" :url="route('vehicle.change-status',$vehicle->id)" />
                                         </td>
                                         <td>{{ jalaliDate($vehicle?->created_at) }}</td>
                                         <td x-data="{ show: false }">

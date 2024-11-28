@@ -228,4 +228,14 @@ class UserController extends BaseController
         return back()->with('success-alert', 'کاربر با موفقیت حذف گردید.');
 
     }
+
+    public function changeStatus(User $user)
+    {
+        Acl::authorize('edit-user');
+
+        $user->status = $user->status == 0 ? 1 : 0;
+        $user->save();
+
+        return response()->json(['status' => true, 'data' => (bool)$user->status]);
+    }
 }

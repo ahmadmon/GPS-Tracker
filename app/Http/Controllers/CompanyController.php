@@ -159,4 +159,14 @@ class CompanyController extends BaseController
         $company->users()->detach($userId);
         return to_route('company.show', $company->id)->with('success-alert', 'کاربر با موفقیت از لیست زیرمجموعه هایتان حذف شد.');
     }
+
+    public function changeStatus(Company $company)
+    {
+        Acl::authorize('edit-company');
+
+        $company->status = $company->status == 0 ? 1 : 0;
+        $company->save();
+
+        return response()->json(['status' => true, 'data' => (bool)$company->status]);
+    }
 }

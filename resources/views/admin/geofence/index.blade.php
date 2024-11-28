@@ -96,11 +96,8 @@
                                             </a>
                                         </td>
                                         <td>
-                                            @if($geofence->status)
-                                                <span class="badge dana rounded-pill badge-success">فعال</span>
-                                            @else
-                                                <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
-                                            @endif
+                                            <x-partials.alpine.change-status :status="(bool)$geofence->status"
+                                                                             :url="route('geofence.change-status',$geofence->id)"/>
                                         </td>
                                         <td>
                                             @if(isset($geofence->start_time) && isset($geofence->end_time))

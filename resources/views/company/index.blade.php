@@ -35,7 +35,7 @@
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
                 @if(can('create-company'))
-                <a href="{{ route('company.create') }}" class="btn btn-primary mb-4">+ ایجاد سازمان جدید</a>
+                    <a href="{{ route('company.create') }}" class="btn btn-primary mb-4">+ ایجاد سازمان جدید</a>
                 @endif
                 <div class="card">
                     <div class="card-header pb-0 card-no-border">
@@ -83,11 +83,8 @@
                                         @endnotRole
                                         <td>{{ $company->contact_number }}</td>
                                         <td>
-                                            @if($company->status)
-                                                <span class="badge dana rounded-pill badge-success">فعال</span>
-                                            @else
-                                                <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
-                                            @endif
+                                            <x-partials.alpine.change-status :status="(bool)$company->status"
+                                                                             :url="route('company.change-status',$company->id)"/>
                                         </td>
                                         <td>
                                             <span class="text-muted">{{ jalaliDate($company->created_at) }}</span>
@@ -120,7 +117,7 @@
                                                 </ul>
                                             </div>
                                             <x-partials.btns.confirm-rmv-btn
-                                                url="{{ route('company.destroy', $company->id) }}"/>
+                                                    url="{{ route('company.destroy', $company->id) }}"/>
                                         </td>
                                     </tr>
                                 @empty

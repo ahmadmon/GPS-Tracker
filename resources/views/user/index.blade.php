@@ -68,11 +68,7 @@
                                         </td>
                                         <td>{{ $user->phone }}</td>
                                         <td>
-                                            @if($user->status)
-                                                <span class="badge dana rounded-pill badge-success">فعال</span>
-                                            @else
-                                                <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
-                                            @endif
+                                            <x-partials.alpine.change-status :status="(bool)$user->status" :url="route('user.change-status',$user->id)" />
                                         </td>
                                         <td>
                                             <span class="text-muted">{{ jalaliDate($user->created_at) }}</span>

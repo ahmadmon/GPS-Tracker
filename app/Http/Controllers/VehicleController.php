@@ -122,4 +122,14 @@ class VehicleController extends BaseController
 
         return back()->with('success-alert', 'وسیله نقلیه با موفقیت حذف گردید.');
     }
+
+    public function changeStatus(Vehicle $vehicle)
+    {
+        Acl::authorize('edit-vehicle');
+
+        $vehicle->status = $vehicle->status == 0 ? 1 : 0;
+        $vehicle->save();
+
+        return response()->json(['status' => true, 'data' => (bool)$vehicle->status]);
+    }
 }

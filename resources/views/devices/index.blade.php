@@ -101,11 +101,7 @@
                                         </td>
                                         @endrole
                                         <td>
-                                            @if($device->status)
-                                                <span class="badge dana rounded-pill badge-success">فعال</span>
-                                            @else
-                                                <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
-                                            @endif
+                                           <x-partials.alpine.change-status :status="(bool)$device->status" :url="route('device.change-status',$device->id)" />
                                         </td>
                                         <td>{{ jalaliDate($device?->created_at,time:true) }}</td>
                                         <td x-data="{ show: false }">
