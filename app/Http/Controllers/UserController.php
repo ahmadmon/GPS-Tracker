@@ -115,7 +115,11 @@ class UserController extends BaseController
             $user->clearPermissionCache();
         }
 
-        Company::find($request->company_id)->users()->attach($user->id);
+        $company = Company::find($request->company_id);
+
+        if ($company) {
+            $company->users()->attach($user->id);
+        }
 
         // Send Sms To User
 //        $smsService->setTo($user->phone);
@@ -210,7 +214,7 @@ class UserController extends BaseController
             $user->clearPermissionCache();
         }
         if (isset($request->company_id))
-        Company::find($request->company_id)->users()->sync([$user->id]);
+            Company::find($request->company_id)->users()->sync([$user->id]);
 
 
         return to_route('user.index')->with('success-alert', "کاربر '{$user->name}' با موفقیت ویرایش شد.");

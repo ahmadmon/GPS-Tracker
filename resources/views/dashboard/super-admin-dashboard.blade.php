@@ -241,6 +241,41 @@
                 </div>
             </div>
 
+            <!-- Top 5 Users Who most device have -->
+            <div class="col-xxl-8 col-lg-6 box-col-6 ord-xl-2 ord-md-3 box-ord-2">
+                <div class="card" x-data="distanceChart($refs.chartEl)">
+                    <div class="card-header card-no-border">
+                        <div class="header-top">
+                            <h5>میانگین کل مسافت طی شده در <strong x-text="dateName"></strong> گذشته</h5>
+                            <div class="card-header-right-icon">
+                                <div class="dropdown custom-dropdown">
+                                    <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown"
+                                            aria-expanded="false">هفت روز
+                                    </button>
+                                    <ul class="dropdown-menu text-start">
+                                        <li><a class="dropdown-item" href="javascript:void(0)"
+                                               @click="filterDistance(0)">هفت روز</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)"
+                                               @click="filterDistance(1)">14 روز</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)"
+                                               @click="filterDistance(2)">یک ماه</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)"
+                                               @click="filterDistance(3)">سه ماه</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)"
+                                               @click="filterDistance(4)">شش ماه</a></li>
+                                        <li><a class="dropdown-item" href="javascript:void(0)"
+                                               @click="filterDistance(5)">یک سال</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body pt-0">
+                        <div x-ref="chartEl"></div>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 @endsection
@@ -291,8 +326,9 @@
                                         fontSize: "15px",
                                         fontWeight: 500,
                                         fontFamily: "inherit",
-                                        label: "100",
-                                        formatter: () => "مجموع",
+                                        color: "#313641",
+                                        label: "مجموع",
+                                        formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0),
                                     },
                                 },
                             },
@@ -339,6 +375,73 @@
                 },
                 init() {
                     new ApexCharts(el, this.options).render();
+                }
+
+            }))
+
+            // Avg trips distance in a period chart
+            //----------------------------------------
+            Alpine.data('distanceChart', (el) => ({
+                options: {
+                    chart: {
+                        height: 350,
+                        type: "area",
+                        toolbar: {
+                            show: false,
+                        },
+                    },
+                    dataLabels: {
+                        enabled: false,
+                    },
+                    stroke: {
+                        curve: "smooth",
+                    },
+                    series: [
+                        {
+                            name: "مسافت‌طی‌شده",
+                            data: [31, 40, 28, 51, 42, 109, 100],
+                        },
+                    ],
+
+                    xaxis: {
+                        type: "datetime",
+                        categories: ["2018-09-19T00:00:00", "2018-09-19T01:30:00", "2018-09-19T02:30:00", "2018-09-19T03:30:00", "2018-09-19T04:30:00", "2018-09-19T05:30:00", "2018-09-19T06:30:00"],
+                    },
+                    tooltip: {
+                        x: {
+                            format: "dd/MM/yy HH:mm",
+                        },
+                    },
+                    colors: [CubaAdminConfig.primary],
+                },
+                dateName: 'هفت روز',
+
+                init() {
+                    new ApexCharts(el, this.options).render();
+                },
+
+                filterDistance($num) {
+                    switch ($num) {
+                        case 0:
+                            this.dateName = 'هفت روز';
+                            break;
+                        case 1:
+                            this.dateName = 'هفت روز';
+                            break;
+                        case 0:
+                            this.dateName = 'هفت روز';
+                            break;
+                        case 0:
+                            this.dateName = 'هفت روز';
+                            break;
+                        case 0:
+                            this.dateName = 'هفت روز';
+                            break;
+                        case 0:
+                            this.dateName = 'هفت روز';
+                            break;
+
+                    }
                 }
 
             }))
