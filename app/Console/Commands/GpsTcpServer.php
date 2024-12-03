@@ -7,6 +7,7 @@ use App\Jobs\StoreGpsDataJob;
 use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use Workerman\Connection\TcpConnection;
 use Workerman\Worker;
 
@@ -59,7 +60,10 @@ class GpsTcpServer extends Command
             Worker::$daemonize = true;
         }
 
-        $tcpWorker = new Worker('tcp://31.214.251.139:5024');
+        $SERVER = Config::get('server-info.server');
+        $PORT = Config::get('server-info.port');
+
+        $tcpWorker = new Worker("tcp://{$SERVER}:{$PORT}");
         $tcpWorker->count = 4;
 
         $tcpWorker->onConnect = function () {

@@ -18,10 +18,21 @@
                              style="height: 177px">
                             <div class="media-body">
                                 <div class="greeting-user">
-                                    <h4 class="f-w-600">خوش آمدید!</h4>
-                                    <p class="mb-0 mt-2">حدیث روز:</p>
-                                    <strong class="d-block">- امام علی سلام‌الله‌علیها:</strong>
-                                    <q>فرصت ها مانند ابر با سرعت میگذرند.</q>
+                                    <h4 class="f-w-600">{{ auth()->user()->name }} خوش آمدید!</h4>
+
+                                    <div class="w-75">
+                                        @if($hadis)
+                                            <p class="mb-0 mt-2">حدیث روز:</p>
+                                            <strong
+                                                class="d-block">- {{ json_decode($hadis->value, true)['person'] ?? '' }}
+                                                :</strong>
+                                            <q>{{ json_decode($hadis->value, true)['text'] ?? '' }}</q>
+                                            <small
+                                                class="d-block opacity-50">{{ json_decode($hadis->value, true)['source'] ?? '' }}</small>
+                                        @else
+                                            <p class="mb-0 mt-2">امیدوارم روز خوبی داشته باشی...</p>
+                                        @endif
+                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -51,13 +62,13 @@
                             </div>
                         </div>
                         <div class="cartoon"><img class="img-fluid" width="175"
-                                                  src="{{ asset('assets/images/dashboard/police-investigation.png') }}"
-                                                  alt="vector women with leptop"></div>
+                                                  src="{{ asset('assets/images/dashboard/police-investigation.webp') }}"
+                                                  alt=""></div>
                     </div>
                 </div>
             </div>
             <!-- Users and Devices count -->
-            <div class="col-xxl-auto col-sm-6 box-col-4">
+            <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-6">
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="card widget-1">
@@ -81,7 +92,9 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <h4><span class="counter" data-target="45195">45,195</span></h4><span
+                                        <h4><span class="counter"
+                                                  data-target="{{ $entities->get('devices_count') }}">{{ priceFormat($entities->get('devices_count')) ?? 0 }}</span>
+                                        </h4><span
                                             class="f-light">کل دستگاه ها</span>
                                     </div>
                                 </div>
@@ -122,7 +135,9 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <h4><span class="counter" data-target="845">845</span>+</h4><span
+                                        <h4><span class="counter"
+                                                  data-target="{{ $entities->get('users_count') }}">{{priceFormat($entities->get('users_count')) ?? 0 }}</span>
+                                        </h4><span
                                             class="f-light">کل کاربران</span>
                                     </div>
                                 </div>
@@ -132,7 +147,7 @@
                 </div>
             </div>
             <!-- Geofence and Vehicles count -->
-            <div class="col-xxl-auto col-sm-6 box-col-4">
+            <div class="col-xxl-auto col-xl-3 col-sm-6 box-col-6">
                 <div class="row">
                     <div class="col-xl-12">
                         <div class="card widget-1">
@@ -151,7 +166,9 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <h4><span class="counter" data-target="45195">45,195</span></h4><span
+                                        <h4><span class="counter"
+                                                  data-target="{{ $entities->get('vehicles_count') }}">{{ priceFormat($entities->get('vehicles_count')) ?? 0 }}</span>
+                                        </h4><span
                                             class="f-light">کل وسایل نقلیه</span>
                                     </div>
                                 </div>
@@ -179,7 +196,9 @@
                                         </div>
                                     </div>
                                     <div>
-                                        <h4><span class="counter" data-target="845">845</span>+</h4><span
+                                        <h4><span class="counter"
+                                                  data-target="{{ $entities->get('geofences_count') }}">{{ priceFormat($entities->get('geofences_count')) ?? 0 }}</span>
+                                        </h4><span
                                             class="f-light">کل حصارها</span>
                                     </div>
                                 </div>
@@ -198,7 +217,13 @@
                     </div>
                     <div class="card-body">
                         <div class="std-class-chart">
-                            <div x-data="deviceBarChart($el)"></div>
+                            @if($entities->get('in_active_users_count') && $entities->get('in_active_devices_count'))
+                                <div x-data="deviceBarChart($el)"></div>
+                            @else
+                                <div class="alert alert-primary rounded-3">
+                                    <p class="mb-0 text-center">فاقد دستگاه یا کابر غیرفعال</p>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
@@ -223,15 +248,22 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <tr>
-                                        <td>
-                                            <a class="d-block f-w-500" href="#">واحد ساری</a>
-                                        </td>
-                                        <td>واحد تهران بزرگ</td>
-                                        <td class="text-end">
-                                            <p class="m-0 font-success">10</p>
-                                        </td>
-                                    </tr>
+                                    @forelse($entities->get('topDeviceUsers') as $user)
+                                        <tr>
+                                            <td>
+                                                <a class="d-block f-w-500"
+                                                   href="{{ route('user.show', $user->id) }}">{{ $user->name }}</a>
+                                            </td>
+                                            <td>{{ $user->joinedCompaniesList }}</td>
+                                            <td class="text-end">
+                                                <p class="m-0 font-success text-center">{{ $user->devices_count }}</p>
+                                            </td>
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="3">کاربری یافت نشد..</td>
+                                        </tr>
+                                    @endforelse
 
                                     </tbody>
                                 </table>
@@ -241,7 +273,7 @@
                 </div>
             </div>
 
-            <!-- Top 5 Users Who most device have -->
+            <!-- Average Total distance By Date -->
             <div class="col-xxl-8 col-lg-6 box-col-6 ord-xl-2 ord-md-3 box-ord-2">
                 <div class="card" x-data="distanceChart($refs.chartEl)">
                     <div class="card-header card-no-border">
@@ -259,12 +291,6 @@
                                                @click="filterDistance(1)">14 روز</a></li>
                                         <li><a class="dropdown-item" href="javascript:void(0)"
                                                @click="filterDistance(2)">یک ماه</a></li>
-                                        <li><a class="dropdown-item" href="javascript:void(0)"
-                                               @click="filterDistance(3)">سه ماه</a></li>
-                                        <li><a class="dropdown-item" href="javascript:void(0)"
-                                               @click="filterDistance(4)">شش ماه</a></li>
-                                        <li><a class="dropdown-item" href="javascript:void(0)"
-                                               @click="filterDistance(5)">یک سال</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -298,7 +324,7 @@
             //----------------------------------------
             Alpine.data('deviceBarChart', (el) => ({
                 options: {
-                    series: [30, 25],
+                    series: [{{ $entities->get('in_active_users_count') ?? 0 }}, {{ $entities->get('in_active_devices_count') ?? 0 }}],
                     labels: ["دستگاه ها", "کاربران"],
                     chart: {
                         height: 185,
@@ -382,12 +408,16 @@
             // Avg trips distance in a period chart
             //----------------------------------------
             Alpine.data('distanceChart', (el) => ({
+                chart: null,
                 options: {
                     chart: {
                         height: 350,
                         type: "area",
                         toolbar: {
                             show: false,
+                        },
+                        zoom: {
+                            enabled: false,
                         },
                     },
                     dataLabels: {
@@ -399,48 +429,76 @@
                     series: [
                         {
                             name: "مسافت‌طی‌شده",
-                            data: [31, 40, 28, 51, 42, 109, 100],
+                            data: [],
                         },
                     ],
 
                     xaxis: {
-                        type: "datetime",
-                        categories: ["2018-09-19T00:00:00", "2018-09-19T01:30:00", "2018-09-19T02:30:00", "2018-09-19T03:30:00", "2018-09-19T04:30:00", "2018-09-19T05:30:00", "2018-09-19T06:30:00"],
+                        type: "date",
+                        categories: [],
                     },
                     tooltip: {
                         x: {
-                            format: "dd/MM/yy HH:mm",
+                            format: "dd/MM",
                         },
+                        custom: function({ series, seriesIndex, dataPointIndex, w }) {
+                            const distance = series[seriesIndex][dataPointIndex];
+                            return `<div class="apexcharts-tooltip-title" style="direction: rtl; text-align: right;">
+            میانگین مسافت طی شده: ${distance.toFixed()} کیلومتر
+        </div>`;
+                        }
                     },
                     colors: [CubaAdminConfig.primary],
                 },
                 dateName: 'هفت روز',
 
                 init() {
-                    new ApexCharts(el, this.options).render();
+                    this.chart = new ApexCharts(el, this.options);
+                    this.chart.render();
+
+
+                    this.getTotalDistance(30);
+                },
+
+                async getTotalDistance($num = 7) {
+                    const response = await fetch(`/get-total-distance/${$num}`);
+                    const data = await response.json();
+
+                    let categories = [];
+                    let seriesData = [];
+
+                    Object.entries(data.dailyAvgDistance).forEach(([date, distance]) => {
+                        categories.push(date);
+                        seriesData.push(distance);
+                    });
+
+
+                    this.chart.updateOptions({
+                        xaxis: {
+                            categories: categories
+                        },
+                        series: [{
+                            data: seriesData
+                        }]
+                    });
+
+
                 },
 
                 filterDistance($num) {
                     switch ($num) {
                         case 0:
                             this.dateName = 'هفت روز';
+                            this.getTotalDistance(7);
                             break;
                         case 1:
-                            this.dateName = 'هفت روز';
+                            this.dateName = 'چهارده روز';
+                            this.getTotalDistance(14);
                             break;
-                        case 0:
-                            this.dateName = 'هفت روز';
+                        case 2:
+                            this.dateName = 'یک ماه';
+                            this.getTotalDistance(30);
                             break;
-                        case 0:
-                            this.dateName = 'هفت روز';
-                            break;
-                        case 0:
-                            this.dateName = 'هفت روز';
-                            break;
-                        case 0:
-                            this.dateName = 'هفت روز';
-                            break;
-
                     }
                 }
 

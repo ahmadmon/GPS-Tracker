@@ -74,7 +74,7 @@
                 <div class="border border-dark rounded p-2">
                     <template x-if="status">
                         <small class="text-muted">
-                            با فعال‌سازی رمز عبور، یک رمز عبور پیش‌فرض چهار صفر (0000) برای دستگاه تنظیم خواهد شد.
+                            با فعال‌سازی رمز عبور، یک رمز عبور پیش‌فرض شش صفر (000000) برای دستگاه تنظیم خواهد شد.
                             <br>
                             از این پس برای انجام دستورات به دستگاه، وارد کردن این رمز عبور الزامی است.
                             <br>
@@ -112,40 +112,44 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2"/>
         </div>
         <!-- Set Admin Number -->
-        <div class="mb-3" x-cloak x-show="parseInt(selected) === 5">
-            <label class="form-label" for="selected-4">شماره تماس ادمین
-                <sup class="text-danger">*</sup>
-            </label>
-            <small class="text-muted d-block">در این بخش، شماره ادمین را وارد کنید تا در صورت نیاز،
-                امکان دریافت اطلاعات از دستگاه فراهم شود.</small>
-            <div class="row">
-            <div class="col-md-6">
-                <input class="form-control mb-3" id="selected-4" name="phones[0]" type="number"
+        <template x-if="parseInt(selected) === 5">
+            <div class="mb-3">
+                <label class="form-label" for="selected-4">شماره تماس ادمین
+                    <sup class="text-danger">*</sup>
+                </label>
+                <small class="text-muted d-block">در این بخش، شماره ادمین را وارد کنید تا در صورت نیاز،
+                    امکان دریافت اطلاعات از دستگاه فراهم شود.</small>
+                <div class="row">
+                    <div class="col-md-6">
+                        <input class="form-control mb-3" id="selected-4" name="phones[0]" type="number"
+                               value="{{ old('phones.0') }}"
+                               placeholder="برای مثال: 09123456789">
+                        <x-input-error :messages="$errors->get('phones.0')" class="mt-2"/>
+                    </div>
+                    <div class="col-md-6">
+                        <input class="form-control" id="selected-5" name="phones[1]" type="number"
+                               value="{{ old('phones.1') }}"
+                               placeholder="برای مثال: 09123456789">
+                        <x-input-error :messages="$errors->get('phones.1')" class="mt-2"/>
+                    </div>
+
+                </div>
+                <x-input-error :messages="$errors->get('phones')" class="mt-2"/>
+            </div>
+        </template>
+        <!-- Delete Admin Number -->
+        <template x-if="parseInt(selected) === 6">
+            <div class="mb-3">
+                <label class="form-label" for="selected-4">شماره تماس ادمین
+                    <sup class="text-danger">*</sup>
+                </label>
+                <small class="text-muted d-block">در این بخش شما میتوانید شماره هایی را که به عنوان شماره های مدیر برای
+                    دستگاه تعریف کرده اید را حذف کنید.</small>
+                <input class="form-control" id="selected-4" name="phones[0]" type="number"
                        value="{{ old('phones.0') }}"
                        placeholder="برای مثال: 09123456789">
                 <x-input-error :messages="$errors->get('phones.0')" class="mt-2"/>
             </div>
-            <div class="col-md-6">
-                <input class="form-control" id="selected-5" name="phones[1]" type="number"
-                       value="{{ old('phones.1') }}"
-                       placeholder="برای مثال: 09123456789">
-                <x-input-error :messages="$errors->get('phones.1')" class="mt-2"/>
-            </div>
-
-            </div>
-            <x-input-error :messages="$errors->get('phones')" class="mt-2"/>
-        </div>
-        <!-- Delete Admin Number -->
-        <div class="mb-3" x-cloak x-show="parseInt(selected) === 6">
-            <label class="form-label" for="selected-4">شماره تماس ادمین
-                <sup class="text-danger">*</sup>
-            </label>
-            <small class="text-muted d-block">در این بخش شما میتوانید شماره هایی را که به عنوان شماره های مدیر برای
-                دستگاه تعریف کرده اید را حذف کنید.</small>
-            <input class="form-control" id="selected-4" name="phones[0]" type="number"
-                   value="{{ old('phones.0') }}"
-                   placeholder="برای مثال: 09123456789">
-            <x-input-error :messages="$errors->get('phones.0')" class="mt-2"/>
-        </div>
+        </template>
     </section>
 </div>

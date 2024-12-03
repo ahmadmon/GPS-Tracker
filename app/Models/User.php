@@ -73,6 +73,13 @@ class User extends Authenticatable
         );
     }
 
+    protected function joinedCompaniesList(): Attribute
+    {
+        return Attribute::make(
+            get: fn(): array|string => $this->joinedCompanies->pluck('name')->implode(', ')
+        );
+    }
+
 
     public function devices(): HasMany
     {

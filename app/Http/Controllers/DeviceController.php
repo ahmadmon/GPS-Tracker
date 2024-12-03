@@ -12,6 +12,7 @@ use App\Models\Trip;
 use App\Models\User;
 use App\Models\Vehicle;
 use Exception;
+use Illuminate\Support\Facades\Log;
 
 class DeviceController extends BaseController
 {
@@ -195,12 +196,13 @@ class DeviceController extends BaseController
             'interval' => $request->interval,
             'password' => $request->password,
             'passStatus' => $request->passStatus ? 'on' : 'off',
-            'phones' => ($device->brand == 'sinotrack' || count($request->phones) == 1 || is_null($request->phones[1])) ? $request->phones[0] : implode(',', $request->phones)
+            'phones' => $this->checkPhone($request->phones, $device)
         ];
 
         $deviceManager = new DeviceManager($device);
         $deviceBrand = $deviceManager->getDevice($device->brand->value);
         $command = $deviceBrand->getCommand($request->command, $params);
+
 
         $sms = new SmsService();
         $sms->setTo($device->phone_number);
@@ -211,16 +213,35 @@ class DeviceController extends BaseController
             if ((isset($request->passStatus) && (bool)$request->passStatus === true) || isset($request->password)) {
                 $pass = is_null($device->password) ? '000000' : $request->password;
                 $device->update(['password' => $pass]);
-            }elseif ((isset($request->passStatus) && (bool)$request->passStatus === false)){
+            } elseif ((isset($request->passStatus) && (bool)$request->passStatus === false)) {
                 $device->update(['password' => null]);
             }
 
 
-
             return back()->with('success-alert', 'دستور با موفقیت برای دستگاه ارسال شد.');
         } else {
+            Log::error("Error Sending Msg by device {$device->serial}: ", [$res->original['error']]);
             return back()->with('error-alert', "خطایی به وجود آمده است!\nلطفا بعد از چند لحظه دوباره امتحان کنید.\nدر صورت مشاهده دوباره این پیغام لطفا با پشتیبانی تماس بگیرید.");
         }
+    }
+
+    private function checkPhone($phones, $device)
+    {
+        $result = null;
+
+        if (is_array($phones)) {
+            if (
+                $device->brand == 'sinotrack' ||
+                count($phones) == 1 ||
+                (array_key_exists(1, $phones) && is_null($phones[1]))
+            ) {
+                $result = $phones[0];
+            } else {
+                $result = implode(',', $phones);
+            }
+        }
+
+        return $result;
     }
 
     public function changeStatus(Device $device)

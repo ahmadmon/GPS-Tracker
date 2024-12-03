@@ -319,7 +319,7 @@
                 if ($wire.onlineMode) {
                     self.updateLocations($wire.deviceLocations);
                 }
-            }, 2000)
+            }, 10000)
         },
 
         // Handle The Devices live location
@@ -386,7 +386,7 @@
         }
         ,
 
-        createPopupContent(data, distance = null) {
+        createPopupContent(data) {
             return `
             <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
                 <span style="margin-left: 5px"><i class="icofont icofont-micro-chip"></i></span>${data.device?.name} - ${data.device?.model}
@@ -414,9 +414,9 @@
             <p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
                 <span style="margin-left: 5px"><i class="icofont icofont-speed-meter"></i></span> ${Math.round(JSON.parse(data.device_stats)?.speed || 0)} کیلومتر ‌بر ساعت
             </p>
-            ${distance ?
+            ${data.distance ?
                 `<p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
-                    <span style="margin-left: 5px"><i class="fa fa-solid fa-flag-checkered"></i></span> ${Math.round(distance)} کیلومتر
+                    <span style="margin-left: 5px"><i class="fa fa-solid fa-flag-checkered"></i></span> ${data.distance.toFixed(2)} کیلومتر
                 </p>`
                 : ''
             }

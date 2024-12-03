@@ -15,6 +15,7 @@ Route::middleware(['auth'])->group(function () {
 
 
     Route::get('/', [DashboardController::class, 'index'])->name('home');
+    Route::get('/get-total-distance/{days}', [DashboardController::class, 'getAvgTotalDistance'])->name('get-avg-total-distance');
 //    Route::get('/', function () {
 //        if (session('warning-alert')) {
 //            $user = Auth::user();
