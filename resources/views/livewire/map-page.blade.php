@@ -44,8 +44,8 @@
                                                 </ul>
                                             </div>
                                         </div>
-                                        <div class="card-body p-0 device-sidebar overflow-hidden">
-                                            <div class="col-md-12">
+                                        <div class="card-body p-0 device-sidebar overflow-y-auto">
+                                            <div class="col-12 position-absolute" style="z-index: 7">
                                                 <input class="form-control rounded-0" id="search" type="text"
                                                        placeholder="جستجو بر اساس نام یا شناسه..." aria-label="جسنجو"
                                                        wire:model.live.debounce.850ms="search">
@@ -60,7 +60,7 @@
                                                             }
                                                         }
                                                 }">
-                                                    <table class="table">
+                                                    <table class="table mt-5">
                                                         <tbody>
                                                         <tr>
                                                             <td @class(['w-100 d-none justify-content-start align-items-center', 'd-flex' => $errors->has('selected')])>
@@ -124,23 +124,67 @@
             <div class="col-md-8">
                 <div class="card">
                     <div class="card-body">
-                        <div class="row g-3 custom-input" x-data="dateTimeRange($refs.dateRangeInp)">
-                            <div class="col-xl col-md-6">
+                        <div class="row">
+                            <div class="col-12 col-xl-6" x-data="dateTimeRange($refs.dateRangeInp)">
                                 <label class="form-label" for="datetime-range">انتخاب تاریخ: </label>
-                                <div class="input-group flatpicker-calender">
-                                    <div class="input-group flatpicker-calender" wire:ignore>
-                                        <input class="form-control" id="datetime-range" type="date"
-                                               wire:model="dateTimeRange"
-                                               x-ref="dateRangeInp"
-                                        >
+                                <div class=" d-flex align-items-center justify-content-start">
+                                    <div class="input-group flatpicker-calender">
+                                        <div class="input-group flatpicker-calender" wire:ignore>
+                                            <input class="form-control" id="datetime-range" type="date"
+                                                   wire:model="dateTimeRange"
+                                                   x-ref="dateRangeInp"
+                                            >
+                                        </div>
+                                    </div>
+                                    <div class="d-flex justify-content-start align-items-center ms-2"><a
+                                            class="btn btn-primary f-w-500" type="button" wire:click="handleTrip"
+                                            :class="disabled && 'disabled'">فیلتر</a>
                                     </div>
                                 </div>
                                 <x-input-error :messages="$errors->get('dateTimeRange')" class="mt-1"/>
                             </div>
-                            <div class="col d-flex justify-content-start align-items-center m-t-40"><a
-                                    class="btn btn-primary f-w-500" type="button" wire:click="handleTrip"
-                                    :class="disabled && 'disabled'">فیلتر</a>
+
+                            <div class="col-12 col-xl-6" wire:ignore x-data="trackplayer">
+                                <label class="form-label">تنظیمات پخش:</label>
+                                <div class="d-flex flex-row-reverse justify-content-between align-items-center">
+                                    <div class="d-flex">
+                                        <button class="btn btn-warning-gradien px-2" data-bs-toggle="tooltip"
+                                                @click="changeSpeed()"
+                                                x-text="speeds[currentSpeed] !== 1 ? speeds[currentSpeed] + 'X' : ''"
+                                                data-bs-placement="top" title="سرعت">
+                                            <img class="img-fluid" :class="currentSpeed !== 0 && 'd-none'"
+                                                 src="{{ asset('assets/libs/leaflet/track-player/icons/playback-speed-svgrepo-com.svg') }}"
+                                                 width="24" height="24" alt="سرعت">
+                                        </button>
+
+                                        <button class="btn btn-warning-gradien px-2 mx-1" data-bs-toggle="tooltip"
+                                                data-bs-placement="top" title="متوقف کردن">
+                                            <img class="img-fluid"
+                                                 src="{{ asset('assets/libs/leaflet/track-player/icons/pause-circle-svgrepo-com.svg') }}"
+                                                 width="24" height="24" alt="متوقف">
+                                        </button>
+
+                                        <button class="btn btn-warning-gradien px-2"
+
+                                                data-bs-toggle="tooltip"
+                                                data-bs-placement="top" title="پخش کردن">
+                                            <img class="img-fluid"
+                                                 src="{{ asset('assets/libs/leaflet/track-player/icons/play-circle-svgrepo-com.svg') }}"
+                                                 width="24" height="24" alt="پخش">
+                                        </button>
+                                    </div>
+
+                                    <div class="range-d-slider">
+                                        <div id="slider_thumb" class="range-d-slider_thumb"></div>
+                                        <div class="range-d-slider_line">
+                                            <div id="slider_line" class="range-d-slider_line-fill"></div>
+                                        </div>
+                                        <input id="slider_input" class="range-d-slider_input" type="range"
+                                               x-model="rangeValue" value="20" min="0" max="100">
+                                    </div>
+                                </div>
                             </div>
+
                         </div>
                     </div>
                 </div>
@@ -188,7 +232,10 @@
 <script src="{{ asset('assets/js/flat-pickr/l10n/fa-jdate.js') }}"></script>
 
 <!-- // track player assets  -->
+<script src="{{ asset('assets/libs/leaflet/track-player/leaflet-trackplayer.umd.cjs') }}"></script>
 
+
+<!-- // Others assets  -->
 
 <style>
     #map {
@@ -270,14 +317,11 @@
 
             this.map.on('baselayerchange', (e) => {
                 console.log(e);
-                // ذخیره مارکرهای فعلی
                 this.savedMarkers = {...this.markers};
 
-                // حذف تمام مارکرهای فعلی
                 Object.values(this.markers).forEach(marker => marker.remove());
                 this.markers = {};
 
-                // اضافه کردن مارکرهای ذخیره شده به لایه جدید
                 Object.entries(this.savedMarkers).forEach(([deviceId, marker]) => {
                     marker.addTo(this.map);
                     this.markers[deviceId] = marker;
@@ -593,6 +637,37 @@
     }))
     ;
 
+    // Track Player
+    //------------------------------------------------------
+    Alpine.data('trackplayer', () => ({
+        speeds: [1, 2, 3, 4, 5],
+        currentSpeed: 0,
+        rangeValue: 0,
+
+        init() {
+            this.initializeRangeSlider();
+            window.addEventListener("resize", this.initializeRangeSlider);
+        },
+
+        changeSpeed() {
+           this.currentSpeed = (this.currentSpeed + 1) % this.speeds.length;
+        },
+
+        initializeRangeSlider() {
+            const slider_input = document.getElementById('slider_input'),
+                slider_thumb = document.getElementById('slider_thumb'),
+                slider_line = document.getElementById('slider_line');
+
+            slider_thumb.innerHTML = slider_input.value;
+            const bulletPosition = (slider_input.value / slider_input.max),
+                space = slider_input.offsetWidth - slider_thumb.offsetWidth;
+
+            slider_thumb.style.left = (bulletPosition * space) + 'px';
+            slider_line.style.width = slider_input.value + '%';
+            slider_input.addEventListener('input', this.initializeRangeSlider, false);
+        }
+    }))
+
     // DatePicker (Enter Time)
     //------------------------------------------------------
     Alpine.data('dateTimeRange', (input) => ({
@@ -652,6 +727,8 @@
             });
         }
     }));
+
+
 </script>
 @endscript
 
