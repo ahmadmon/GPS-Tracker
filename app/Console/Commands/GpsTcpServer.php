@@ -77,10 +77,10 @@ class GpsTcpServer extends Command
 
                 if ($parsedData['expectsResponse']) {
                     $connection->send($parsedData['response']);
-                    $this->info('Response Sent at: ' . now()->toDateTimeString());
+                    $this->info('Response Sent at: ' . jalaliDate(now(), format: 'Y-m-d H:i:s'));
                 }
 
-                $this->info('Received message at: ' . now()->toDateTimeString());
+                $this->info('Received data at: ' . jalaliDate(now(), format: 'Y-m-d H:i:s'));
 
                 if ($parsedData['data'] != null) {
                     StoreGpsDataJob::dispatch($parsedData['data']);

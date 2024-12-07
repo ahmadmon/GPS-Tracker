@@ -31,9 +31,7 @@ class CheckGeofenceStatusJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $geofences = Geofence::where('device_id', $this->device->id)->where('status', 1)->get();
-//        dd($geofences);
-        foreach ($geofences as $fence) {
+        foreach ($this->device->geofences()->where('status', 1)->get() as $fence) {
 
             if ($fence->isGeofenceActive()) continue;
 

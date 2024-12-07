@@ -282,7 +282,7 @@
                             <div class="card-header-right-icon">
                                 <div class="dropdown custom-dropdown">
                                     <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown"
-                                            aria-expanded="false">هفت روز
+                                            aria-expanded="false" x-text="dateName">
                                     </button>
                                     <ul class="dropdown-menu text-start">
                                         <li><a class="dropdown-item" href="javascript:void(0)"
@@ -457,7 +457,7 @@
                     this.chart.render();
 
 
-                    this.getTotalDistance(30);
+                    this.getTotalDistance(7);
                 },
 
                 async getTotalDistance($num = 7) {
