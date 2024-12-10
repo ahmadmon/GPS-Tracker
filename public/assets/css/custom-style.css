@@ -34,6 +34,11 @@
     cursor: pointer !important;
 }
 
+.cursor-not-allowed {
+    cursor: not-allowed;
+    pointer-events: all !important;
+}
+
 img.img-opacity:hover {
     filter: opacity(.5);
     transition: 0.4s;

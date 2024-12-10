@@ -149,7 +149,16 @@
                                 <div class="d-flex flex-row-reverse justify-content-between align-items-center">
                                     <div class="d-flex">
                                         <button class="btn btn-warning-gradien px-2" data-bs-toggle="tooltip"
+                                                @click="removeTracker()"
+                                                data-bs-placement="top" title="حذف پخش کننده">
+                                            <img class="img-fluid"
+                                                 src="{{ asset('assets/libs/leaflet/track-player/icons/close-square-svgrepo-com.svg') }}"
+                                                 width="24" height="24" alt="">
+                                        </button>
+
+                                        <button class="btn btn-warning-gradien px-2 mx-1" data-bs-toggle="tooltip"
                                                 @click="changeSpeed()"
+                                                :disabled="!btnStatus"
                                                 data-bs-placement="top" title="سرعت">
                                             <span class="text-dark f-w-900" x-show="displaySpeed"
                                                   x-text="displaySpeed"></span>
@@ -159,20 +168,13 @@
                                                  width="24" height="24" alt="سرعت">
                                         </button>
 
-                                        <button class="btn btn-warning-gradien px-2 mx-1" data-bs-toggle="tooltip"
-                                                data-bs-placement="top" title="متوقف کردن">
+                                        <button class="btn btn-warning-gradien  px-2"
+                                                @click="togglePlay()"
+                                                :disabled="!btnStatus"
+                                                :title="isPlaying ? 'توقف کردن' : 'پخش کردن'">
                                             <img class="img-fluid"
-                                                 src="{{ asset('assets/libs/leaflet/track-player/icons/pause-circle-svgrepo-com.svg') }}"
-                                                 width="24" height="24" alt="متوقف">
-                                        </button>
-
-                                        <button class="btn btn-warning-gradien px-2"
-
-                                                data-bs-toggle="tooltip"
-                                                data-bs-placement="top" title="پخش کردن">
-                                            <img class="img-fluid"
-                                                 src="{{ asset('assets/libs/leaflet/track-player/icons/play-circle-svgrepo-com.svg') }}"
-                                                 width="24" height="24" alt="پخش">
+                                                 :src="isPlaying ? '{{ asset('assets/libs/leaflet/track-player/icons/pause-circle-svgrepo-com.svg') }}' : '{{ asset('assets/libs/leaflet/track-player/icons/play-circle-svgrepo-com.svg') }}'"
+                                                 width="24" height="24" alt="">
                                         </button>
                                     </div>
 
@@ -182,7 +184,9 @@
                                             <div x-ref="slider_line" class="range-d-slider_line-fill"></div>
                                         </div>
                                         <input x-ref="slider_input" class="range-d-slider_input" type="range"
-                                               @input="handleSliderInput($event)" :value="rangeValue" min="0" max="100">
+                                               :disabled="!btnStatus"
+                                               @input="handleSliderInput($event)" min="0"
+                                               max="100" :value="currentProgress">
                                     </div>
                                 </div>
                             </div>
@@ -191,7 +195,9 @@
                     </div>
                 </div>
 
-                <div class="card-body z-1 position-relative" x-data="mapComponent($refs.map)" wire:ignore>
+                <div class="card-body z-1 position-relative" x-data="mapComponent" wire:ignore>
+                    <div @remove-all.window="removeWayPoints()"></div>
+                    <div @show-waypoints.window="showWaypoints(trips)"></div>
                     <div class="map-js-height" x-ref="map" id="map"></div>
 
                     <div wire:loading>
@@ -235,6 +241,8 @@
 
 <!-- // track player assets  -->
 <script src="{{ asset('assets/libs/leaflet/track-player/leaflet-trackplayer.umd.cjs') }}"></script>
+<script src="{{ asset('assets/libs/leaflet/track-player/rotatedMarker.js') }}"></script>
+{{--<script src="{{ asset('assets/libs/leaflet/track-player/turf.min.js') }}"></script>--}}
 
 
 <!-- // Others assets  -->
@@ -291,11 +299,156 @@
 
 @script
 <script>
+    // Global States
+    //------------------------------------------------------
+    Alpine.store('map', {
+        map: null,
+        mapView: [35.715298, 51.404343],
+
+        initMap() {
+            return this.map = L.map(document.getElementById('map'), {
+                pmIgnore: false,
+                fullscreenControl: true,
+            }).setView(this.mapView, 11)
+        },
+
+        setMapView(view) {
+            this.mapView = view;
+        }
+    })
+
+    // Track Player
+    //------------------------------------------------------
+    Alpine.data('trackplayer', () => ({
+        track: [],
+        trackPlayer: null,
+        map: null,
+        speeds: [1, 2, 3, 4, 5],
+        currentProgress: 0,
+        isPlaying: false,
+        currentSpeed: 1,
+
+        init() {
+
+            $wire.on('trips-fetched', (locations) => {
+                if (locations.length > 0) {
+                    this.map = Alpine.store('map').map;
+                    this.prepareTrack(Object.values(locations[0]));
+                }
+            })
+
+            this.initializeRangeSlider();
+            window.addEventListener("resize", this.initializeRangeSlider);
+
+        },
+
+        prepareTrack(deviceLocations) {
+            this.track = deviceLocations.at(-1).map(location => [
+                parseFloat(location.lat),
+                parseFloat(location.long)
+            ]);
+        },
+
+        initMap() {
+            this.map.setView(this.track[0], 13, {animate: true, duration: 1});
+
+
+            this.trackPlayer = new L.TrackPlayer(this.track, {
+                speed: 600 * this.currentSpeed,
+                markerIcon: L.divIcon({
+                    html: `<div class="marker-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" x="0px" y="0px" viewBox="0 0 512 512" xml:space="preserve"><g><g><path fill="#22201F" fill-rule="evenodd" d="M124.124,432.18l66.555-216.71L0,79.82l512,55.156L124.124,432.18z"/></g></g></svg></div>`,
+                    className: 'custom-marker',
+                    iconSize: [32, 32],
+                }),
+            }).addTo(this.map);
+
+            this.setupTrackPlayerEvents();
+        },
+
+        setupTrackPlayerEvents() {
+            this.trackPlayer.on('progress', (progress) => {
+                this.currentProgress = progress * 100;
+                this.initializeRangeSlider()
+            });
+
+            this.trackPlayer.on('finished', () => {
+                this.isPlaying = false;
+            });
+        },
+
+        togglePlay() {
+            this.$dispatch('remove-all');
+
+            if (this.isPlaying) {
+                this.trackPlayer.pause();
+                this.isPlaying = false;
+            } else {
+                // Reinitialize if not already initialized
+                if (!this.trackPlayer) this.initMap();
+                this.trackPlayer.start();
+                this.isPlaying = true;
+            }
+        },
+
+        setProgress(value) {
+            this.trackPlayer.setProgress(value / 100);
+        },
+
+        removeTracker() {
+            if (this.trackPlayer) {
+                this.trackPlayer.remove();
+                this.$dispatch('show-waypoints');
+                this.trackPlayer = null;
+                this.currentProgress = 0;
+                this.currentSpeed = 1;
+                this.track = [];
+                this.isPlaying = false;
+            }
+        },
+
+        changeSpeed() {
+            const speedIndex = (this.speeds.indexOf(this.currentSpeed) + 1) % this.speeds.length;
+            this.currentSpeed = this.speeds[speedIndex] === 0 ? 1 : this.speeds[speedIndex];
+
+            if (this.trackPlayer) {
+                this.trackPlayer.setSpeed(600 * this.currentSpeed);
+            }
+        },
+
+        get displaySpeed() {
+            return this.currentSpeed !== 1 ? this.currentSpeed + 'X' : false;
+        },
+
+        get btnStatus() {
+            return this.track.length > 0;
+        },
+
+        initializeRangeSlider() {
+            const slider_input = this.$refs.slider_input,
+                slider_thumb = this.$refs.slider_thumb,
+                slider_line = this.$refs.slider_line;
+
+            this.$nextTick(() => {
+                slider_thumb.innerHTML = slider_input.value;
+                const bulletPosition = (slider_input.value / slider_input.max),
+                    space = slider_input.offsetWidth - slider_thumb.offsetWidth;
+
+                slider_thumb.style.left = (bulletPosition * space) + 'px';
+                slider_line.style.width = slider_input.value + '%';
+            });
+        },
+
+        handleSliderInput(e) {
+            let rangeValue = e.target.value;
+            this.setProgress(rangeValue);
+            this.initializeRangeSlider();
+        },
+    }))
+
     // Map
     //------------------------------------------------------
     Alpine.data('mapComponent', (el) => ({
         map: null,
-        mapCenter: [35.715298, 51.404343],
         control: null,
         markers: {},
         savedMarkers: {},
@@ -303,22 +456,23 @@
         drawnWaypoints: {},
         circleMarkers: [],
         currentLayer: null,
+        trips: null,
 
 
         init() {
             let self = this;
+            this.map = Alpine.store('map').initMap();
             // Initializing The Map
-            this.map = L.map(el, {
-                pmIgnore: false,
-                fullscreenControl: true,
-            }).setView(this.mapCenter, 11);
+            // this.map = L.map(el, {
+            //     pmIgnore: false,
+            //     fullscreenControl: true,
+            // }).setView(this.mapCenter, 11);
 
 
             this.currentLayer = OSMBase.addTo(this.map);
             L.control.layers(null, baseMaps, {position: 'topright'}).addTo(this.map);
 
             this.map.on('baselayerchange', (e) => {
-                console.log(e);
                 this.savedMarkers = {...this.markers};
 
                 Object.values(this.markers).forEach(marker => marker.remove());
@@ -349,6 +503,7 @@
             // Initial Map Waypoint
             $wire.on('trips-fetched', (trips) => {
                 if (trips.length > 0) {
+                    this.trips = Object.values(trips[0]);
                     this.showWaypoints(Object.values(trips[0]));
                 }
             })
@@ -639,51 +794,7 @@
     }))
     ;
 
-    // Track Player
-    //------------------------------------------------------
-    Alpine.data('trackplayer', () => ({
-        speeds: [1, 2, 3, 4, 5],
-        currentSpeed: 0,
-        rangeValue: 0,
 
-        init() {
-            this.initializeRangeSlider();
-            window.addEventListener("resize", this.initializeRangeSlider);
-        },
-
-        showTrackPlayer(){
-
-        },
-
-        changeSpeed() {
-            this.currentSpeed = (this.currentSpeed + 1) % this.speeds.length;
-            console.log(this.displaySpeed)
-        },
-
-        get displaySpeed(){
-            return this.speeds[this.currentSpeed] !== 1 ? this.speeds[this.currentSpeed] + 'X' : false;
-        },
-
-        initializeRangeSlider() {
-            const slider_input = this.$refs.slider_input,
-                slider_thumb = this.$refs.slider_thumb,
-                slider_line = this.$refs.slider_line;
-
-            this.$nextTick(() => {
-                slider_thumb.innerHTML = slider_input.value;
-                const bulletPosition = (slider_input.value / slider_input.max),
-                    space = slider_input.offsetWidth - slider_thumb.offsetWidth;
-
-                slider_thumb.style.left = (bulletPosition * space) + 'px';
-                slider_line.style.width = slider_input.value + '%';
-            });
-        },
-
-        handleSliderInput(){
-            this.rangeValue = event.target.value;
-            this.initializeRangeSlider();
-        }
-    }))
 
     // DatePicker (Enter Time)
     //------------------------------------------------------
@@ -732,6 +843,7 @@
         initializeFlatpickr() {
             this.flatpickrInstance = flatpickr(input, {
                 mode: "range",
+                defaultDate: '{{ '1403/08/01 - 00:00' }}',
                 enableTime: true,
                 time_24hr: true,
                 locale: "fa",
