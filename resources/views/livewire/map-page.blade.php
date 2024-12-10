@@ -150,9 +150,11 @@
                                     <div class="d-flex">
                                         <button class="btn btn-warning-gradien px-2" data-bs-toggle="tooltip"
                                                 @click="changeSpeed()"
-                                                x-text="speeds[currentSpeed] !== 1 ? speeds[currentSpeed] + 'X' : ''"
                                                 data-bs-placement="top" title="سرعت">
-                                            <img class="img-fluid" :class="currentSpeed !== 0 && 'd-none'"
+                                            <span class="text-dark f-w-900" x-show="displaySpeed"
+                                                  x-text="displaySpeed"></span>
+                                            <img class="img-fluid"
+                                                 x-show="!displaySpeed"
                                                  src="{{ asset('assets/libs/leaflet/track-player/icons/playback-speed-svgrepo-com.svg') }}"
                                                  width="24" height="24" alt="سرعت">
                                         </button>
@@ -175,12 +177,12 @@
                                     </div>
 
                                     <div class="range-d-slider">
-                                        <div id="slider_thumb" class="range-d-slider_thumb"></div>
+                                        <div x-ref="slider_thumb" class="range-d-slider_thumb"></div>
                                         <div class="range-d-slider_line">
-                                            <div id="slider_line" class="range-d-slider_line-fill"></div>
+                                            <div x-ref="slider_line" class="range-d-slider_line-fill"></div>
                                         </div>
-                                        <input id="slider_input" class="range-d-slider_input" type="range"
-                                               x-model="rangeValue" value="20" min="0" max="100">
+                                        <input x-ref="slider_input" class="range-d-slider_input" type="range"
+                                               @input="handleSliderInput($event)" :value="rangeValue" min="0" max="100">
                                     </div>
                                 </div>
                             </div>
@@ -649,22 +651,37 @@
             window.addEventListener("resize", this.initializeRangeSlider);
         },
 
+        showTrackPlayer(){
+
+        },
+
         changeSpeed() {
-           this.currentSpeed = (this.currentSpeed + 1) % this.speeds.length;
+            this.currentSpeed = (this.currentSpeed + 1) % this.speeds.length;
+            console.log(this.displaySpeed)
+        },
+
+        get displaySpeed(){
+            return this.speeds[this.currentSpeed] !== 1 ? this.speeds[this.currentSpeed] + 'X' : false;
         },
 
         initializeRangeSlider() {
-            const slider_input = document.getElementById('slider_input'),
-                slider_thumb = document.getElementById('slider_thumb'),
-                slider_line = document.getElementById('slider_line');
+            const slider_input = this.$refs.slider_input,
+                slider_thumb = this.$refs.slider_thumb,
+                slider_line = this.$refs.slider_line;
 
-            slider_thumb.innerHTML = slider_input.value;
-            const bulletPosition = (slider_input.value / slider_input.max),
-                space = slider_input.offsetWidth - slider_thumb.offsetWidth;
+            this.$nextTick(() => {
+                slider_thumb.innerHTML = slider_input.value;
+                const bulletPosition = (slider_input.value / slider_input.max),
+                    space = slider_input.offsetWidth - slider_thumb.offsetWidth;
 
-            slider_thumb.style.left = (bulletPosition * space) + 'px';
-            slider_line.style.width = slider_input.value + '%';
-            slider_input.addEventListener('input', this.initializeRangeSlider, false);
+                slider_thumb.style.left = (bulletPosition * space) + 'px';
+                slider_line.style.width = slider_input.value + '%';
+            });
+        },
+
+        handleSliderInput(){
+            this.rangeValue = event.target.value;
+            this.initializeRangeSlider();
         }
     }))
 
