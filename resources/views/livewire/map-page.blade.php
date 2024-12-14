@@ -242,7 +242,7 @@
 <!-- // track player assets  -->
 <script src="{{ asset('assets/libs/leaflet/track-player/leaflet-trackplayer.umd.cjs') }}"></script>
 <script src="{{ asset('assets/libs/leaflet/track-player/rotatedMarker.js') }}"></script>
-{{--<script src="{{ asset('assets/libs/leaflet/track-player/turf.min.js') }}"></script>--}}
+<script src="{{ asset('assets/libs/leaflet/track-player/turf.min.js') }}"></script>
 
 
 <!-- // Others assets  -->
@@ -356,10 +356,12 @@
             this.trackPlayer = new L.TrackPlayer(this.track, {
                 speed: 600 * this.currentSpeed,
                 markerIcon: L.divIcon({
-                    html: `<div class="marker-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" x="0px" y="0px" viewBox="0 0 512 512" xml:space="preserve"><g><g><path fill="#22201F" fill-rule="evenodd" d="M124.124,432.18l66.555-216.71L0,79.82l512,55.156L124.124,432.18z"/></g></g></svg></div>`,
+                    html: `<div><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" fill="#0D311B" viewBox="0 0 29 29" xml:space="preserve" width="29" height="29"><style>.st3{fill:#0d311b}</style><path style="fill:#031108" d="M29 14.5A14.5 14.5 0 0 1 14.5 29 14.5 14.5 0 0 1 0 14.5a14.5 14.5 0 0 1 29 0"/><g style="opacity:.2"><path class="st3" d="M14.5 7.613 7.975 22.294l6.525-3.263 6.525 3.263z"/><path class="st3" d="M21.025 22.883c-.091 0-.181 0-.272-.045L14.5 19.711l-6.253 3.127c-.227.136-.498.091-.68-.091s-.227-.453-.136-.68l6.525-14.636a.589.589 0 0 1 1.088 0l6.525 14.636a.63.63 0 0 1-.136.68q-.204.136-.408.136M14.5 18.397c.091 0 .181 0 .272.045l4.984 2.492L14.5 9.153 9.244 20.98l4.984-2.492c.091-.045.181-.091.272-.091"/></g><path style="fill:#fff;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10" d="M14.5 6.797 8.111 21.161l6.389-3.217 6.389 3.217z"/></svg></div>`,
                     className: 'custom-marker',
                     iconSize: [32, 32],
                 }),
+                markerRotation: true,
+                markerRotationOrigin: 'center'
             }).addTo(this.map);
 
             this.setupTrackPlayerEvents();
@@ -397,7 +399,7 @@
         removeTracker() {
             if (this.trackPlayer) {
                 this.trackPlayer.remove();
-                this.$dispatch('show-waypoints');
+                this.$dispatch('appear-waypoints');
                 this.trackPlayer = null;
                 this.currentProgress = 0;
                 this.currentSpeed = 1;

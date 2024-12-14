@@ -9,7 +9,7 @@
 @section('content')
     <div class="row m-0">
         <div class="col-xl-7 p-0">
-            <img class="bg-img-cover bg-center" src="{{ asset('assets/images/login/police-amiat-eghtesadi.webp') }}" alt="صفحه ورود"></div>
+            <img class="bg-img-cover bg-center" src="{{ asset('assets/images/login/login-bg.png') }}" alt="صفحه ورود"></div>
         <div class="col-xl-5 p-0">
             <div class="login-card login-dark">
                 <div>
@@ -21,7 +21,7 @@
                             <img class="img-fluid for-dark" width="50" src="{{ asset('assets/images/logo/Economic_Security_Police_of_Iran-logo.png') }}"
                                  alt="صفحه ورود">
                         </a>
-                        <h3 class="fw-bold pb-4">سَمـفـا - پلیس امنیت اقتصادی</h3>
+                        <h3 class="fw-bold pb-4 auth-title">سَمـفـا - پلیس امنیت اقتصادی</h3>
                     </div>
                     <div class="login-main">
                         <form action="{{ route('login') }}" class="theme-form" method="POST" autocomplete="off"
