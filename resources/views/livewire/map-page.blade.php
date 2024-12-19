@@ -1031,7 +1031,6 @@
             initializeFlatpickr() {
                 this.flatpickrInstance = flatpickr(input, {
                     mode: "range",
-                    defaultDate: '{{ '1403/08/01 - 00:00' }}',
                     enableTime: true,
                     time_24hr: true,
                     locale: "fa",
