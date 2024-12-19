@@ -20,7 +20,7 @@
     </div>
 
     <section wire:ignore>
-        <x-partials.alert.warning-alert />
+        <x-partials.alert.warning-alert/>
     </section>
     <div class="row">
         <div class="row">
@@ -37,9 +37,9 @@
                                                 <ul class="tg-list common-flex">
                                                     <li class="tg-list-item">
                                                         <input class="tgl tgl-skewed" id="cb3" type="checkbox"
-                                                            wire:click="changeMode" @checked($onlineMode)>
+                                                               wire:click="changeMode" @checked($onlineMode)>
                                                         <label class="tgl-btn" data-tg-off="آفلاین" data-tg-on="آنلاین"
-                                                            for="cb3"></label>
+                                                               for="cb3"></label>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -47,76 +47,68 @@
                                         <div class="card-body p-0 device-sidebar overflow-y-auto">
                                             <div class="col-12 position-absolute" style="z-index: 7">
                                                 <input class="form-control rounded-0" id="search" type="text"
-                                                    placeholder="جستجو بر اساس نام یا شناسه..." aria-label="جسنجو"
-                                                    wire:model.live.debounce.850ms="search">
-                                                <x-input-error :messages="$errors->get('search')" class="mt-1" />
+                                                       placeholder="جستجو بر اساس نام یا شناسه..." aria-label="جسنجو"
+                                                       wire:model.live.debounce.850ms="search">
+                                                <x-input-error :messages="$errors->get('search')" class="mt-1"/>
                                             </div>
                                             <div class="taskadd visible-scroll">
                                                 <div class="table-responsive text-nowrap" x-data="{
-                                                    scrollToMap() {
-                                                        const mapEl = document.getElementById('map');
-                                                        if (mapEl) {
-                                                            mapEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                                        scrollToMap(){
+                                                            const mapEl= document.getElementById('map');
+                                                            if (mapEl){
+                                                                mapEl.scrollIntoView({ behavior:'smooth', block: 'center' });
+                                                            }
                                                         }
-                                                    }
                                                 }">
                                                     <table class="table mt-5">
                                                         <tbody>
-                                                            <tr>
-                                                                <td @class([
-                                                                    'w-100 d-none justify-content-start align-items-center',
-                                                                    'd-flex' => $errors->has('selected'),
-                                                                ])>
-                                                                    <x-input-error :messages="$errors->get('selected')" class="mt-1" />
-                                                                </td>
-                                                                <td @class([
-                                                                    'w-100 d-none justify-content-start align-items-center',
-                                                                    'd-flex' => $errors->has('selected.*'),
-                                                                ])>
-                                                                    <x-input-error :messages="$errors->get('selected.*')" class="mt-1" />
+                                                        <tr>
+                                                            <td @class(['w-100 d-none justify-content-start align-items-center', 'd-flex' => $errors->has('selected')])>
+                                                                <x-input-error :messages="$errors->get('selected')"
+                                                                               class="mt-1"/>
+                                                            </td>
+                                                            <td @class(['w-100 d-none justify-content-start align-items-center', 'd-flex' => $errors->has('selected.*')])>
+                                                                <x-input-error
+                                                                    :messages="$errors->get('selected.*')"
+                                                                    class="mt-1"/>
+                                                            </td>
+                                                        </tr>
+                                                        @forelse($devices as $key => $device)
+                                                            <tr wire:key="{{ $device->id }}" @click="scrollToMap()">
+                                                                <td class="w-100 d-flex justify-content-between align-items-center">
+                                                                    <div
+                                                                        class="d-flex justify-content-start align-items-center me-3">
+                                                                        <input type="checkbox" id="input-{{ $key }}"
+                                                                               value="{{ $device->id }}"
+                                                                               class="ui-checkbox me-2"
+                                                                               @checked(in_array($device->id,$selected))
+                                                                               wire:model.live="selected"
+                                                                        >
+                                                                        <label for="input-{{ $key }}"
+                                                                               class="cursor-pointer">
+                                                                            <h6 class="task_title_0">
+                                                                                دستگاه {{ str($device->name)->replace('دستگاه', '') }}</h6>
+                                                                            <small
+                                                                                class="project_name_0 text-muted d-block">{{ $device->serial }}</small>
+                                                                            <small
+                                                                                class="project_name_0 text-muted d-block">{{ $device->user?->name }}</small>
+                                                                        </label>
+                                                                    </div>
+                                                                    @if($device->lastLocation())
+                                                                        <div
+                                                                            class="d-flex justify-content-end align-items-center">
+                                                                            <span>KM/H <strong
+                                                                                    class="text-success">{{ json_decode($device?->lastLocation()->device_stats)?->speed }}</strong></span>
+                                                                        </div>
+                                                                    @endif
                                                                 </td>
                                                             </tr>
-                                                            @forelse($devices as $key => $device)
-                                                                <tr wire:key="{{ $device->id }}"
-                                                                    @click="scrollToMap()">
-                                                                    <td
-                                                                        class="w-100 d-flex justify-content-between align-items-center">
-                                                                        <div
-                                                                            class="d-flex justify-content-start align-items-center me-3">
-                                                                            <input type="checkbox"
-                                                                                id="input-{{ $key }}"
-                                                                                value="{{ $device->id }}"
-                                                                                class="ui-checkbox me-2"
-                                                                                @checked(in_array($device->id, $selected))
-                                                                                wire:model.live="selected">
-                                                                            <label for="input-{{ $key }}"
-                                                                                class="cursor-pointer">
-                                                                                <h6 class="task_title_0">
-                                                                                    دستگاه
-                                                                                    {{ str($device->name)->replace('دستگاه', '') }}
-                                                                                </h6>
-                                                                                <small
-                                                                                    class="project_name_0 text-muted d-block">{{ $device->serial }}</small>
-                                                                                <small
-                                                                                    class="project_name_0 text-muted d-block">{{ $device->user?->name }}</small>
-                                                                            </label>
-                                                                        </div>
-                                                                        @if ($device->lastLocation())
-                                                                            <div
-                                                                                class="d-flex justify-content-end align-items-center">
-                                                                                <span>KM/H <strong
-                                                                                        class="text-success">{{ json_decode($device?->lastLocation()->device_stats)?->speed }}</strong></span>
-                                                                            </div>
-                                                                        @endif
-                                                                    </td>
-                                                                </tr>
-                                                                <tr x-intersect.once="$wire.loadMore()"></tr>
-                                                            @empty
-                                                                <tr>
-                                                                    <p class="text-muted text-center">دستگاهی یافت نشد.
-                                                                    </p>
-                                                                </tr>
-                                                            @endforelse
+                                                            <tr x-intersect.once="$wire.loadMore()"></tr>
+                                                        @empty
+                                                            <tr>
+                                                                <p class="text-muted text-center">دستگاهی یافت نشد.</p>
+                                                            </tr>
+                                                        @endforelse
                                                         </tbody>
                                                     </table>
                                                 </div>
@@ -247,6 +239,10 @@
     <link rel="stylesheet" href="{{ asset('assets/libs/leaflet/routing-machine/leaflet-routing-machine.css') }}">
     </link>
     <script src="{{ asset('assets/libs/leaflet/routing-machine/leaflet-routing-machine.min.js') }}"></script>
+<!-- // track player assets  -->
+<script src="{{ asset('assets/libs/leaflet/track-player/leaflet-trackplayer.umd.cjs') }}"></script>
+<script src="{{ asset('assets/libs/leaflet/track-player/rotatedMarker.js') }}"></script>
+<script src="{{ asset('assets/libs/leaflet/track-player/turf.min.js') }}"></script>
 
 
     <!-- // Others assets  -->
@@ -382,16 +378,16 @@
                 });
 
 
-                this.trackPlayer = new L.TrackPlayer(this.track, {
-                    speed: 600 * this.currentSpeed,
-                    markerIcon: L.divIcon({
-                        html: `<div><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" fill="#0D311B" viewBox="0 0 29 29" xml:space="preserve" width="29" height="29"><style>.st3{fill:#0d311b}</style><path style="fill:#031108" d="M29 14.5A14.5 14.5 0 0 1 14.5 29 14.5 14.5 0 0 1 0 14.5a14.5 14.5 0 0 1 29 0"/><g style="opacity:.2"><path class="st3" d="M14.5 7.613 7.975 22.294l6.525-3.263 6.525 3.263z"/><path class="st3" d="M21.025 22.883c-.091 0-.181 0-.272-.045L14.5 19.711l-6.253 3.127c-.227.136-.498.091-.68-.091s-.227-.453-.136-.68l6.525-14.636a.589.589 0 0 1 1.088 0l6.525 14.636a.63.63 0 0 1-.136.68q-.204.136-.408.136M14.5 18.397c.091 0 .181 0 .272.045l4.984 2.492L14.5 9.153 9.244 20.98l4.984-2.492c.091-.045.181-.091.272-.091"/></g><path style="fill:#fff;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10" d="M14.5 6.797 8.111 21.161l6.389-3.217 6.389 3.217z"/></svg></div>`,
-                        className: 'custom-marker',
-                        iconSize: [32, 32],
-                    }),
-                    markerRotation: true,
-                    markerRotationOrigin: 'center'
-                }).addTo(this.map);
+            this.trackPlayer = new L.TrackPlayer(this.track, {
+                speed: 600 * this.currentSpeed,
+                markerIcon: L.divIcon({
+                    html: `<div><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" x="0" y="0" fill="#0D311B" viewBox="0 0 29 29" xml:space="preserve" width="29" height="29"><style>.st3{fill:#0d311b}</style><path style="fill:#031108" d="M29 14.5A14.5 14.5 0 0 1 14.5 29 14.5 14.5 0 0 1 0 14.5a14.5 14.5 0 0 1 29 0"/><g style="opacity:.2"><path class="st3" d="M14.5 7.613 7.975 22.294l6.525-3.263 6.525 3.263z"/><path class="st3" d="M21.025 22.883c-.091 0-.181 0-.272-.045L14.5 19.711l-6.253 3.127c-.227.136-.498.091-.68-.091s-.227-.453-.136-.68l6.525-14.636a.589.589 0 0 1 1.088 0l6.525 14.636a.63.63 0 0 1-.136.68q-.204.136-.408.136M14.5 18.397c.091 0 .181 0 .272.045l4.984 2.492L14.5 9.153 9.244 20.98l4.984-2.492c.091-.045.181-.091.272-.091"/></g><path style="fill:#fff;stroke:#fff;stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10" d="M14.5 6.797 8.111 21.161l6.389-3.217 6.389 3.217z"/></svg></div>`,
+                    className: 'custom-marker',
+                    iconSize: [32, 32],
+                }),
+                markerRotation: true,
+                markerRotationOrigin: 'center'
+            }).addTo(this.map);
 
                 this.setupTrackPlayerEvents();
             },

@@ -202,7 +202,7 @@ class DeviceController extends BaseController
         $deviceManager = new DeviceManager($device);
         $deviceBrand = $deviceManager->getDevice($device->brand->value);
         $command = $deviceBrand->getCommand($request->command, $params);
-
+dd($command);
 
         $sms = new SmsService();
         $sms->setTo($device->phone_number);
