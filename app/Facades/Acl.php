@@ -6,10 +6,10 @@ namespace App\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static authorize(string $permission, $entity = null)
- * @method static hasRole(array $roles)
- * @method static hasPermission(string $permission)
- * @method static getRole()
+ * @method authorize(string $permission, $entity = null)
+ * @method hasRole(array $roles)
+ * @method hasPermission(string $permission)
+ * @method getRole()
  */
 class Acl extends Facade
 {

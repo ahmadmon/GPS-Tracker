@@ -187,22 +187,22 @@ class MapPage extends Component
             ->get()
             ->groupBy('device_id')
             ->map(function ($records) {
-                $first = $records->first();
-                $last = $records->last();
+                // $first = $records->first();
+                // $last = $records->last();
 
-                if ($first && $last) {
-                    $distance = calculateHaversineDistance(
-                        $first->lat,
-                        $first->long,
-                        $last->lat,
-                        $last->long
-                    );
+                // if ($first && $last) {
+                //     $distance = calculateHaversineDistance(
+                //         $first->lat,
+                //         $first->long,
+                //         $last->lat,
+                //         $last->long
+                //     );
 
-                    return $records->map(function ($record) use ($distance) {
-                        $record->distance = $distance;
-                        return $record;
-                    });
-                }
+                //     return $records->map(function ($record) use ($distance) {
+                //         $record->distance = $distance;
+                //         return $record;
+                //     });
+                // }
 
                 return $records->map(function ($record) {
                     $record->distance = 0;
