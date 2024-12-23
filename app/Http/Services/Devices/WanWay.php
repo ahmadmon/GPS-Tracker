@@ -86,6 +86,8 @@ class WanWay implements DeviceInterface
         //if is Login Packet data then send a Response to device
         if ($protocolNumber == '01') {
             return hex2bin("{$startBit}05{$protocolNumber}0001D9DC0D0A");
+        } elseif ($protocolNumber == '13') {
+            return hex2bin("{$startBit}05{$protocolNumber}0001E9F10D0A");
         }
         //if is not Location Packet data then return null
         if (!in_array($protocolNumber, ['12', '16', '22'])) {
