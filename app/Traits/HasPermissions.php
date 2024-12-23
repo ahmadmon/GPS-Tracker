@@ -104,6 +104,8 @@ trait HasPermissions
                 return $this->id === $entityId;
             }
 
+            if ($this->id === $entityId) return true;
+
             return $this->subsets()->contains('id', $entityId);
 
         } elseif ($this->hasRole(['user'])) {

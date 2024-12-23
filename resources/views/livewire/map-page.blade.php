@@ -506,7 +506,7 @@
             let self = this;
             this.map = Alpine.store('map').initMap();
             // if (this.map && this.map.project) {
-                L.control.layers(this.baseMaps, null, {position: 'topright').addTo(this.map);
+                L.control.layers(this.baseMaps, null, {position: 'topright'}).addTo(this.map);
             // }
 
             this.map.createPane('data-point');
