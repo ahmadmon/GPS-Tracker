@@ -105,7 +105,7 @@
                             @endif
                         </div>
 
-                        <div class="col-12 mb-3" x-cloak x-show="[0,1,3].includes(parseInt(selected))">
+                        <div class="col-12 mb-3" x-cloak x-show="[0,1].includes(parseInt(selected))">
                         <label class="form-label" for="user_id">عضو سازمان
                             <sup class="text-danger">*</sup>
                         </label>

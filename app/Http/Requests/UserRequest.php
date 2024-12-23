@@ -46,7 +46,7 @@ class UserRequest extends FormRequest
 
         } else {
             $rules['user_type'] = 'required|numeric|in:0,1,2,3';
-            $rules['company_id'] = $isStoreRoute ? 'nullable|required_if:user_type,0|required_if:user_type,1|required_if:user_type,3|numeric|exists:companies,id' : 'nullable|numeric|exists:companies,id';
+            $rules['company_id'] = $isStoreRoute ? 'nullable|required_if:user_type,0|required_if:user_type,1|numeric|exists:companies,id' : 'nullable|numeric|exists:companies,id';
 
         }
 
