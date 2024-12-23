@@ -16,7 +16,7 @@
 {{--        </form>--}}
         <div class="header-logo-wrapper col-auto p-0">
             <div class="logo-wrapper"><a href="{{ route('home') }}"><img class="img-fluid" width="30"
-                                                                         src="{{ asset('assets/images/logo/Economic_Security_Police_of_Iran-logo.png') }}"
+                                                                         src="{{ asset('assets/images/logo/samfa-logo.png') }}"
                                                                          alt="سمفا - سامانه هوشمند ردیابی پلیس امنیت اقتصادیGPS"></a></div>
             <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i>
             </div>
@@ -24,7 +24,7 @@
         <div class="left-header col-xxl-5 col-xl-6 col-lg-5 col-md-4 col-sm-3 p-0">
             <div class="notification-slider">
                 <div class="d-flex h-100">
-                    <h6 class="mb-0 f-w-400"><span class="f-light">سمفا - سامانه هوشمند ردیابی پلیس امنیت اقتصادی</span></h6>
+                    <h6 class="mb-0 f-w-400"><span class="f-light">سمفا - سامانه هوشمند ردیابی GPS</span></h6>
                 </div>
             </div>
         </div>

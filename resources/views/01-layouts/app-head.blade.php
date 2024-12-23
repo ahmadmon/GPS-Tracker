@@ -3,13 +3,21 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description"
-          content="Cuba admin is super flexible, powerful, clean &amp; modern responsive bootstrap 5 admin template with unlimited possibilities.">
+          content="سمفا یک سامانه جامع و قدرتمند برای ردیابی و مدیریت دستگاه‌های GPS است. با استفاده از سمفا، می‌توانید به صورت آنلاین و دقیق موقعیت دستگاه‌های خود را ردیابی کرده و از آن‌ها مدیریت کنید.">
     <meta name="keywords"
-          content="admin template, Cuba admin template, dashboard template, flat admin template, responsive admin template, web app">
-    <meta name="author" content="pixelstrap">
-    <link rel="icon" href="{{ asset('assets/images/logo/favicon.ico')}}" type="image/x-icon">
-    <link rel="shortcut icon" href="{{ asset('assets/images/logo/favicon-32x32.png')}}" type="image/x-icon">
-    <title>{{ $title ?? 'عنوان صحنه' }}</title>
+          content="سامانه ردیابی GPS, ردیابی خودرو, ردیابی آنلاین, مدیریت ناوگان, GPS, سمفا, ردیابی دستگاه, نظارت بر ناوگان, افزایش بهره‌وری, امنیت ناوگان, سامانه سازمانی, نرم افزار ردیابی, اپلیکیشن ردیابی,Gps Tracker">
+    <meta property="og:title" content="سمفا - سامانه هوشمند ردیابی GPS">
+    <meta property="og:description" content="سمفا یک سامانه جامع و قدرتمند برای ردیابی و مدیریت دستگاه‌های GPS است.">
+    <meta property="og:url" content="https://samfa.aronict.com">
+    <meta lang="fa_IR">
+    <meta name="robots" content="index, follow">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/images/logo/favicon/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/images/logo/favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/images/logo/favicon/favicon-16x16.png') }}">
+    <link rel="icon" href="{{ asset('assets/images/logo/favicon/favicon.ico') }}" type="image/x-icon">
+    <link rel="shortcut icon" href="{{ asset('assets/images/logo/favicon/favicon.ico') }}" type="image/x-icon">
+    <link rel="manifest" href="{{ asset('assets/images/logo/favicon/site.webmanifest') }}">
+    <title>{{ $title ?? 'سامانه هوشمند ردیابی GPS' }} - سمفا</title>
     <!-- Google font-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/font-awesome.css')}}">
     <!-- ico-font-->

@@ -9,19 +9,19 @@
 @section('content')
     <div class="row m-0">
         <div class="col-xl-7 p-0">
-            <img class="bg-img-cover bg-center" src="{{ asset('assets/images/login/login-bg.png') }}" alt="صفحه ورود"></div>
+            <img class="bg-img-cover bg-center" src="{{ asset('assets/images/login/gps-vector.svg') }}" alt="صفحه ورود"></div>
         <div class="col-xl-5 p-0">
             <div class="login-card login-dark">
                 <div>
                     <div class="d-flex justify-content-start align-items-center">
                         <a class="logo text-start me-2" href="javascript:void(0)">
                             <img class="img-fluid for-light" width="50"
-                                 src="{{ asset('assets/images/logo/Economic_Security_Police_of_Iran-logo.png') }}"
+                                 src="{{ asset('assets/images/logo/samfa-logo.png') }}"
                                  alt="صفحه ورود">
-                            <img class="img-fluid for-dark" width="50" src="{{ asset('assets/images/logo/Economic_Security_Police_of_Iran-logo.png') }}"
+                            <img class="img-fluid for-dark" width="50" src="{{ asset('assets/images/logo/samfa-logo.png') }}"
                                  alt="صفحه ورود">
                         </a>
-                        <h3 class="fw-bold pb-4 auth-title">سَمـفـا - پلیس امنیت اقتصادی</h3>
+                        <h3 class="fw-bold pb-4 auth-title">سَمـفـا - سامانه هوشمند ردیابی GPS</h3>
                     </div>
                     <div class="login-main">
                         <form action="{{ route('login') }}" class="theme-form" method="POST" autocomplete="off"

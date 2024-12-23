@@ -234,6 +234,10 @@ section.leaflet-control-layers-list div.leaflet-control-layers-base label:nth-ch
     background-color: #e2e2e2;
 }
 
+section.leaflet-control-layers-list div.leaflet-control-layers-base label span span {
+    padding-right: 5px;
+}
+
 
 /* Custom Range Slider */
 

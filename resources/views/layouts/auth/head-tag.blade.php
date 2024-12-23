@@ -4,13 +4,18 @@
 <meta name="description"
       content="سمفا یک سامانه جامع و قدرتمند برای ردیابی و مدیریت دستگاه‌های GPS است. با استفاده از سمفا، می‌توانید به صورت آنلاین و دقیق موقعیت دستگاه‌های خود را ردیابی کرده و از آن‌ها مدیریت کنید.">
 <meta name="keywords"
-      content="سامانه ردیابی GPS, ردیابی خودرو, ردیابی آنلاین, مدیریت ناوگان, GPS, سمفا, ردیابی دستگاه, نظارت بر ناوگان, افزایش بهره‌وری, امنیت ناوگان, سامانه سازمانی, نرم افزار ردیابی, اپلیکیشن ردیابی">
+      content="سامانه ردیابی GPS, ردیابی خودرو, ردیابی آنلاین, مدیریت ناوگان, GPS, سمفا, ردیابی دستگاه, نظارت بر ناوگان, افزایش بهره‌وری, امنیت ناوگان, سامانه سازمانی, نرم افزار ردیابی, اپلیکیشن ردیابی,Gps Tracker">
 <meta property="og:title" content="سمفا - سامانه هوشمند ردیابی GPS">
 <meta property="og:description" content="سمفا یک سامانه جامع و قدرتمند برای ردیابی و مدیریت دستگاه‌های GPS است.">
-{{--<meta property="og:url" content="https://samfatrack.ir">--}}
-<meta lang="fa">
-<link rel="icon" href="{{ asset('assets/images/logo/favicon.ico') }}" type="image/x-icon">
-<link rel="shortcut icon" href="{{ asset('assets/images/logo/favicon.ico') }}" type="image/x-icon">
+<meta property="og:url" content="https://samfa.aronict.com">
+<meta lang="fa_IR">
+<meta name="robots" content="index, follow">
+<link rel="apple-touch-icon" sizes="180x180" href="{{ asset('assets/images/logo/favicon/apple-touch-icon.png') }}">
+<link rel="icon" type="image/png" sizes="32x32" href="{{ asset('assets/images/logo/favicon-32x32.png') }}">
+<link rel="icon" type="image/png" sizes="16x16" href="{{ asset('assets/images/logo/favicon/favicon-16x16.png') }}">
+<link rel="icon" href="{{ asset('assets/images/logo/favicon/favicon.ico') }}" type="image/x-icon">
+<link rel="shortcut icon" href="{{ asset('assets/images/logo/favicon/favicon.ico') }}" type="image/x-icon">
+<link rel="manifest" href="{{ asset('assets/images/logo/favicon/site.webmanifest') }}">
 <title>@yield('title', 'سمفا - احراز هویت')</title>
 <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/font-awesome.css') }}">
 <!-- ico-font-->
