@@ -6,7 +6,7 @@ use App\Http\Requests\ChangeUserPasswordRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
-class profileController extends Controller
+class ProfileController extends Controller
 {
     public function index()
     {
