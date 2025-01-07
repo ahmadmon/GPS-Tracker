@@ -2,14 +2,16 @@
 
 namespace App\Console\Commands;
 
-use App\Http\Services\DeviceManager;
-use App\Jobs\StoreGpsDataJob;
 use Exception;
+use Workerman\Worker;
+use App\Jobs\StoreGpsDataJob;
 use Illuminate\Console\Command;
+use App\Http\Services\DeviceManager;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Symfony\Component\Process\Process;
+use Log;
 use Workerman\Connection\TcpConnection;
-use Workerman\Worker;
 
 class GpsTcpServer extends Command
 {
@@ -86,7 +88,6 @@ class GpsTcpServer extends Command
                     StoreGpsDataJob::dispatch($parsedData['data']);
                     $this->info('Data Inserted to Database.');
                 }
-
             } catch (Exception $e) {
                 $this->error('Error parsing data: ' . $e->getMessage());
             }
@@ -106,8 +107,40 @@ class GpsTcpServer extends Command
 
     protected function stopServer(): void
     {
-        Worker::stopAll();
-        $this->info("Server stopped.\n");
+        try {
+            $pidFile = storage_path('logs/pidfile.pid');
+
+            // Check if PID file exists
+            if (!file_exists($pidFile)) {
+                $this->info("PID File not Found.\n");
+            }
+
+            // Read PID from file
+            $pid = trim(file_get_contents($pidFile));
+
+            if (empty($pid)) {
+                $this->info("PID file is empty.\n");
+            }
+
+            // Create the sudo kill command
+            $process = new Process(['sudo', '-S', 'kill', '-9', $pid]);
+            $process->setInput("2SwL3uxlnrrcHX3\n"); // Pass sudo password
+
+            $process->run();
+
+            if ($process->isSuccessful()) {
+                // Try to remove the PID file
+                @unlink($pidFile);
+
+                $this->info("Gps Server with PID {$pid} successfully terminated.\n");
+            }
+
+
+            $this->info("Failed to terminate Gps Server: ' . {$process->getErrorOutput()}\n");
+        } catch (Exception $e) {
+            Log::error('Error stopping server: ' . $e->getMessage());
+            $this->info("error message: {$e->getMessage()}\n");
+        }
     }
 
     protected function restartServer($isDaemon): void
@@ -175,5 +208,4 @@ class GpsTcpServer extends Command
 
         return null;
     }
-
 }
