@@ -153,6 +153,8 @@ class MapPage extends Component
             ->get()
             ->keyBy('device_id')
             ->toArray();
+
+        $this->dispatch('locationUpdated');
     }
 
 

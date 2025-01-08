@@ -60,7 +60,7 @@
                                                         }
                                                     }
                                                 }">
-                                                    <table class="table mt-5">
+                                                    <table class="table mt-5" @if($onlineMode) wire:poll.4s.keep-alive @endif>
                                                         <tbody>
                                                             <tr>
                                                                 <td @class([
@@ -202,7 +202,7 @@
                     <div @appear-waypoints.window="showWaypoints(trips)"></div>
                     <div class="map-js-height" x-ref="map" id="map"></div>
 
-                    <div wire:loading>
+                    <div id="spinner-loader" wire:loading wire:target="updatedSelected, updateDeviceLocation, handleTrip, loadMore, changeMode">
                         <div class="bg-loader">
                             <div class="loader"></div>
                         </div>
@@ -484,11 +484,10 @@
 
         // Map
         //------------------------------------------------------
-        Alpine.data('mapComponent', (el) => ({
+        Alpine.data('mapComponent', () => ({
             map: null,
             baseMaps: baseMaps,
-            currentZoom: 16,
-            control: null,
+            currentZoom: 16,control: null,
             markers: {},
             savedMarkers: {},
             drownGeofences: {},
@@ -508,6 +507,7 @@
                 L.control.layers(this.baseMaps, null, {
                     position: 'topright'
                 }).addTo(this.map);
+
 
                 this.map.createPane('data-point');
                 this.map.getPane('data-point').style.zIndex = 650;
@@ -593,9 +593,9 @@
 
                 setInterval(() => {
                     if ($wire.onlineMode) {
-                        self.updateLocations($wire.deviceLocations);
+                        $wire.on('locationUpdated', () => this.updateLocations($wire.deviceLocations));
                     }
-                }, 10000)
+                }, 4000)
             },
 
             // Handle The Devices live location
@@ -694,8 +694,8 @@
             </p>
             ${data.distance ?
                 `<p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
-                                                                                                                                                                                                                                                                                                                                                <span style="margin-left: 5px"><i class="fa fa-solid fa-flag-checkered"></i></span> ${data.distance} کیلومتر
-                                                                                                                                                                                                                                                                                                                                            </p>`
+                                                                                                                                                                                                                                                                                                                                        <span style="margin-left: 5px"><i class="fa fa-solid fa-flag-checkered"></i></span> ${data.distance} کیلومتر
+                                                                                                                                                                                                                                                                                                                                    </p>`
                 : ''
             }
         `;
@@ -808,6 +808,7 @@
             // Handle The Devices trips
             //-----------------------------------
             showWaypoints(trips) {
+
                 const startIcon = L.icon({
                     iconUrl: '{{ asset('assets/libs/leaflet/images/map-start.svg') }}',
                     iconSize: [32, 32],
@@ -1028,7 +1029,7 @@
                     mode: "range",
                     enableTime: true,
                     time_24hr: true,
-                    defaultDate: ["1403/08/01"],
+
                     locale: "fa",
                     altInput: true,
                     altFormat: 'Y/m/d - H:i',
