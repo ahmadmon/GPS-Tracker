@@ -31,12 +31,13 @@ class RemoveSubsets extends Component
 
     public function render()
     {
-        $selectedUsers = $this->company->users()
+         $selectedUsers = $this->company->users()
             ->withCount(['vehicles', 'devices'])
-            ->whereLike('name', "%{$this->search}%")
-            ->orWhereLike('phone', "%{$this->search}%")
+            ->when(!empty($this->search), fn($q) =>
+            $q->whereLike('name', "%{$this->search}%")
+                ->orWhereLike('phone', "%{$this->search}%"))
             ->orderByDesc('created_at')
-            ->paginate($this->perPage);
+        ->paginate($this->perPage);
 
         return view('livewire.company.remove-subsets', [
             'selectedUsers' => $selectedUsers

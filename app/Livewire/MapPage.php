@@ -74,39 +74,48 @@ class MapPage extends Component
     {
         $user = auth()->user();
         $role = Acl::getRole();
+
+        $query = null;
         if ($role === 'user') {
-            return $user->devices()
+            $query = $user->devices()
                 ->with(['user', 'vehicle'])
                 ->where('status', 1)
                 ->when($this->search !== '', function ($q) {
                     $q->whereLike('name', "%{$this->search}%")
-                        ->orWhereLike('serial', "%{$this->search}%");
+                        ->orWhereLike('serial', "%{$this->search}%")
+                        ->orWhereHas('user', fn($query) => $query->whereLike('name', "%{$this->search}%"));
                 })
                 ->orderByDesc('connected_at')
-                ->take($this->take)
-                ->cursor();
+                ->take($this->take);
 
         } elseif ($role === 'manager') {
-            return Device::whereIn('user_id', $user->subsets()->pluck('id')->merge([$user->id]))
+            $query = Device::whereIn('user_id', $user->subsets()->pluck('id')->merge([$user->id]))
                 ->with(['user', 'vehicle'])
                 ->where('status', 1)
                 ->when($this->search !== '', function ($q) {
                     $q->whereLike('name', "%{$this->search}%")
-                        ->orWhereLike('serial', "%{$this->search}%");
+                        ->orWhereLike('serial', "%{$this->search}%")
+                        ->orWhereHas('user', fn($query) => $query->whereLike('name', "%{$this->search}%"));
                 })
                 ->orderByDesc('connected_at')
-                ->take($this->take)
-                ->cursor();
+                ->take($this->take);
         } else {
-            return Device::with(['vehicle', 'user'])
+            $query = Device::with(['vehicle', 'user'])
                 ->where('status', 1)
                 ->when($this->search !== '', function ($q) {
-                    $q->whereLike('name', "%{$this->search}%")->orWhereLike('serial', "%{$this->search}%");
+                    $q->whereLike('name', "%{$this->search}%")
+                        ->orWhereLike('serial', "%{$this->search}%")
+                        ->orWhereHas('user', fn($query) => $query->whereLike('name', "%{$this->search}%"));
                 })
                 ->orderByDesc('connected_at')
-                ->take($this->take)
-                ->cursor();
+                ->take($this->take);
         }
+
+        $devices = $query->cursor();
+
+        $this->selected = $devices->count() === 1 ? [$devices->first()->id] : $this->selected;
+
+        return $devices;
     }
 
     public function refreshMap(): void

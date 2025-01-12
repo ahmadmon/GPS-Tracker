@@ -617,7 +617,8 @@
 
                     const status = this.getMarkerStatus(data);
                     const marker = L.marker(position, {
-                        icon: this.createCustomIcon(status, parseFloat(JSON.parse(data.device_stats)?.direction))
+                        icon: this.createCustomIcon(status, parseFloat(JSON.parse(data
+                            .device_stats)?.direction))
                     }).bindPopup(this.createPopupContent(data));
 
                     this.markers[deviceId] = marker;
@@ -694,8 +695,8 @@
             </p>
             ${data.distance ?
                 `<p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
-                                                                                                                                                                                                                                                                                                                                                <span style="margin-left: 5px"><i class="fa fa-solid fa-flag-checkered"></i></span> ${data.distance} کیلومتر
-                                                                                                                                                                                                                                                                                                                                            </p>`
+                                                                                                                                                                                                                                                                                                                                                        <span style="margin-left: 5px"><i class="fa fa-solid fa-flag-checkered"></i></span> ${data.distance} کیلومتر
+                                                                                                                                                                                                                                                                                                                                                    </p>`
                 : ''
             }
         `;
@@ -1028,7 +1029,6 @@
                     mode: "range",
                     enableTime: true,
                     time_24hr: true,
-                    defaultDate: ["1403/08/01"],
                     locale: "fa",
                     altInput: true,
                     altFormat: 'Y/m/d - H:i',
