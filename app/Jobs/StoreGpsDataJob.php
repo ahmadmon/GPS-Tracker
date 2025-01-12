@@ -32,15 +32,18 @@ class StoreGpsDataJob implements ShouldQueue
     public function handle(): void
     {
         try {
+            $now = Carbon::now();
+
             $device = Device::where('serial', $this->data['device_id'])->first();
 
             if ($device) {
-                $trip = DB::transaction(function () use ($device) {
+                $device->update(['connected_at' => $now]);
+                $trip = DB::transaction(function () use ($device, $now) {
                     return Trip::create([
                         'device_id' => $device->id,
                         'user_id' => $device->user_id,
                         'vehicle_id' => $device?->vehicle_id,
-                        'name' => jalaliDate(Carbon::now(), format: 'Y/m/d H:i:s'),
+                        'name' => jalaliDate($now, format: 'Y/m/d H:i:s'),
                         'lat' => $this->data['lat'],
                         'long' => $this->data['long'],
                         'device_stats' => json_encode($this->data),
