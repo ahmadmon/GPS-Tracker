@@ -60,7 +60,8 @@
                                                         }
                                                     }
                                                 }">
-                                                    <table class="table mt-5" @if($onlineMode) wire:poll.4s.keep-alive @endif>
+                                                    <table class="table mt-5"
+                                                        @if ($onlineMode) wire:poll.4s.keep-alive @endif>
                                                         <tbody>
                                                             <tr>
                                                                 <td @class([
@@ -202,7 +203,8 @@
                     <div @appear-waypoints.window="showWaypoints(trips)"></div>
                     <div class="map-js-height" x-ref="map" id="map"></div>
 
-                    <div id="spinner-loader" wire:loading wire:target="updatedSelected, updateDeviceLocation, handleTrip, loadMore, changeMode">
+                    <div id="spinner-loader" wire:loading
+                        wire:target="updatedSelected, updateDeviceLocation, handleTrip, loadMore, changeMode">
                         <div class="bg-loader">
                             <div class="loader"></div>
                         </div>
@@ -487,8 +489,10 @@
         Alpine.data('mapComponent', () => ({
             map: null,
             baseMaps: baseMaps,
-            currentZoom: 16,control: null,
+            currentZoom: 16,
+            control: null,
             markers: {},
+            // followerLine: {},
             savedMarkers: {},
             drownGeofences: {},
             drawnWaypoints: {},
@@ -621,8 +625,16 @@
                             .device_stats)?.direction))
                     }).bindPopup(this.createPopupContent(data));
 
+                    // const pathCoordinates = [position]
+                    // const followerLine = L.polyline(pathCoordinates, {
+                    //     color: 'green'
+                    // });
+                    //
                     this.markers[deviceId] = marker;
+                    // this.followerLine[deviceId] = followerLine;
                     marker.addTo(this.map);
+                    // followerLine.addTo(this.map)
+                    //
                     bounds.extend(position);
                 });
 
@@ -695,8 +707,8 @@
             </p>
             ${data.distance ?
                 `<p style="margin: 0 !important; padding: 3px 0 3px 20px !important; white-space: nowrap; vertical-align: middle !important; text-align: right">
-                                                                                                                                                                                                                                                                                                                                        <span style="margin-left: 5px"><i class="fa fa-solid fa-flag-checkered"></i></span> ${data.distance} کیلومتر
-                                                                                                                                                                                                                                                                                                                                    </p>`
+                                                                                                                                                                                                                                                                                                                                                    <span style="margin-left: 5px"><i class="fa fa-solid fa-flag-checkered"></i></span> ${data.distance} کیلومتر
+                                                                                                                                                                                                                                                                                                                                                </p>`
                 : ''
             }
         `;
