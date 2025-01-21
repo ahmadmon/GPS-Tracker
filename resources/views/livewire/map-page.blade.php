@@ -379,10 +379,12 @@
         },
 
         prepareTrack(deviceLocations) {
-            this.track = deviceLocations.at(-1).map(location => [
-                parseFloat(location.lat),
-                parseFloat(location.long)
-            ]);
+            if (deviceLocations.length > 0) {
+                this.track = deviceLocations.at(-1).map(location => [
+                    parseFloat(location.lat),
+                    parseFloat(location.long)
+                ]);
+            }
         },
 
         initMap() {
@@ -399,8 +401,6 @@
                     className: 'custom-marker',
                     iconSize: [32, 32],
                 }),
-                markerRotation: true,
-                markerRotationOrigin: 'center'
             }).addTo(this.map);
 
             this.setupTrackPlayerEvents();
@@ -502,7 +502,7 @@
         drawnWaypoints: {},
         circleMarkers: [],
         trips: null,
-        snapMode: true,
+        snapMode: false,
         dirMode: false,
         routeDecorator: null,
         totalDistance: [],
@@ -894,12 +894,30 @@
             this.circleMarkers = []; // Array to store circle markers
 
             trips.forEach((trip, i) => {
-                const routeCoords = trip.map(coord => [parseFloat(coord.lat), parseFloat(coord
-                    .long)]);
-                let polyline, snapedRoute;
+                const chunkSize = 500;
+                const routeChunks = [];
+                for (let j = 0; j < trip.length; j += chunkSize) {
+                    routeChunks.push(trip.slice(j, j + chunkSize));
+                }
+
+                let allRouteCoords = [];
+
+                routeChunks.forEach((chunk, chunkIndex) => {
+                    const routeCoords = chunk.map(coord => [parseFloat(coord.lat), parseFloat(coord.long)]);
+                    allRouteCoords = allRouteCoords.concat(routeCoords);
+
+                    let polyline, snapedRoute;
 
                     if (this.snapMode) {
                         snapedRoute = L.Routing.control({
+                            router: L.Routing.osrmv1({
+                                serviceUrl: 'http://31.214.251.139:8090/route/v1',
+                                profile: 'driving',
+                                routingOptions: {
+                                    alternatives: false,
+                                    continue_straight: true,
+                                }
+                            }),
                             waypoints: routeCoords,
                             waypointMode: 'snap',
                             draggableWaypoints: false,
@@ -912,97 +930,101 @@
                                     opacity: this.snapMode ? 0.9 : 0
                                 }]
                             },
-                            createMarker: function() {},
+                            createMarker: function () {
+                            },
                         }).addTo(this.map);
 
-                    snapedRoute.on('routesfound', (e) => {
-                        const routes = e.routes;
+                        snapedRoute.on('routesfound', (e) => {
+                            const routes = e.routes;
 
-                        if (routes.length > 0) {
-                            if (this.dirMode)
-                                this.addRouteDirection(routes[0].coordinates);
-                        }
+                            if (routes.length > 0) {
+                                if (this.dirMode)
+                                    this.addRouteDirection(routes[0].coordinates);
+                            }
 
-                        // Assign totalDistance to every point in the trip
-                        const totalDistance = (routes[0].summary.totalDistance / 1000)
-                            .toFixed(2);
-                        trip.forEach(point => point.distance = totalDistance);
+                            // Assign totalDistance to every point in the chunk
+                            const totalDistance = (routes[0].summary.totalDistance / 1000).toFixed(2);
+                            chunk.forEach(point => point.distance = totalDistance);
+                        });
 
+                    } else {
+                        polyline = L.polyline(routeCoords, {
+                            color: "#F50A0AFF",
+                            weight: 5,
+                            opacity: !this.snapMode ? 0.9 : 0
+                        }).addTo(this.map);
+
+                        if (this.dirMode)
+                            this.addRouteDirection(polyline.getLatLngs());
+                    }
+
+                    if (polyline) {
+                        this.map.fitBounds(polyline.getBounds(), {
+                            animate: true,
+                            duration: 2
+                        });
+                    }
+
+                    routeCoords.forEach((coord, i) => {
+                        const circle = L.circleMarker(coord, {
+                            radius: 5,
+                            pane: 'data-point',
+                            color: "#3388ff",
+                            fillOpacity: 0.5,
+                        }).addTo(this.map);
+
+                        circle.on('click', (event) => {
+                            this.fetchAddress(coord, (address) => {
+                                L.popup()
+                                    .setLatLng(event.latlng)
+                                    .setContent(this.createPopupContent(chunk[i], address))
+                                    .openOn(this.map);
+                            });
+                        });
+
+                        this.circleMarkers.push(circle);
                     });
 
-                } else {
-                    polyline = L.polyline(routeCoords, {
-                        color: "#F50A0AFF",
-                        weight: 5,
-                        opacity: !this.snapMode ? 0.9 : 0
-                    }).addTo(this.map);
-
-                    if (this.dirMode)
-                        this.addRouteDirection(polyline.getLatLngs());
-
-                    this.map.fitBounds(polyline.getBounds(), {
-                        animate: true,
-                        duration: 1
+                    this.map.on('zoomend', () => {
+                        const currentZoom = this.map.getZoom();
+                        this.circleMarkers.forEach((circle) => {
+                            if (currentZoom >= 10) {
+                                circle.addTo(this.map); // Show circles
+                            } else {
+                                this.map.removeLayer(circle); // Hide circles
+                            }
+                        });
                     });
-                }
 
+                    if (!this.drawnWaypoints[i]) this.drawnWaypoints[i] = {};
+                    this.drawnWaypoints[i][chunkIndex] = {
+                        polyline: polyline,
+                        snapedRoute: snapedRoute
+                    };
+                });
 
-                const startMarker = L.marker(routeCoords[0], {
+                const startMarker = L.marker(allRouteCoords[0], {
                     icon: startIcon,
                     title: 'شروع'
                 }).addTo(this.map);
-                const endMarker = L.marker(routeCoords.at(-1), {
+
+                const endMarker = L.marker(allRouteCoords.at(-1), {
                     icon: endIcon,
                     title: 'پایان'
                 }).addTo(this.map);
 
-                routeCoords.forEach((coord, i) => {
-                    const circle = L.circleMarker(coord, {
-                        radius: 5,
-                        pane: 'data-point',
-                        color: "#3388ff",
-                        fillOpacity: 0.5,
-                    }).addTo(this.map);
-
-                    circle.on('click', (event) => {
-                        this.fetchAddress(coord, (address) => {
-                            L.popup()
-                                .setLatLng(event.latlng)
-                                .setContent(this.createPopupContent(trip[i], address))
-                                .openOn(this.map);
-                        })
-                    });
-
-                    this.circleMarkers.push(circle);
-                });
-
-                this.fetchAddress(routeCoords[0], (startAddress) => {
+                this.fetchAddress(allRouteCoords[0], (startAddress) => {
                     startMarker.bindPopup(this.createPopupContent(trip[0], startAddress));
                 });
 
-                this.fetchAddress(routeCoords.at(-1), (endAddress) => {
+                this.fetchAddress(allRouteCoords.at(-1), (endAddress) => {
                     endMarker.bindPopup(this.createPopupContent(trip.at(-1), endAddress));
                 });
 
 
-                this.map.on('zoomend', () => {
-                    const currentZoom = this.map.getZoom();
-                    this.circleMarkers.forEach((circle) => {
-                        if (currentZoom >= 13) {
-                            circle.addTo(this.map); // Show circles
-                        } else {
-                            this.map.removeLayer(circle); // Hide circles
-                        }
-                    });
-                });
-
-                this.drawnWaypoints[i] = {
-                    polyline: polyline,
-                    snapedRoute: snapedRoute
-                };
                 this.drawnWaypoints[i].markers = {
-                    startMarker,
-                    endMarker,
+                    startMarker: startMarker,
+                    endMarker: endMarker
                 };
             });
         },
@@ -1031,12 +1053,14 @@
 
         removeWayPoints() {
 
-            Object.values(this.drawnWaypoints).forEach((route) => {
-                if (route.polyline) this.map.removeLayer(route.polyline);
-                if (route.snapedRoute) route.snapedRoute.remove();
+            Object.values(this.drawnWaypoints).forEach((waypointGroup) => {
+                Object.values(waypointGroup).forEach((route) => {
+                    if (route.polyline) this.map.removeLayer(route.polyline);
+                    if (route.snapedRoute) route.snapedRoute.remove();
+                });
 
-                if (route.markers) {
-                    Object.values(route.markers).forEach((marker) => {
+                if (waypointGroup.markers) {
+                    Object.values(waypointGroup.markers).forEach((marker) => {
                         if (marker) this.map.removeLayer(marker);
                     });
                 }

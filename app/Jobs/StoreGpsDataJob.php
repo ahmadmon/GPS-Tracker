@@ -41,7 +41,7 @@ class StoreGpsDataJob implements ShouldQueue
                     'lat' => $device->lastLocation()?->lat,
                     'lng' => $device->lastLocation()?->long,
                     'datetime' => $device->lastLocation()?->created_at,
-                    'speed' => $device->lastLocation()?->device_stats['speed']
+                    'speed' => json_decode($device->lastLocation()?->device_stats)['speed']
                 ];
 
                 $currentPoint = [
