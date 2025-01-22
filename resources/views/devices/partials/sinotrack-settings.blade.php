@@ -10,8 +10,8 @@
             <option value="2" @selected(old('command') == 2)>زمانبندی ارسال موقعیت</option>
             <option value="3" @selected(old('command') == 3)>تنظیم رمز عبور</option>
             <option value="4" @selected(old('command') == 4)>معرفی شماره ادمین</option>
-            <option value="5" @selected(old('command') == 5)>بازگردانی دستگاه به حالت کارخانه
-            </option>
+            <option value="5" @selected(old('command') == 5)>بازگردانی دستگاه به حالت کارخانه</option>
+            <option value="6" @selected(old('command') == 6)>سایر دستورات</option>
         </select>
         <x-input-error :messages="$errors->get('command')" class="mt-2"/>
     </div>
@@ -67,6 +67,21 @@
                    value="{{ old('phones.0') }}"
                    placeholder="برای مثال: 09123456789">
             <x-input-error :messages="$errors->get('phones.0')" class="mt-2"/>
+        </div>
+        <!-- Others Command -->
+        <div class="mb-3" x-cloak x-show="parseInt(selected) === 6">
+            <label class="form-label" for="selected-8">دستور مورد نظر را وارد کنید
+                <sup class="text-danger">*</sup>
+            </label>
+            {{--            <small class="text-muted d-block">پاسخ ارسال‌شده از سوی دستگاه به شماره‌ای که به‌عنوان شماره اضطراری (SOS) ثبت شده است، ارسال خواهد شد.</small>--}}
+            <div>
+                <input class="form-control" id="selected-8" name="other" type="text"
+                       style="text-transform: uppercase"
+                       value="{{ old('other') }}"
+                       dir="ltr"
+                       placeholder="COMMAND">
+            </div>
+            <x-input-error :messages="$errors->get('other')" class="mt-2"/>
         </div>
     </section>
 </div>

@@ -23,7 +23,7 @@ class StoreSmsRequest extends FormRequest
     public function rules(): array
     {
         $rules = [
-            'command' => 'required|in:0,1,2,3,4,5,6,7',
+            'command' => 'required|in:0,1,2,3,4,5,6,7,8',
             'apn' => 'nullable|required_if:command,1|string',
             'interval' => 'nullable|required_if:command,2|numeric|min:10',
             'passStatus' => 'nullable|in:false,on',
@@ -31,6 +31,7 @@ class StoreSmsRequest extends FormRequest
             'phones' => 'nullable|required_if:command,5|required_if:command,6|array|max:2',
             'phones.0' => 'nullable|required_if:command,5|required_if:command,6|numeric|digits:11',
             'phones.1' => 'nullable|numeric|digits:11',
+            'other' => 'nullable|required_if:command,8|string|regex:/^[A-Za-z0-9,]+$/'
         ];
         if ($this->device->brand === DeviceBrand::SINOTRACK) {
             $rules['password'] = 'nullable|required_if:command,4|numeric|digits:4';
@@ -50,7 +51,8 @@ class StoreSmsRequest extends FormRequest
             'password' => 'رمز عبور',
             'passStatus' => 'وضعیت رمزعبور',
             'phones' => 'شماره تماس ادمین',
-            'phones.*' => 'شماره تماس ادمین'
+            'phones.*' => 'شماره تماس ادمین',
+            'other' => 'سایر دستورات'
         ];
     }
 
@@ -68,6 +70,8 @@ class StoreSmsRequest extends FormRequest
             'passStatus.required_if' => "فیلد :attribute الزامی میباشد.",
             'phones.required_if' => "فیلد :attribute الزامی میباشد.",
             'phones.*.required_if' => "فیلد :attribute الزامی میباشد.",
+            'other.required_if' => "فیلد :attribute الزامی میباشد.",
+            'other.regex' => 'مقدار وارد شده باید فقط شامل حروف و اعداد انگلیسی، و علامت کاما (,) باشد. استفاده از سایر عبارات مجاز نیست.',
         ];
     }
 }

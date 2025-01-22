@@ -42,6 +42,7 @@ class ConCox implements DeviceInterface
         // 5 => set Admin Number
         // 6 => delete Admin Number
         // 7 => Hard Reset Factory
+        // 7 => Other Commands
         $commands = [
             '0' => $hasPass ? "SERVER,{$this->password},0,{$this->ip},{$this->port},0#" : "SERVER,0,{$this->ip},{$this->port},0#",
             '1' => $hasPass ? "APN,{$this->password},{apn}#" : "APN,{apn}#",
@@ -51,6 +52,7 @@ class ConCox implements DeviceInterface
             '5' => $hasPass ? "SOS,{$this->password},A,{phones},{$meliPayamakNumber}#" : "SOS,A,{phones},{$meliPayamakNumber}#",
             '6' => $hasPass ? "SOS,{$this->password},D,{phones}#" : "SOS,D,{phones}#",
             '7' => $hasPass ? "FACTORY,{$this->password},#" : "FACTORY#",
+            '8' => $hasPass ? "{other},{$this->password},#" : "{other}#",
         ];
 
         $commandTemplate = $commands[$commandKey] ?? null;
