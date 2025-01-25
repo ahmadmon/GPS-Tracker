@@ -15,7 +15,7 @@ class Location extends ResourceAbstract
     {
         return [
             'message', 'serial', 'type', 'lat', 'long', 'speed',
-            'signal', 'direction', 'datetime', 'timezone', 'data', 'response',
+            'signal', 'direction', 'datetime', 'data', 'response',
         ];
     }
     /**
@@ -102,14 +102,6 @@ class Location extends ResourceAbstract
      * @return ?string
      */
     public function datetime(): ?string
-    {
-        return $this->attribute(__FUNCTION__);
-    }
-
-    /**
-     * @return ?string
-     */
-    public function timezone(): ?string
     {
         return $this->attribute(__FUNCTION__);
     }

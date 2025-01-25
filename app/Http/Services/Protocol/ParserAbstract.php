@@ -4,6 +4,7 @@ namespace App\Http\Services\Protocol;
 
 use App\Http\Services\Protocol\Resource\Auth as ResourceAuth;
 use App\Http\Services\Protocol\Resource\HeartBeat as ResourceHeartBeat;
+use App\Http\Services\Protocol\Resource\Location as ResourceLocation;
 use App\Http\Services\Protocol\Resource\ResourceAbstract;
 
 abstract class ParserAbstract
@@ -19,14 +20,17 @@ abstract class ParserAbstract
     protected array $resources = [];
 
     /**
+     * @var array
+     */
+    protected array $cache = [];
+
+    /**
      * @param string $message
      * @param array $data = []
      *
      * @return void
      */
-    public function __construct(protected string $message, protected array $data = [])
-    {
-    }
+    public function __construct(protected string $message, protected array $data = []) {}
 
     /**
      * @return array<ResourceAbstract>
@@ -95,6 +99,26 @@ abstract class ParserAbstract
         return new ResourceHeartbeat([
             'message' => $this->message(),
             'device_id' => $this->serial(),
+            'data' => $this->data(),
+            'response' => $this->response(),
+        ]);
+    }
+
+
+    /**
+     * @return ResourceLocation
+     */
+    protected function resourceLocation(): ResourceLocation
+    {
+        return new ResourceLocation([
+            'message' => $this->message(),
+            'device_id' => $this->serial(),
+            'lat' => $this->latitude(),
+            'long' => $this->longitude(),
+            'speed' => $this->speed(),
+            'signal' => $this->signal(),
+            'direction' => $this->direction(),
+            'datetime' => $this->datetime(),
             'data' => $this->data(),
             'response' => $this->response(),
         ]);
