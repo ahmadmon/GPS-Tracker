@@ -15,7 +15,8 @@
         "livewire/livewire": "^3.5",
         "melipayamak/laravel": "1.0.0",
         "morilog/jalali": "3.*",
-        "workerman/workerman": "^4.1"
+        "workerman/workerman": "^4.1",
+        "ext-http": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

@@ -14,7 +14,7 @@ class Location extends ResourceAbstract
     protected function attributesAvailable(): array
     {
         return [
-            'message', 'serial', 'type', 'lat', 'long', 'speed',
+            'message', 'serial', 'type', 'latitude', 'longitude', 'speed',
             'signal', 'direction', 'datetime', 'data', 'response',
         ];
     }
@@ -61,7 +61,7 @@ class Location extends ResourceAbstract
     /**
      * @return ?float
      */
-    public function lat(): ?float
+    public function latitude(): ?float
     {
         return $this->attribute(__FUNCTION__);
     }
@@ -69,7 +69,7 @@ class Location extends ResourceAbstract
     /**
      * @return ?float
      */
-    public function long(): ?float
+    public function longitude(): ?float
     {
         return $this->attribute(__FUNCTION__);
     }

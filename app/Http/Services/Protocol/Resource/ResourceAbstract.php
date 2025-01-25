@@ -23,7 +23,7 @@ abstract class ResourceAbstract
      */
     protected function attributes(array $attributes): void
     {
-        $this->attributes = array_intersect_key($attributes, array_flip($this->attributesAvailable()));
+        array_map(fn ($key) => $this->attributes[$key] = $attributes[$key] ?? null, $this->attributesAvailable());
     }
 
     /**
@@ -46,7 +46,7 @@ abstract class ResourceAbstract
      */
     public function data(): array
     {
-        return $this->attribute('data', []);
+        return $this->attribute(__FUNCTION__, []);
     }
 
 
