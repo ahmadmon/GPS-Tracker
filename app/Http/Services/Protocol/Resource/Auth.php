@@ -24,7 +24,7 @@ class Auth extends ResourceAbstract
     }
 
     /**
-     * @inheritDoc
+     * @return bool
      */
     public function isValid(): bool
     {
@@ -32,7 +32,7 @@ class Auth extends ResourceAbstract
     }
 
     /**
-     * @inheritDoc
+     * @return string
      */
     public function message(): string
     {
@@ -40,7 +40,7 @@ class Auth extends ResourceAbstract
     }
 
     /**
-     * @inheritDoc
+     * @return string
      */
     public function serial(): string
     {
@@ -48,7 +48,7 @@ class Auth extends ResourceAbstract
     }
 
     /**
-     * @inheritDoc
+     * @return string
      */
     public function response(): string
     {

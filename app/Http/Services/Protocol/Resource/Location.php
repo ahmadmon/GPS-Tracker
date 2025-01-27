@@ -31,7 +31,7 @@ class Location extends ResourceAbstract
      */
     public function isValid(): bool
     {
-        return $this->lat() && $this->long() && $this->serial() && $this->datetime();
+        return $this->latitude() && $this->longitude() && $this->serial() && $this->datetime();
     }
 
     /**
