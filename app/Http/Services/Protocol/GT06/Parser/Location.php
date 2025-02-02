@@ -28,7 +28,7 @@ class Location extends ParserAbstract
      */
     public function messageIsValid(): bool
     {
-        return ($this->data['device_id'] ?? false)
+        return ($this->data['serial'] ?? false)
             && (bool)preg_match($this->messageIsValidRegExp(), $this->message, $this->values);
     }
 
@@ -66,7 +66,7 @@ class Location extends ParserAbstract
      */
     protected function serial(): string
     {
-        return $this->data['device_id'];
+        return $this->data['serial'];
     }
 
     /**
@@ -74,7 +74,7 @@ class Location extends ParserAbstract
      */
     protected function data(): array
     {
-        return ['device_id' => $this->serial()];
+        return ['serial' => $this->serial()];
     }
 
     /**

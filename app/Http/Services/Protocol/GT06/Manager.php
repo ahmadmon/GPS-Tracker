@@ -4,12 +4,15 @@ namespace App\Http\Services\Protocol\GT06;
 
 use App\Http\Services\Protocol\GT06\Parser\Auth as AuthParser;
 use App\Http\Services\Protocol\GT06\Parser\HeartBeat as HeartBeatParser;
-use App\Http\Services\Protocol\GT06\Parser\Location;
-use App\Http\Services\Protocol\GT06\Parser\LocationGpsModular;
+use App\Http\Services\Protocol\GT06\Parser\Location as LocationParser;
+use App\Http\Services\Protocol\GT06\Parser\LocationGpsModular as LocationGpsModularParser;
 use App\Http\Services\Protocol\ProtocolAbstract;
 
 class Manager extends ProtocolAbstract
 {
+    const PORT = 5024;
+
+
     /**
      * @return string
      */
@@ -27,6 +30,14 @@ class Manager extends ProtocolAbstract
         return 'GT06';
     }
 
+    /**
+     * @return int
+     */
+    public function port(): int
+    {
+        return self::PORT;
+    }
+
 
     /**
      * @return array
@@ -36,8 +47,8 @@ class Manager extends ProtocolAbstract
         return [
             AuthParser::class,
             HeartBeatParser::class,
-            Location::class,
-            LocationGpsModular::class
+            LocationParser::class,
+            LocationGpsModularParser::class
         ];
     }
 

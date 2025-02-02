@@ -25,6 +25,14 @@ abstract class ParserAbstract
     protected array $cache = [];
 
     /**
+     * @return self
+     */
+    public static function new(): self
+    {
+        return new static(...func_get_args());
+    }
+
+    /**
      * @param string $message
      * @param array $data = []
      *
@@ -84,7 +92,7 @@ abstract class ParserAbstract
     {
         return new ResourceAuth([
             'message' => $this->message(),
-            'device_id' => $this->serial(),
+            'serial' => $this->serial(),
             'response' => $this->response(),
             'data' => $this->data(),
         ]);
@@ -98,7 +106,7 @@ abstract class ParserAbstract
     {
         return new ResourceHeartbeat([
             'message' => $this->message(),
-            'device_id' => $this->serial(),
+            'serial' => $this->serial(),
             'data' => $this->data(),
             'response' => $this->response(),
         ]);
@@ -112,7 +120,7 @@ abstract class ParserAbstract
     {
         return new ResourceLocation([
             'message' => $this->message(),
-            'device_id' => $this->serial(),
+            'serial' => $this->serial(),
             'lat' => $this->latitude(),
             'long' => $this->longitude(),
             'speed' => $this->speed(),

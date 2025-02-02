@@ -57,7 +57,7 @@ class Auth extends ParserAbstract
      */
     protected function data(): array
     {
-        return ['device_id' => $this->serial()];
+        return ['serial' => $this->serial()];
     }
 
     /**

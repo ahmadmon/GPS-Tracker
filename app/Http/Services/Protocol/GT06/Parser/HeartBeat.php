@@ -14,6 +14,7 @@ class HeartBeat extends ParserAbstract
     {
         $this->values = [];
 
+        dd($this->data['serial'] ?? false);
         if ($this->messageIsValid() === false) {
             return [];
         }
@@ -29,7 +30,8 @@ class HeartBeat extends ParserAbstract
      */
     public function messageIsValid(): bool
     {
-        return ($this->data['device_id'] ?? false)
+
+        return ($this->data['serial'] ?? false)
             && (bool)preg_match($this->messageIsValidRegExp(), $this->message, $this->values);
     }
 
@@ -50,7 +52,7 @@ class HeartBeat extends ParserAbstract
      */
     protected function serial(): string
     {
-        return $this->data['device_id'];
+        return $this->data['serial'];
     }
 
     /**
