@@ -2,6 +2,7 @@
 
 namespace App\Http\Services\Server;
 
+use App\Http\Services\Protocol\ParserAbstract;
 use App\Http\Services\Protocol\ProtocolAbstract;
 use App\Http\Services\Protocol\Resource\ResourceAbstract;
 use App\Jobs\StoreGpsDataJob;
@@ -71,6 +72,7 @@ class MultiProtocolServer
 
 
             $worker->onMessage = function (TcpConnection $connection, $message) use ($protocolManager) {
+                echo "Message Received at: " . jalaliDate(now(), format: "Y/m/d H:i:s") . "\n";
                 $this->handleMessage($protocolManager, $connection, $this->readBuffer($message));
             };
 
@@ -88,13 +90,16 @@ class MultiProtocolServer
                 echo "Connection closed on protocol {$protocolManager->name()}\n";
                 $this->logger->info("Connection closed on protocol {$protocolManager->name()}");
 
-                unset($this->connections[$connection->id]);
+                // ParserAbstract::removeSerial($connection->id);
+
+//                unset($this->connections[$connection->id]);
             };
 
             $worker->onError = function ($connection, $code, $msg) use ($protocolManager) {
+                echo "Error on protocol {$protocolManager->name()} : $msg - (Code: $code)";
                 $this->logger->error("Error on protocol {$protocolManager->name()} : $msg - (Code: $code)");
 
-                unset($this->connections[$connection->id]);
+//                unset($this->connections[$connection->id]);
             };
 
             $this->servers[] = $worker;
@@ -120,27 +125,25 @@ class MultiProtocolServer
     protected function handleMessage(ProtocolAbstract $protocolManager, TcpConnection $connection, string $buffer): void
     {
         try {
-            $resources = $protocolManager->resources($buffer);
-            dd($resources);
+            $this->logger->info("Packet is: ", [$protocolManager->messages($buffer)]);
+
+            $resources = $protocolManager->resources($buffer, $connection->id);
+            // dd($resources);
             if (empty($resources)) return;
-
-
-            $lastResource = null;
 
             foreach ($resources as $resource) {
                 if ($resource->format() === 'location') {
                     StoreGpsDataJob::dispatch($this->saveData($resource));
                 }
-
-                $lastResource = $resource;
             }
 
+            $lastResource = end($resources);
             if ($lastResource !== null && !empty($lastResource->response())) {
                 $connection->send($lastResource->response()); // Send protocol-specific response from last resource
             }
 
             // Update last activity time for the connection
-            $this->connections[$connection->id]['last_activity'] = time();
+            // $this->connections[$connection->id]['last_activity'] = time();
 
         } catch (\Exception $e) {
             $this->logger->error("Error processing message: " . $e->getMessage());

@@ -33,13 +33,13 @@ abstract class ProtocolAbstract
      *
      * @return array
      */
-    public function resources(string $message, array $data = []): array
+    public function resources(string $message,string $connectionId ,array $data = []): array
     {
         $resources = [];
 
         foreach ($this->messages($message) as $message) {
             foreach ($this->parsers() as $parser) {
-                $valid = $parser::new($message, $data)->resources();
+                $valid = $parser::new($message,$connectionId, $data)->resources();
 
                 if (empty($valid)) {
                     continue;

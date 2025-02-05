@@ -6,9 +6,12 @@ use App\Http\Services\Protocol\Resource\Auth as ResourceAuth;
 use App\Http\Services\Protocol\Resource\HeartBeat as ResourceHeartBeat;
 use App\Http\Services\Protocol\Resource\Location as ResourceLocation;
 use App\Http\Services\Protocol\Resource\ResourceAbstract;
+use App\Traits\Protocol\SerialHelper;
 
 abstract class ParserAbstract
 {
+    use SerialHelper;
+
     /**
      * @var array
      */
@@ -38,7 +41,7 @@ abstract class ParserAbstract
      *
      * @return void
      */
-    public function __construct(protected string $message, protected array $data = []) {}
+    public function __construct(protected string $message,protected string $connectionId, protected array $data = []) {}
 
     /**
      * @return array<ResourceAbstract>
@@ -83,6 +86,14 @@ abstract class ParserAbstract
     protected function data(): array
     {
         return $this->data;
+    }
+
+    /**
+     * @return int
+     */
+    protected function connection(): int
+    {
+        return (int)$this->connectionId;
     }
 
     /**

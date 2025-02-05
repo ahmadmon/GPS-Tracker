@@ -18,6 +18,9 @@ class Auth extends ParserAbstract
             return [];
         }
 
+        self::setSerial($this->connection(), $this->serial());
+        dump(self::$serials, $this->connection());
+
         $this->addIfValid($this->resourceAuth());
 
         return $this->resources;

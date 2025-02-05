@@ -14,7 +14,7 @@ class HeartBeat extends ParserAbstract
     {
         $this->values = [];
 
-        dd($this->data['serial'] ?? false);
+//        dd($this->data['serial'] ?? false);
         if ($this->messageIsValid() === false) {
             return [];
         }

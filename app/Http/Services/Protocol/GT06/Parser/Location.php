@@ -14,6 +14,7 @@ class Location extends ParserAbstract
     {
         $this->values = [];
 
+        dump(self::$serials, $this->connection());
         if ($this->messageIsValid() === false) {
             return [];
         }
@@ -66,7 +67,7 @@ class Location extends ParserAbstract
      */
     protected function serial(): string
     {
-        return $this->data['serial'];
+        return self::getSerial($this->connection());
     }
 
     /**
