@@ -90,7 +90,9 @@ class MultiProtocolServer
                 echo "Connection closed on protocol {$protocolManager->name()}\n";
                 $this->logger->info("Connection closed on protocol {$protocolManager->name()}");
 
-                // ParserAbstract::removeSerial($connection->id);
+//                $connectionKey = "{$connection->getRemoteIp()}:{$connection->getRemotePort()}";
+//                 ParserAbstract::removeSerial($connectionKey);
+//                 echo json_encode(ParserAbstract::getAllSerials());
 
 //                unset($this->connections[$connection->id]);
             };
@@ -127,8 +129,8 @@ class MultiProtocolServer
         try {
             $this->logger->info("Packet is: ", [$protocolManager->messages($buffer)]);
 
-            $resources = $protocolManager->resources($buffer, $connection->id);
-            // dd($resources);
+            $resources = $protocolManager->resources($buffer, $connection);
+            dump($resources);
             if (empty($resources)) return;
 
             foreach ($resources as $resource) {

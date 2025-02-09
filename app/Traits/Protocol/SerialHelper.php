@@ -2,50 +2,43 @@
 
 namespace App\Traits\Protocol;
 
-trait SerialHelper {
+trait SerialHelper
+{
 
     /**
      * @var array $serial
      */
     protected static array $serials = [];
 
+
     /**
      *
-     * @return array
-     */
-    protected function data(): array
-    {
-        return ['serial' => self::$serials[$this->connectionId] ?? ''];
-    }
-
-      /**
-     *
-     * @param string $connectionId
+     * @param string $connectionKey
      * @param string $serial
      */
-    public static function setSerial(string $connectionId, string $serial): void
+    public static function setSerial(string $connectionKey, string $serial): void
     {
-        self::$serials[$connectionId] = $serial;
+        self::$serials[$connectionKey] = $serial;
     }
 
     /**
      *
-     * @param string $connectionId
+     * @param string $connectionKey
      * @return string
      */
-    public static function getSerial(string $connectionId): string
+    public static function getSerial(string $connectionKey): string
     {
-        return self::$serials[$connectionId] ?? '';
+        return self::$serials[$connectionKey] ?? '';
     }
 
 
     /**
      *
-     * @param string $connectionId
+     * @param string $connectionKey
      */
-    public static function removeSerial(string $connectionId): void
+    public static function removeSerial(string $connectionKey): void
     {
-        unset(self::$serials[$connectionId]);
+        unset(self::$serials[$connectionKey]);
     }
 }
 //

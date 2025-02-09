@@ -2,6 +2,8 @@
 
 namespace App\Http\Services\Protocol;
 
+use Workerman\Connection\TcpConnection;
+
 abstract class ProtocolAbstract
 {
     /**
@@ -29,17 +31,18 @@ abstract class ProtocolAbstract
 
     /**
      * @param string $message
+     * @param TcpConnection $connection
      * @param array $data = []
      *
      * @return array
      */
-    public function resources(string $message,string $connectionId ,array $data = []): array
+    public function resources(string $message, TcpConnection $connection, array $data = []): array
     {
         $resources = [];
 
         foreach ($this->messages($message) as $message) {
             foreach ($this->parsers() as $parser) {
-                $valid = $parser::new($message,$connectionId, $data)->resources();
+                $valid = $parser::new($message, $connection, $data)->resources();
 
                 if (empty($valid)) {
                     continue;

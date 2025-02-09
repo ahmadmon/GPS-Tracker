@@ -32,7 +32,7 @@ class LocationGpsModular extends ParserAbstract
      */
     public function messageIsValid(): bool
     {
-        return ($this->data['serial'] ?? false)
+        return ($this->serial() ?? false)
             && (bool)preg_match($this->messageIsValidRegExp(), $this->message, $this->values);
     }
 
@@ -53,7 +53,7 @@ class LocationGpsModular extends ParserAbstract
      */
     protected function serial(): string
     {
-        return $this->data['device_id'];
+        return self::getSerial($this->connectionKey());
     }
 
     /**

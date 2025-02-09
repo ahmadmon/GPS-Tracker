@@ -14,11 +14,10 @@ class Location extends ParserAbstract
     {
         $this->values = [];
 
-        dump(self::$serials, $this->connection());
         if ($this->messageIsValid() === false) {
             return [];
         }
-
+        dump($this->resourceLocation());
         $this->addIfValid($this->resourceLocation());
 
         return $this->resources;
@@ -29,7 +28,7 @@ class Location extends ParserAbstract
      */
     public function messageIsValid(): bool
     {
-        return ($this->data['serial'] ?? false)
+        return ($this->data()['serial'] ?? false)
             && (bool)preg_match($this->messageIsValidRegExp(), $this->message, $this->values);
     }
 
@@ -67,7 +66,7 @@ class Location extends ParserAbstract
      */
     protected function serial(): string
     {
-        return self::getSerial($this->connection());
+        return self::getSerial($this->connectionKey());
     }
 
     /**
@@ -110,7 +109,7 @@ class Location extends ParserAbstract
     {
         $value = round(hexdec($hex) / 60 / 30000, 5);
 
-        if($negative){
+        if ($negative) {
             $value *= -1;
         }
 

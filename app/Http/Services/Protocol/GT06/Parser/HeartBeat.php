@@ -14,7 +14,7 @@ class HeartBeat extends ParserAbstract
     {
         $this->values = [];
 
-//        dd($this->data['serial'] ?? false);
+
         if ($this->messageIsValid() === false) {
             return [];
         }
@@ -31,7 +31,7 @@ class HeartBeat extends ParserAbstract
     public function messageIsValid(): bool
     {
 
-        return ($this->data['serial'] ?? false)
+        return ($this->serial() ?? false)
             && (bool)preg_match($this->messageIsValidRegExp(), $this->message, $this->values);
     }
 
@@ -44,6 +44,7 @@ class HeartBeat extends ParserAbstract
             . '(7878)'        // 1 - start
             . '([0-9a-f]{2})' // 2 - length
             . '(13|23)'       // 3 - protocol
+            . '([0-9a-f]{8})' // 4 - status information
             . '/';
     }
 
@@ -52,7 +53,38 @@ class HeartBeat extends ParserAbstract
      */
     protected function serial(): string
     {
-        return $this->data['serial'];
+        return self::getSerial($this->connectionKey());
+    }
+
+    /**
+     * @return string
+     */
+    protected function statusInfo(): string
+    {
+        return $this->values[6];
+    }
+
+    /**
+     * @return string
+     */
+    protected function terminalByte(): string
+    {
+        return ;
+    }
+
+    /**
+     * @return array
+     */
+    protected function terminalInfo(): array
+    {
+        return [
+            'status' => boolval($this->statusInfo() & 0x01),
+            'ignition' => boolval($this->statusInfo() & 0x02),
+            'charging' => $this->charging(),
+            'alarmType' => $this->alarmType(),
+            'gpsTracking' => $this->gpsTracking(),
+            'relayState' => $this->relayState(),
+        ];
     }
 
     /**

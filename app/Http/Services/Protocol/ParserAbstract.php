@@ -7,6 +7,7 @@ use App\Http\Services\Protocol\Resource\HeartBeat as ResourceHeartBeat;
 use App\Http\Services\Protocol\Resource\Location as ResourceLocation;
 use App\Http\Services\Protocol\Resource\ResourceAbstract;
 use App\Traits\Protocol\SerialHelper;
+use Workerman\Connection\TcpConnection;
 
 abstract class ParserAbstract
 {
@@ -37,11 +38,13 @@ abstract class ParserAbstract
 
     /**
      * @param string $message
+     * @param TcpConnection $connection
      * @param array $data = []
      *
-     * @return void
      */
-    public function __construct(protected string $message,protected string $connectionId, protected array $data = []) {}
+    public function __construct(protected string $message, protected TcpConnection $connection, protected array $data = [])
+    {
+    }
 
     /**
      * @return array<ResourceAbstract>
@@ -89,11 +92,11 @@ abstract class ParserAbstract
     }
 
     /**
-     * @return int
+     * @return string
      */
-    protected function connection(): int
+    protected function connectionKey(): string
     {
-        return (int)$this->connectionId;
+        return "{$this->connection->getRemoteIp()}:{$this->connection->getRemotePort()}";
     }
 
     /**
@@ -132,8 +135,8 @@ abstract class ParserAbstract
         return new ResourceLocation([
             'message' => $this->message(),
             'serial' => $this->serial(),
-            'lat' => $this->latitude(),
-            'long' => $this->longitude(),
+            'latitude' => $this->latitude(),
+            'longitude' => $this->longitude(),
             'speed' => $this->speed(),
             'signal' => $this->signal(),
             'direction' => $this->direction(),
