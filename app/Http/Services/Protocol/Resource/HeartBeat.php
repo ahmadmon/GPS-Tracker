@@ -10,7 +10,7 @@ class HeartBeat extends ResourceAbstract
      */
     protected function attributesAvailable(): array
     {
-        return ['message', 'serial', 'data', 'response'];
+        return ['message', 'serial', 'data', 'terminalInfo', 'voltageLevel', 'signalLevel', 'response'];
     }
 
     /**
@@ -33,6 +33,30 @@ class HeartBeat extends ResourceAbstract
      * @return string
      */
     public function message(): string
+    {
+        return $this->attribute(__FUNCTION__);
+    }
+
+    /**
+     * @return array
+     */
+    public function terminalInfo(): array
+    {
+        return $this->attribute(__FUNCTION__);
+    }
+
+    /**
+     * @return int
+     */
+    public function voltageLevel(): int
+    {
+        return $this->attribute(__FUNCTION__);
+    }
+
+    /**
+     * @return int
+     */
+    public function signalLevel(): int
     {
         return $this->attribute(__FUNCTION__);
     }

@@ -12,6 +12,7 @@ use Workerman\Connection\TcpConnection;
 use Workerman\Timer;
 use Workerman\Worker;
 use App\Http\Services\Protocol\ProtocolFactory;
+use Carbon\Carbon;
 
 class MultiProtocolServer
 {
@@ -90,25 +91,24 @@ class MultiProtocolServer
                 echo "Connection closed on protocol {$protocolManager->name()}\n";
                 $this->logger->info("Connection closed on protocol {$protocolManager->name()}");
 
-//                $connectionKey = "{$connection->getRemoteIp()}:{$connection->getRemotePort()}";
-//                 ParserAbstract::removeSerial($connectionKey);
-//                 echo json_encode(ParserAbstract::getAllSerials());
+                //                $connectionKey = "{$connection->getRemoteIp()}:{$connection->getRemotePort()}";
+                //                 ParserAbstract::removeSerial($connectionKey);
+                //                 echo json_encode(ParserAbstract::getAllSerials());
 
-//                unset($this->connections[$connection->id]);
+                //                unset($this->connections[$connection->id]);
             };
 
             $worker->onError = function ($connection, $code, $msg) use ($protocolManager) {
                 echo "Error on protocol {$protocolManager->name()} : $msg - (Code: $code)";
                 $this->logger->error("Error on protocol {$protocolManager->name()} : $msg - (Code: $code)");
 
-//                unset($this->connections[$connection->id]);
+                //                unset($this->connections[$connection->id]);
             };
 
             $this->servers[] = $worker;
 
             echo "Server started for protocol {$protocolManager->name()} on port {$port}\n";
             $this->logger->info("Server started for protocol {$protocolManager->name()} on port {$port}");
-
         } catch (\Exception $e) {
             echo "Error running servers: " . $e->getMessage();
             $this->logger->error("Error running servers: " . $e->getMessage());
@@ -135,7 +135,9 @@ class MultiProtocolServer
 
             foreach ($resources as $resource) {
                 if ($resource->format() === 'location') {
-                    StoreGpsDataJob::dispatch($this->saveData($resource));
+                    StoreGpsDataJob::dispatch($this->locationData($resource));
+                }
+                if ($resource->format() === 'heartBeat') {
                 }
             }
 
@@ -151,7 +153,6 @@ class MultiProtocolServer
             $this->logger->error("Error processing message: " . $e->getMessage());
             return;
         }
-
     }
 
     /**
@@ -160,7 +161,7 @@ class MultiProtocolServer
      * @param ResourceAbstract $resource
      * @return array
      */
-    protected function saveData(ResourceAbstract $resource): array
+    protected function locationData(ResourceAbstract $resource): array
     {
         return [
             'device_id' => $resource->serial(),
@@ -174,37 +175,54 @@ class MultiProtocolServer
     }
 
     /**
+     * Prepare data for storing Tracker information.
+     *
+     * @param ResourceAbstract $resource
+     * @return array
+     */
+    protected function heartBeatData(ResourceAbstract $resource): array
+    {
+        return [
+            'device_id' => $resource->serial(),
+            'terminal_info' => array_except($resource->terminalInfo(), ['alarmType']),
+            'alarm_type' => $resource->terminalInfo()['alarmType'],
+            'voltageLevel' => $resource->voltageLevel(),
+            'signalLevel' => $resource->signalLevel(),
+        ];
+    }
+
+    /**
      * Run all servers.
      */
     public function run(): void
     {
         // Start Timer to check inactive connection
         // check every 60 seconds
-//        Timer::add(60, fn() => $this->checkInactiveConnections());
+        //        Timer::add(60, fn() => $this->checkInactiveConnections());
 
 
         Worker::runAll();
     }
 
-//    /**
-//     * Check and close inactive connections.
-//     */
-//    protected function checkInactiveConnections(): void
-//    {
-//        $inactiveTimeout = 300; // Close connections inactive for 5 minutes (300 seconds)
-//        $currentTime = time();
-//
-//        foreach ($this->connections as $connectionId => $connectionData) {
-//            if ($currentTime - $connectionData['last_activity'] > $inactiveTimeout) {
-//                $connection = $connectionData['connection'];
-//                if ($connection) {
-//                    $this->logger->info("Closing inactive connection: $connectionId");
-//                    $connection->close();
-//                    unset($this->connections[$connectionId]);
-//                }
-//            }
-//        }
-//    }
+    //    /**
+    //     * Check and close inactive connections.
+    //     */
+    //    protected function checkInactiveConnections(): void
+    //    {
+    //        $inactiveTimeout = 300; // Close connections inactive for 5 minutes (300 seconds)
+    //        $currentTime = time();
+    //
+    //        foreach ($this->connections as $connectionId => $connectionData) {
+    //            if ($currentTime - $connectionData['last_activity'] > $inactiveTimeout) {
+    //                $connection = $connectionData['connection'];
+    //                if ($connection) {
+    //                    $this->logger->info("Closing inactive connection: $connectionId");
+    //                    $connection->close();
+    //                    unset($this->connections[$connectionId]);
+    //                }
+    //            }
+    //        }
+    //    }
 
 
     /**

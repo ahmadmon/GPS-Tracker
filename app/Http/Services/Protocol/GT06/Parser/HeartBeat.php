@@ -61,7 +61,7 @@ class HeartBeat extends ParserAbstract
      */
     protected function statusInfo(): string
     {
-        return $this->values[6];
+        return $this->values[4];
     }
 
     /**
@@ -69,7 +69,23 @@ class HeartBeat extends ParserAbstract
      */
     protected function terminalByte(): string
     {
-        return ;
+        return hexdec(substr($this->statusInfo(), 0, 2));
+    }
+
+    /**
+     * @return string
+     */
+    protected function alarmType(): string
+    {
+        $alarm = ($this->terminalByte() & 0x38) >> 3;
+
+        return match ($alarm) {
+            1 => 'shock', // shock
+            2 => 'power cut',
+            3 => 'low battery',
+            4 => 'sos',
+            default => 'normal'
+        };
     }
 
     /**
@@ -78,20 +94,57 @@ class HeartBeat extends ParserAbstract
     protected function terminalInfo(): array
     {
         return [
-            'status' => boolval($this->statusInfo() & 0x01),
-            'ignition' => boolval($this->statusInfo() & 0x02),
-            'charging' => $this->charging(),
+            'status' => boolval($this->terminalByte() & 0x01),
+            'ignition' => boolval($this->terminalByte() & 0x02),
+            'charging' => boolval($this->terminalByte() & 0x04),
             'alarmType' => $this->alarmType(),
-            'gpsTracking' => $this->gpsTracking(),
-            'relayState' => $this->relayState(),
+            'gpsTracking' => boolval($this->terminalByte() & 0x40),
+            'relayState' => boolval($this->terminalByte() & 0x80),
         ];
     }
+
+    /**
+     * @return int
+     */
+    protected function voltageLevel(): int
+    {
+        $voltageLevel = hexdec(substr($this->statusInfo(), 2, 2));
+
+        return match ($voltageLevel) {
+            0 => 0, // no power (shutdown)
+            1 => 1, // extremely low battery
+            2 => 2, // very low battery
+            3 => 3, // low battery (can be used normally),
+            4 => 4, // medium
+            5 => 5, // high
+            6 => 6, // very high
+            default => 7 // unknown
+        };
+    }
+
+    /**
+     * @return int
+     */
+    protected function signalLevel(): int
+    {
+        $signalLevel = hexdec(substr($this->statusInfo(), 4, 2));
+
+        return match ($signalLevel) {
+            0 => 0, // no signal
+            1 => 1, // extremely weak signal
+            2 => 2, // very weak signal
+            3 => 3, // good signal,
+            4 => 4, // strong signal
+            default => 5 // unknown
+        };
+    }
+
 
     /**
      * @return string
      */
     protected function response(): string
     {
-        return hex2bin("{$this->values[1]}05{$this->values[3]}0001D9DC0D0A");
+        return hex2bin("{$this->values[1]}05{$this->values[3]}0001E9F10D0A");
     }
 }

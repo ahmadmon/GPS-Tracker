@@ -42,9 +42,7 @@ abstract class ParserAbstract
      * @param array $data = []
      *
      */
-    public function __construct(protected string $message, protected TcpConnection $connection, protected array $data = [])
-    {
-    }
+    public function __construct(protected string $message, protected TcpConnection $connection, protected array $data = []) {}
 
     /**
      * @return array<ResourceAbstract>
@@ -121,6 +119,9 @@ abstract class ParserAbstract
         return new ResourceHeartbeat([
             'message' => $this->message(),
             'serial' => $this->serial(),
+            'terminalInfo' => $this->terminalInfo(),
+            'voltageLevel' => $this->voltageLevel(),
+            'signalLevel' => $this->signalLevel(),
             'data' => $this->data(),
             'response' => $this->response(),
         ]);
