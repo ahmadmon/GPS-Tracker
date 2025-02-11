@@ -39,10 +39,10 @@ class Auth extends ParserAbstract
     protected function messageIsValidRegExp(): string
     {
         return '/^'
-            . '(7878)'        // 1 - start
-            . '([0-9a-f]{2})' // 2 - length
-            . '(01)'          // 3 - protocol
-            . '([0-9]{16})'   // 4 - serial
+            . '(7878)'              // 1 - start
+            . '([0-9a-f]{2})'       // 2 - length
+            . '(01)'                // 3 - protocol
+            . '(?:0)?([0-9]{15})'   // 4 - serial (without 0 in start)
             . '/';
     }
 

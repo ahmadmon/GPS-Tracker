@@ -6,6 +6,8 @@ use App\Http\Services\Protocol\ParserAbstract;
 use App\Http\Services\Protocol\ProtocolAbstract;
 use App\Http\Services\Protocol\Resource\ResourceAbstract;
 use App\Jobs\StoreGpsDataJob;
+use App\Jobs\StoreTrackerInfoJob;
+use Illuminate\Support\Arr;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Workerman\Connection\TcpConnection;
@@ -130,7 +132,6 @@ class MultiProtocolServer
             $this->logger->info("Packet is: ", [$protocolManager->messages($buffer)]);
 
             $resources = $protocolManager->resources($buffer, $connection);
-            dump($resources);
             if (empty($resources)) return;
 
             foreach ($resources as $resource) {
@@ -138,6 +139,8 @@ class MultiProtocolServer
                     StoreGpsDataJob::dispatch($this->locationData($resource));
                 }
                 if ($resource->format() === 'heartBeat') {
+                    dump($this->heartBeatData($resource));
+                    StoreTrackerInfoJob::dispatch($this->heartBeatData($resource));
                 }
             }
 
@@ -184,7 +187,7 @@ class MultiProtocolServer
     {
         return [
             'device_id' => $resource->serial(),
-            'terminal_info' => array_except($resource->terminalInfo(), ['alarmType']),
+            'terminal_info' => Arr::except($resource->terminalInfo(), ['alarmType']),
             'alarm_type' => $resource->terminalInfo()['alarmType'],
             'voltageLevel' => $resource->voltageLevel(),
             'signalLevel' => $resource->signalLevel(),

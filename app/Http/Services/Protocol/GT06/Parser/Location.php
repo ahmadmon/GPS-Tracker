@@ -17,7 +17,7 @@ class Location extends ParserAbstract
         if ($this->messageIsValid() === false) {
             return [];
         }
-        dump($this->resourceLocation());
+
         $this->addIfValid($this->resourceLocation());
 
         return $this->resources;
