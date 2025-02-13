@@ -81,7 +81,7 @@
                                                         </tr>
                                                         @forelse($devices as $key => $device)
                                                             <tr wire:key="{{ $device->id }}"
-                                                                @click="scrollToMap()">
+                                                                @click="scrollToMap()" class="device-section">
                                                                 <td
                                                                     class="w-100 d-flex justify-content-between align-items-center">
                                                                     <div
@@ -94,9 +94,15 @@
                                                                                wire:model.live="selected">
                                                                         <label for="input-{{ $key }}"
                                                                                class="cursor-pointer">
-                                                                            <h6 class="task_title_0">
+                                                                            <h6 class="task_title_0 device-title">
                                                                                 دستگاه
                                                                                 {{ str($device->name)->replace('دستگاه', '') }}
+                                                                                @if($device->lastStatus())
+                                                                                    <i class="fa fa-info-circle cursor-pointer"
+                                                                                       data-bs-toggle="modal"
+                                                                                       data-bs-target="#status-modal"
+                                                                                       @click="$event.preventDefault(); $wire.handleDeviceStatus({{ $device->id }})"></i>
+                                                                                @endif
                                                                             </h6>
                                                                             <small
                                                                                 class="project_name_0 text-muted d-block">{{ $device->serial }}</small>
@@ -215,6 +221,10 @@
             </div>
         </div>
     </div>
+
+
+    <x-partials.modals.device-status-modal :$deviceStatus/>
+
 
 </div>
 

@@ -19,38 +19,68 @@ class DeviceStatus extends Model
         ];
     }
 
-    protected function voltageLevel(): Attribute
+    protected function batteryStatus(): Attribute
     {
         return Attribute::make(
             get: function () {
-                return match ((int)$this->voltage_level) {
-                    0 => 'بدون برق',
-                    1 => 'باتری خیلی ضعیف',
-                    2 => 'باتری خیلی کم',
-                    3 => 'باتری کم (قابل استفاده)',
-                    4 => 'باتری متوسط',
-                    5 => 'باتری زیاد',
-                    6 => 'باتری خیلی زیاد',
+                $voltageLevel = (int)$this->voltage_level;
+
+                $text = match ($voltageLevel) {
+                    0 => 'بدون شارژ',
+                    1 => 'خیلی ضعیف',
+                    2 => 'خیلی کم',
+                    3 => 'کم (قابل استفاده)',
+                    4 => 'متوسط',
+                    5 => 'زیاد',
+                    6 => 'خیلی زیاد',
                     7 => 'نامشخص',
 
                 };
+
+                $iconClass = match ($voltageLevel) {
+                    0 => 'battery-empty', // Empty
+                    1, 2, 3 => 'battery-quarter text-danger', // Low
+                    4 => 'battery-half text-warning', // Half
+                    5 => 'battery-three-quarter text-success', // Good
+                    6 => 'battery-full text-success',  //Very Good
+                    default => 'battery-unknown text-secondary',
+                };
+
+                return [
+                    'text' => $text,
+                    'iconClass' => $iconClass
+                ];
             }
         );
     }
 
-    protected function signalLevel(): Attribute
+    protected function signalStatus(): Attribute
     {
         return Attribute::make(
             get: function () {
-                return match ((int)$this->signal_level) {
+                $signalLevel = (int)$this->signal_level;
+
+                $text = match ((int)$this->signal_level) {
                     0 => 'بدون سیگنال',
-                    1 => 'سیگنال خیلی ضعیف',
-                    2 => 'سیگنال ضعیف',
-                    3 => 'سیگنال خوب',
-                    4 => '',
+                    1 => 'خیلی ضعیف',
+                    2 => 'ضعیف',
+                    3 => 'خوب',
+                    4 => 'خیلی خوب',
                     5 => 'نامشخص',
 
                 };
+
+                $color = match ($signalLevel) {
+                    0, 1 => 'text-danger',
+                    2 => 'text-warning',
+                    3, 4 => 'text-success',
+                    default => 'signal-unknown text-secondary',
+                };
+
+                return [
+                    'text' => $text,
+                    'color' => $color
+                ];
             }
         );
     }

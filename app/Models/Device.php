@@ -28,6 +28,14 @@ class Device extends Model
         return Trip::where('device_id', $this->id)->orderByDesc('id')->first() ?? null;
     }
 
+    /**
+     * @return DeviceStatus|null
+     */
+    public function lastStatus(): DeviceStatus|null
+    {
+        return DeviceStatus::where('device_id', $this->id)->latest()->first() ?? null;
+    }
+
 
     public function vehicle(): BelongsTo
     {

@@ -160,17 +160,20 @@ img.img-opacity:hover {
     font-size: 8px;
     padding: 0;
 }
+
 .leaflet-top.leaflet-right .leaflet-control-layers.leaflet-control-layers-expanded.leaflet-control form div label {
     line-height: 10px;
     margin: 0;
     height: 11px;
 }
+
 .leaflet-top.leaflet-right .leaflet-control-layers.leaflet-control-layers-expanded.leaflet-control form div label input {
     margin: 0;
     /* height: 0.8em;
     width: 0.8em; */
     transform: scale(0.7);
 }
+
 .leaflet-top.leaflet-right .leaflet-control-layers.leaflet-control-layers-expanded.leaflet-control {
     max-height: 450px;
     height: 95%;
@@ -187,15 +190,18 @@ img.img-opacity:hover {
 .leaflet-control-layers-expanded .leaflet-control-layers-list {
     margin-bottom: 0;
 }
+
 .leaflet-control-layers-expanded .leaflet-control-layers-list .leaflet-control-layers-base div span,
 .leaflet-control-layers-expanded .leaflet-control-layers-list .leaflet-control-layers-overlays div span {
     font-size: 10px;
 }
+
 .leaflet-control-layers-expanded .leaflet-control-layers-list .leaflet-control-layers-base div input.leaflet-control-layers-selector,
 .leaflet-control-layers-expanded .leaflet-control-layers-list .leaflet-control-layers-overlays div input.leaflet-control-layers-selector {
     top: auto;
     margin: 0;
 }
+
 .leaflet-control-layers-expanded .leaflet-control-layers-list .leaflet-control-layers-overlays div span {
     font-weight: bold;
 }
@@ -219,6 +225,7 @@ section.leaflet-control-layers-list div.leaflet-control-layers-base div.TileProv
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
 }
+
 section.leaflet-control-layers-list div.leaflet-control-layers-base label {
     padding-bottom: 8px;
     padding-top: 6px;
@@ -227,9 +234,11 @@ section.leaflet-control-layers-list div.leaflet-control-layers-base label {
     border-left: #0a6aa1 solid 1px;
     border-right: #0a6aa1 solid 1px;
 }
+
 section.leaflet-control-layers-list div.leaflet-control-layers-base label:nth-child(even) {
     background-color: #f2f2f2;
 }
+
 section.leaflet-control-layers-list div.leaflet-control-layers-base label:nth-child(odd) {
     background-color: #e2e2e2;
 }
@@ -321,4 +330,46 @@ section.leaflet-control-layers-list div.leaflet-control-layers-base label span s
     background-color: #DB9100;
     cursor: pointer;
     border-radius: 30px;
+}
+
+.device-section i {
+    opacity: 0;
+    transition: opacity .3s ease-in-out, transform .3s ease-in-out;
+    transform: translateX(-10px);
+    color: #7366FF;
+}
+
+.device-section i:hover {
+    color: #A49BFF;
+    transform: translateY(4px);
+}
+
+.device-section:hover i {
+    opacity: 1;
+    transform: translateX(0);
+    animation: slideInFromRight .5s ease-in-out;
+}
+
+@keyframes slideInFromRight {
+    0% {
+        transform: translateX(20px);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@media screen and (max-width: 1024px) {
+    .device-section i {
+        opacity: 1;
+        transform: translateX(0);
+        animation: none;
+    }
+
+    .device-section i:hover {
+        color: #7366FF;
+        transform: translateX(0);
+    }
 }

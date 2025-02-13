@@ -4,11 +4,14 @@ namespace App\Livewire;
 
 use App\Facades\Acl;
 use App\Models\Device;
+use App\Models\DeviceStatus;
 use App\Models\Geofence;
 use App\Models\Trip;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
+use JetBrains\PhpStorm\NoReturn;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
@@ -33,6 +36,7 @@ class MapPage extends Component
     public array $deviceLocations = [];
     public $trips = [];
     public $geofences = [];
+    public mixed $deviceStatus = [];
 
     public int $take = 10;
 
@@ -250,5 +254,31 @@ class MapPage extends Component
         $this->onlineMode = !$this->onlineMode;
 
         $this->dispatch('mode-changed', $this->onlineMode);
+    }
+
+    /**
+     * @param string $id
+     * @return void
+     */
+    #[NoReturn]
+    public function handleDeviceStatus(string $id): void
+    {
+        $device = DeviceStatus::with(['device', 'device.user:name', 'device.vehicle:name'])->where('device_id', $id)->first();
+
+        if (!$device) {
+            $this->alert('error', 'وضعیت دستگاه یافت نشد.', [
+                'position' => 'top',
+                'timer' => 3000,
+                'toast' => true,
+                'customClass' => [
+                    'popup' => 'colored-toast',
+                    'icon' => 'white'
+                ],
+                'showCancelButton' => false,
+                'showConfirmButton' => false
+            ]);
+        }
+
+        $this->deviceStatus = $device;
     }
 }
