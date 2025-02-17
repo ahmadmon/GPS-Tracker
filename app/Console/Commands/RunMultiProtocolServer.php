@@ -12,7 +12,9 @@ class RunMultiProtocolServer extends Command
      *
      * @var string
      */
-    protected $signature = 'server:run';
+    protected $signature = 'server:run
+    	{action? : The command to run (start, stop, restart, reload, status, connections)}
+    	{mode? : The mode to run in (-d for daemon mode, -g for graceful stop/reload)}';
 
     /**
      * The console command description.
@@ -27,10 +29,18 @@ class RunMultiProtocolServer extends Command
      */
     public function handle(): void
     {
+        $action = $this->argument('action') ?? 'start';
+        $mode = $this->argument('mode') ?? '';
+
         $this->info("Starting multi-protocol server...");
 
         $server = new MultiProtocolServer();
         $server->initializeServers();
+
+        // Pass the command and mode to Workerman
+        global $argv;
+        $argv = array_merge(['artisan'], explode(' ', "server:run $action $mode"));
+
         $server->run();
     }
 }

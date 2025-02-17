@@ -71,7 +71,7 @@ class MultiProtocolServer
             $port = $protocolManager->port();
 
 
-            $worker = new Worker("tcp://0.0.0.0:{$port}");
+            $worker = new Worker("tcp://31.214.251.139:{$port}");
 
 
             $worker->onMessage = function (TcpConnection $connection, $message) use ($protocolManager) {
@@ -202,6 +202,11 @@ class MultiProtocolServer
         // Start Timer to check inactive connection
         // check every 60 seconds
         //        Timer::add(60, fn() => $this->checkInactiveConnections());
+
+        global $argv;
+        if (!isset($argv[1])) {
+            $argv[1] = 'start';
+        }
 
 
         Worker::runAll();

@@ -4,11 +4,13 @@ namespace App\Jobs;
 
 use App\Models\Device;
 use App\Models\DeviceStatus;
+use Exception;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class StoreTrackerInfoJob implements ShouldQueue
 {
@@ -28,13 +30,15 @@ class StoreTrackerInfoJob implements ShouldQueue
      */
     public function handle(): void
     {
-        $device = Device::where('serial', $this->data()->device_id)->first();
+        try{
 
-        if (!$device) {
-            return;
-        }
-        DB::transaction(function () use ($device) {
-            return DeviceStatus::updateOrCreate(['device_id' => $device->id],
+            $device = Device::where('serial', $this->data()->device_id)->first();
+
+            if (!$device) {
+                return;
+            }
+            DB::transaction(function () use ($device) {
+                return DeviceStatus::updateOrCreate(['device_id' => $device->id],
                 [
                     'ac_status' => $this->terminalInfo()?->status,
                     'ignition' => $this->terminalInfo()?->ignition,
@@ -45,7 +49,10 @@ class StoreTrackerInfoJob implements ShouldQueue
                     'voltage_level' => $this->data()?->voltageLevel,
                     'signal_level' => $this->data()?->signalLevel
                 ]);
-        });
+            });
+        } catch(Exception $e){
+            Log::error('Error storing Status Data: ' . $e->getMessage());
+        };
     }
 
     /**
