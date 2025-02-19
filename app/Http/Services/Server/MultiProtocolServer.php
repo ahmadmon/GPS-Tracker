@@ -71,7 +71,7 @@ class MultiProtocolServer
             $port = $protocolManager->port();
 
 
-            $worker = new Worker("tcp://31.214.251.139:{$port}");
+            $worker = new Worker("tcp://0.0.0.0:{$port}");
 
 
             $worker->onMessage = function (TcpConnection $connection, $message) use ($protocolManager) {

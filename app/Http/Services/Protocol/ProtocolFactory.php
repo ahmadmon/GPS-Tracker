@@ -5,6 +5,7 @@ namespace App\Http\Services\Protocol;
 
 
 use App\Http\Services\Protocol\GT06\Manager as GT06Manager;
+use App\Http\Services\Protocol\H02\Manager as H02Manger;
 use http\Exception\UnexpectedValueException;
 
 class ProtocolFactory
@@ -16,7 +17,8 @@ class ProtocolFactory
     public static function list(): array
     {
         return [
-            'gt06' => GT06Manager::class
+            'gt06' => GT06Manager::class,
+            'h02' => H02Manger::class
         ];
     }
 

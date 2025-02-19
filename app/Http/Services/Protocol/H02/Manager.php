@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Services\Protocol\GT06;
+namespace App\Http\Services\Protocol\H02;
 
 use App\Http\Services\Protocol\GT06\Parser\Auth as AuthParser;
 use App\Http\Services\Protocol\GT06\Parser\HeartBeat as HeartBeatParser;
@@ -10,7 +10,7 @@ use App\Http\Services\Protocol\ProtocolAbstract;
 
 class Manager extends ProtocolAbstract
 {
-    const PORT = 5024;
+    const PORT = 5023;
 
 
     /**
@@ -18,7 +18,7 @@ class Manager extends ProtocolAbstract
      */
     public function code(): string
     {
-        return 'gt06';
+        return 'h02';
     }
 
 
@@ -27,7 +27,7 @@ class Manager extends ProtocolAbstract
      */
     public function name(): string
     {
-        return 'GT06';
+        return 'H02';
     }
 
     /**
@@ -45,10 +45,7 @@ class Manager extends ProtocolAbstract
     protected function parsers(): array
     {
         return [
-            AuthParser::class,
-            HeartBeatParser::class,
             LocationParser::class,
-            LocationGpsModularParser::class
         ];
     }
 

@@ -12,6 +12,7 @@ class Location extends ParserAbstract
      */
     public function resources(): array
     {
+        $this->cache = [];
         $this->values = [];
 
         if ($this->messageIsValid() === false) {
