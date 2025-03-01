@@ -268,6 +268,7 @@
 
 <!-- // Others assets  -->
 <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylinedecorator.js"></script>
+<script src="{{ asset('assets/js/custom/gpsDataFilter.js') }}"></script>
 
 <style>
     #map {
@@ -904,6 +905,13 @@
             this.circleMarkers = []; // Array to store circle markers
 
             trips.forEach((trip, i) => {
+                const gpsData = trip.map(t => ({
+                    lat: t.lat,
+                    lng: t.long,
+                    speed: JSON.parse(t.device_stats).speed,
+                    datetime: new Date(t.created_at)
+                }));
+
                 const chunkSize = 500;
                 const routeChunks = [];
                 for (let j = 0; j < trip.length; j += chunkSize) {
@@ -921,7 +929,7 @@
                     if (this.snapMode) {
                         snapedRoute = L.Routing.control({
                             router: L.Routing.osrmv1({
-                                serviceUrl: 'http://31.214.251.139:8090/route/v1',
+                                serviceUrl: 'https://31.214.251.139:8090/route/v1',
                                 profile: 'driving',
                                 routingOptions: {
                                     alternatives: false,
@@ -964,8 +972,17 @@
                             opacity: !this.snapMode ? 0.9 : 0
                         }).addTo(this.map);
 
+                        const gpsFilter = new GPSFilter();
+                        const filteredData = gpsFilter.filterGPSData(gpsData)
+                        console.log(filteredData);
+                        L.polyline(filteredData.map(p => [parseFloat(p.lat), parseFloat(p.lng)]), {
+                            color: "green",
+                            weight: 8,
+                            opacity: !this.snapMode ? 0.9 : 0
+                        }).addTo(this.map);
+
                         if (this.dirMode)
-                            this.addRouteDirection(polyline.getLatLngs());
+                            this.addRouteDirection(allRouteCoords);
                     }
 
                     if (polyline) {
