@@ -174,6 +174,7 @@ class MultiProtocolServer
             'signal' => $resource->signal(),
             'direction' => $resource->direction(),
             'datetime' => $resource->datetime(),
+            'received_at' => now()
         ];
     }
 

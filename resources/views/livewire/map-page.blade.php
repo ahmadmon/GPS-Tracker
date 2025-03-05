@@ -269,6 +269,7 @@
 <!-- // Others assets  -->
 <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylinedecorator.js"></script>
 <script src="{{ asset('assets/js/custom/gpsDataFilter.js') }}"></script>
+<script src="{{ asset('assets/libs/leaflet/ant-path/leaflet-ant-path.js') }}"></script>
 
 <style>
     #map {
@@ -530,7 +531,7 @@
 
 
             this.map.createPane('data-point');
-            this.map.getPane('data-point').style.zIndex = 650;
+            this.map.getPane('data-point').style.zIndex = 850;
 
             this.map.on('zoomend', () => this.currentZoom = this.map.getZoom());
 
@@ -928,14 +929,14 @@
 
                     if (this.snapMode) {
                         snapedRoute = L.Routing.control({
-                            router: L.Routing.osrmv1({
-                                serviceUrl: 'https://31.214.251.139:8090/route/v1',
-                                profile: 'driving',
-                                routingOptions: {
-                                    alternatives: false,
-                                    continue_straight: true,
-                                }
-                            }),
+                            // router: L.Routing.osrmv1({
+                            //     serviceUrl: 'https://31.214.251.139:8090/route/v1',
+                            //     profile: 'driving',
+                            //     routingOptions: {
+                            //         alternatives: false,
+                            //         continue_straight: true,
+                            //     }
+                            // }),
                             waypoints: routeCoords,
                             waypointMode: 'snap',
                             draggableWaypoints: false,
@@ -957,7 +958,7 @@
 
                             if (routes.length > 0) {
                                 if (this.dirMode)
-                                    this.addRouteDirection(routes[0].coordinates);
+                                    this.addRouteDirection(allRouteCoords);
                             }
 
                             // Assign totalDistance to every point in the chunk
@@ -969,15 +970,7 @@
                         polyline = L.polyline(routeCoords, {
                             color: "#F50A0AFF",
                             weight: 5,
-                            opacity: !this.snapMode ? 0.9 : 0
-                        }).addTo(this.map);
-
-                        const gpsFilter = new GPSFilter();
-                        const filteredData = gpsFilter.filterGPSData(gpsData)
-                        console.log(filteredData);
-                        L.polyline(filteredData.map(p => [parseFloat(p.lat), parseFloat(p.lng)]), {
-                            color: "green",
-                            weight: 8,
+                            smoothFactor: 1.5,
                             opacity: !this.snapMode ? 0.9 : 0
                         }).addTo(this.map);
 
@@ -1015,7 +1008,7 @@
                     this.map.on('zoomend', () => {
                         const currentZoom = this.map.getZoom();
                         this.circleMarkers.forEach((circle) => {
-                            if (currentZoom >= 10) {
+                            if (currentZoom >= 15) {
                                 circle.addTo(this.map); // Show circles
                             } else {
                                 this.map.removeLayer(circle); // Hide circles
@@ -1163,7 +1156,10 @@
                 maxDate: "today",
                 disableMobile: true,
                 disabled: this.disabled,
-                placeholder: this.placeholder
+                placeholder: this.placeholder,
+                onClose: (selectedDates, dateStr) => {
+                    $wire.set('dateTimeRange', dateStr);
+                }
             });
         }
     }));
