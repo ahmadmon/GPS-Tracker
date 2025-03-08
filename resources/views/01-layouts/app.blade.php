@@ -40,7 +40,7 @@
 
             <div class="page-body">
                 <div class="container-fluid pb-5">
-                   {{ $slot }}
+                    {{ $slot }}
                 </div>
             </div>
 

@@ -17,7 +17,7 @@
         <div class="header-logo-wrapper col-auto p-0">
             <div class="logo-wrapper"><a href="{{ route('home') }}"><img class="img-fluid" width="30"
                                                                          src="{{ asset('assets/images/logo/samfa-logo.png') }}"
-                                                                         alt="سمفا - سامانه هوشمند ردیابی پلیس امنیت اقتصادیGPS"></a></div>
+                                                                         alt="سمفا - سامانه هوشمند ردیابی GPS"></a></div>
             <div class="toggle-sidebar"><i class="status_toggle middle sidebar-toggle" data-feather="align-center"></i>
             </div>
         </div>

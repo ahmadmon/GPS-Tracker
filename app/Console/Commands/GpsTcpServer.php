@@ -65,7 +65,7 @@ class GpsTcpServer extends Command
         $SERVER = Config::get('server-info.server');
         $PORT = Config::get('server-info.port');
 
-        $tcpWorker = new Worker("tcp://{$SERVER}:{$PORT}");
+        $tcpWorker = new Worker("tcp://0.0.0.0:5022");
         $tcpWorker->count = 4;
 
         $tcpWorker->onConnect = function () {
@@ -174,6 +174,7 @@ class GpsTcpServer extends Command
     private function detectDevice($data, $connection): array|null
     {
         $uniqueKey = $connection->getRemoteIp() . ':' . $connection->getRemotePort();
+        dump($uniqueKey);
 
         if (str_starts_with($data, '*HQ')) {
             preg_match('/\*HQ,(\d{10,15}),/', $data, $matches);

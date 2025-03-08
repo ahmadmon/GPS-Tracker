@@ -81,7 +81,7 @@
                                                         </tr>
                                                         @forelse($devices as $key => $device)
                                                             <tr wire:key="{{ $device->id }}"
-                                                                @click="scrollToMap()">
+                                                                @click="scrollToMap()" class="device-section">
                                                                 <td
                                                                     class="w-100 d-flex justify-content-between align-items-center">
                                                                     <div
@@ -94,9 +94,15 @@
                                                                                wire:model.live="selected">
                                                                         <label for="input-{{ $key }}"
                                                                                class="cursor-pointer">
-                                                                            <h6 class="task_title_0">
+                                                                            <h6 class="task_title_0 device-title">
                                                                                 دستگاه
                                                                                 {{ str($device->name)->replace('دستگاه', '') }}
+                                                                                @if($device->lastStatus())
+                                                                                    <i class="fa fa-info-circle cursor-pointer"
+                                                                                       data-bs-toggle="modal"
+                                                                                       data-bs-target="#status-modal"
+                                                                                       @click="$event.preventDefault(); $wire.handleDeviceStatus({{ $device->id }})"></i>
+                                                                                @endif
                                                                             </h6>
                                                                             <small
                                                                                 class="project_name_0 text-muted d-block">{{ $device->serial }}</small>
@@ -216,6 +222,10 @@
         </div>
     </div>
 
+
+    <x-partials.modals.device-status-modal :$deviceStatus/>
+
+
 </div>
 
 @assets
@@ -258,6 +268,8 @@
 
 <!-- // Others assets  -->
 <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylinedecorator.js"></script>
+<script src="{{ asset('assets/js/custom/gpsDataFilter.js') }}"></script>
+<script src="{{ asset('assets/libs/leaflet/ant-path/leaflet-ant-path.js') }}"></script>
 
 <style>
     #map {
@@ -519,7 +531,7 @@
 
 
             this.map.createPane('data-point');
-            this.map.getPane('data-point').style.zIndex = 650;
+            this.map.getPane('data-point').style.zIndex = 850;
 
             this.map.on('zoomend', () => this.currentZoom = this.map.getZoom());
 
@@ -894,6 +906,13 @@
             this.circleMarkers = []; // Array to store circle markers
 
             trips.forEach((trip, i) => {
+                const gpsData = trip.map(t => ({
+                    lat: t.lat,
+                    lng: t.long,
+                    speed: JSON.parse(t.device_stats).speed,
+                    datetime: new Date(t.created_at)
+                }));
+
                 const chunkSize = 500;
                 const routeChunks = [];
                 for (let j = 0; j < trip.length; j += chunkSize) {
@@ -910,14 +929,14 @@
 
                     if (this.snapMode) {
                         snapedRoute = L.Routing.control({
-                            router: L.Routing.osrmv1({
-                                serviceUrl: 'http://31.214.251.139:8090/route/v1',
-                                profile: 'driving',
-                                routingOptions: {
-                                    alternatives: false,
-                                    continue_straight: true,
-                                }
-                            }),
+                            // router: L.Routing.osrmv1({
+                            //     serviceUrl: 'https://31.214.251.139:8090/route/v1',
+                            //     profile: 'driving',
+                            //     routingOptions: {
+                            //         alternatives: false,
+                            //         continue_straight: true,
+                            //     }
+                            // }),
                             waypoints: routeCoords,
                             waypointMode: 'snap',
                             draggableWaypoints: false,
@@ -939,7 +958,7 @@
 
                             if (routes.length > 0) {
                                 if (this.dirMode)
-                                    this.addRouteDirection(routes[0].coordinates);
+                                    this.addRouteDirection(allRouteCoords);
                             }
 
                             // Assign totalDistance to every point in the chunk
@@ -951,11 +970,12 @@
                         polyline = L.polyline(routeCoords, {
                             color: "#F50A0AFF",
                             weight: 5,
+                            smoothFactor: 1.5,
                             opacity: !this.snapMode ? 0.9 : 0
                         }).addTo(this.map);
 
                         if (this.dirMode)
-                            this.addRouteDirection(polyline.getLatLngs());
+                            this.addRouteDirection(allRouteCoords);
                     }
 
                     if (polyline) {
@@ -988,7 +1008,7 @@
                     this.map.on('zoomend', () => {
                         const currentZoom = this.map.getZoom();
                         this.circleMarkers.forEach((circle) => {
-                            if (currentZoom >= 10) {
+                            if (currentZoom >= 15) {
                                 circle.addTo(this.map); // Show circles
                             } else {
                                 this.map.removeLayer(circle); // Hide circles
@@ -1136,7 +1156,31 @@
                 maxDate: "today",
                 disableMobile: true,
                 disabled: this.disabled,
-                placeholder: this.placeholder
+                placeholder: this.placeholder,
+                onChange: (selectedDates, dateStr, instance) => {
+                    if (selectedDates.length === 2) {
+                        const $startDate = selectedDates[0];
+                        const $endDate = selectedDates[1];
+
+                        if (
+                            $startDate.getDate() === $endDate.getDate() &&
+                            $startDate.getMonth() === $endDate.getMonth() &&
+                            $startDate.getFullYear() === $endDate.getFullYear() &&
+                            $startDate.getHours() === $endDate.getHours() &&
+                            $startDate.getMinutes() === $endDate.getMinutes()
+                        ) {
+                            $endDate.setHours(23);
+                            $endDate.setMinutes(59);
+
+                            instance.setDate([$startDate, $endDate]);
+                        }
+
+                    }
+
+                },
+                onClose: (selectedDates, dateStr) => {
+                    $wire.set('dateTimeRange', dateStr);
+                }
             });
         }
     }));
