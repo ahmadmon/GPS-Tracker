@@ -37,38 +37,38 @@ class StoreGpsDataJob implements ShouldQueue
             $device = Device::where('serial', $this->data['device_id'])->first();
 
             if ($device) {
-                $prevPoint = [
-                    'lat' => $device->lastLocation()?->lat,
-                    'lng' => $device->lastLocation()?->long,
-                    'datetime' => $device->lastLocation()?->created_at,
-                    'speed' => json_decode($device->lastLocation()?->device_stats)?->speed
-                ];
+//                $prevPoint = [
+//                    'lat' => $device->lastLocation()?->lat,
+//                    'lng' => $device->lastLocation()?->long,
+//                    'datetime' => $device->lastLocation()?->created_at,
+//                    'speed' => json_decode($device->lastLocation()?->device_stats)?->speed
+//                ];
+//
+//                $currentPoint = [
+//                    'lat' => $this->data['lat'],
+//                    'lng' => $this->data['long'],
+//                    'datetime' => Carbon::make($this->data['datetime']),
+//                    'speed' => $this->data['speed']
+//                ];
 
-                $currentPoint = [
-                    'lat' => $this->data['lat'],
-                    'lng' => $this->data['long'],
-                    'datetime' => Carbon::make($this->data['datetime']),
-                    'speed' => $this->data['speed']
-                ];
+//                if ($this->isValid($prevPoint, $currentPoint)) {
 
-                if ($this->isValid($prevPoint, $currentPoint)) {
+                $device->update(['connected_at' => $now]);
+                $trip = DB::transaction(function () use ($device, $now) {
+                    return Trip::create([
+                        'device_id' => $device->id,
+                        'user_id' => $device->user_id,
+                        'vehicle_id' => $device?->vehicle_id,
+                        'name' => jalaliDate($this->data['received_at'], format: 'Y/m/d H:i:s'),
+                        'lat' => $this->data['lat'],
+                        'long' => $this->data['long'],
+                        'device_stats' => json_encode($this->data),
+                        'created_at' => $this->data['received_at']
+                    ]);
+                });
 
-                    $device->update(['connected_at' => $now]);
-                    $trip = DB::transaction(function () use ($device, $now) {
-                        return Trip::create([
-                            'device_id' => $device->id,
-                            'user_id' => $device->user_id,
-                            'vehicle_id' => $device?->vehicle_id,
-                            'name' => jalaliDate($this->data['received_at'], format: 'Y/m/d H:i:s'),
-                            'lat' => $this->data['lat'],
-                            'long' => $this->data['long'],
-                            'device_stats' => json_encode($this->data),
-                            'created_at' => $this->data['received_at']
-                        ]);
-                    });
-
-                    CheckGeofenceStatusJob::dispatch($device, $trip);
-                }
+                CheckGeofenceStatusJob::dispatch($device, $trip);
+//                }
             }
 
         } catch (\Exception $e) {

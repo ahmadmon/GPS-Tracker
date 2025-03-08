@@ -70,8 +70,8 @@ class MultiProtocolServer
         try {
             $port = $protocolManager->port();
 
-
-            $worker = new Worker("tcp://0.0.0.0:{$port}");
+            $serverIP = config('server-info.server');
+            $worker = new Worker("tcp://{$serverIP}:{$port}");
 
 
             $worker->onMessage = function (TcpConnection $connection, $message) use ($protocolManager) {
@@ -94,7 +94,8 @@ class MultiProtocolServer
                 $this->logger->info("Connection closed on protocol {$protocolManager->name()}");
 
                 //                $connectionKey = "{$connection->getRemoteIp()}:{$connection->getRemotePort()}";
-                //                 ParserAbstract::removeSerial($connectionKey);
+                //                 ParserAbstract::removeSerial($conne
+                //ctionKey);
                 //                 echo json_encode(ParserAbstract::getAllSerials());
 
                 //                unset($this->connections[$connection->id]);

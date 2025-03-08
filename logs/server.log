@@ -407,3 +407,5 @@
 [2025-02-19T13:44:33.830742+03:30] MultiProtocolServer.INFO: Server started for protocol H02 on port 5023 [] []
 [2025-02-19T13:57:48.570474+03:30] MultiProtocolServer.INFO: Server started for protocol GT06 on port 5024 [] []
 [2025-02-19T13:57:48.571754+03:30] MultiProtocolServer.INFO: Server started for protocol H02 on port 5023 [] []
+[2025-03-08T12:27:42.523617+03:30] MultiProtocolServer.INFO: Server started for protocol GT06 on port 5024 [] []
+[2025-03-08T12:27:42.530612+03:30] MultiProtocolServer.INFO: Server started for protocol H02 on port 5023 [] []
