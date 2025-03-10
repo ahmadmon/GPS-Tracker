@@ -32,7 +32,7 @@ class StoreGpsDataJob implements ShouldQueue
     public function handle(): void
     {
         try {
-            $now = Carbon::now();
+            $received_time = $this->data['received_at'] ?? Carbon::now();
 
             $device = Device::where('serial', $this->data['device_id'])->first();
 
@@ -53,17 +53,17 @@ class StoreGpsDataJob implements ShouldQueue
 
 //                if ($this->isValid($prevPoint, $currentPoint)) {
 
-                $device->update(['connected_at' => $now]);
-                $trip = DB::transaction(function () use ($device, $now) {
+                $device->update(['connected_at' => $received_time]);
+                $trip = DB::transaction(function () use ($device, $received_time) {
                     return Trip::create([
                         'device_id' => $device->id,
                         'user_id' => $device->user_id,
                         'vehicle_id' => $device?->vehicle_id,
-                        'name' => jalaliDate($this->data['received_at'], format: 'Y/m/d H:i:s'),
+                        'name' => jalaliDate($received_time, format: 'Y/m/d H:i:s'),
                         'lat' => $this->data['lat'],
                         'long' => $this->data['long'],
                         'device_stats' => json_encode($this->data),
-                        'created_at' => $this->data['received_at']
+                        'created_at' => $received_time
                     ]);
                 });
 

@@ -12,14 +12,13 @@ class DeviceManager
 {
     protected $devices;
     const IP = '31.214.251.139';
-    const PORT = '5024';
 
     public function __construct(?Device $device = null)
     {
         $this->devices = [
-            'sinotrack' => new SinoTrack(self::IP,self::PORT, $device?->password),
-            'concox' => new ConCox(self::IP,self::PORT, $device?->password),
-            'wanway' => new WanWay(self::IP,self::PORT, $device?->password),
+            'sinotrack' => new SinoTrack(self::IP,5024, $device?->password),
+            'concox' => new ConCox(self::IP,5023, $device?->password),
+            'wanway' => new WanWay(self::IP,5024, $device?->password),
         ];
     }
 
