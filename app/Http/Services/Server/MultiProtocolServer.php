@@ -94,8 +94,7 @@ class MultiProtocolServer
                 $this->logger->info("Connection closed on protocol {$protocolManager->name()}");
 
                 //                $connectionKey = "{$connection->getRemoteIp()}:{$connection->getRemotePort()}";
-                //                 ParserAbstract::removeSerial($conne
-                //ctionKey);
+                //                 ParserAbstract::removeSerial($connectionKey);
                 //                 echo json_encode(ParserAbstract::getAllSerials());
 
                 //                unset($this->connections[$connection->id]);
@@ -175,7 +174,7 @@ class MultiProtocolServer
             'signal' => $resource->signal(),
             'direction' => $resource->direction(),
             'datetime' => $resource->datetime(),
-            'received_at' => now()
+            'received_at' => Carbon::now()
         ];
     }
 

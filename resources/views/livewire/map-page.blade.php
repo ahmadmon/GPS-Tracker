@@ -515,7 +515,7 @@
         circleMarkers: [],
         trips: null,
         snapMode: false,
-        dirMode: false,
+        dirMode: true,
         routeDecorator: null,
         totalDistance: [],
         neshanApi: @js(env('NESHAN_API')),
@@ -930,7 +930,7 @@
                     if (this.snapMode) {
                         snapedRoute = L.Routing.control({
                             // router: L.Routing.osrmv1({
-                            //     serviceUrl: 'https://31.214.251.139:8090/route/v1',
+                            //     serviceUrl: 'https://test.aronict.com/app/route/v1',
                             //     profile: 'driving',
                             //     routingOptions: {
                             //         alternatives: false,
@@ -1157,27 +1157,27 @@
                 disableMobile: true,
                 disabled: this.disabled,
                 placeholder: this.placeholder,
-                onChange: (selectedDates, dateStr, instance) => {
-                    if (selectedDates.length === 2) {
-                        const $startDate = selectedDates[0];
-                        const $endDate = selectedDates[1];
-
-                        if (
-                            $startDate.getDate() === $endDate.getDate() &&
-                            $startDate.getMonth() === $endDate.getMonth() &&
-                            $startDate.getFullYear() === $endDate.getFullYear() &&
-                            $startDate.getHours() === $endDate.getHours() &&
-                            $startDate.getMinutes() === $endDate.getMinutes()
-                        ) {
-                            $endDate.setHours(23);
-                            $endDate.setMinutes(59);
-
-                            instance.setDate([$startDate, $endDate]);
-                        }
-
-                    }
-
-                },
+                // onChange: (selectedDates, dateStr, instance) => {
+                //     if (selectedDates.length === 2) {
+                //         const $startDate = selectedDates[0];
+                //         const $endDate = selectedDates[1];
+                //
+                //         if (
+                //             $startDate.getDate() === $endDate.getDate() &&
+                //             $startDate.getMonth() === $endDate.getMonth() &&
+                //             $startDate.getFullYear() === $endDate.getFullYear() &&
+                //             $startDate.getHours() === $endDate.getHours() &&
+                //             $startDate.getMinutes() === $endDate.getMinutes()
+                //         ) {
+                //             $endDate.setHours(23);
+                //             $endDate.setMinutes(59);
+                //
+                //             instance.setDate([$startDate, $endDate]);
+                //         }
+                //
+                //     }
+                //
+                // },
                 onClose: (selectedDates, dateStr) => {
                     $wire.set('dateTimeRange', dateStr);
                 }
