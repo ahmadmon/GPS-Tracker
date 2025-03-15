@@ -10,8 +10,10 @@
             <option value="2" @selected(old('command') == 2)>زمانبندی ارسال موقعیت</option>
             <option value="3" @selected(old('command') == 3)>تنظیم رمز عبور</option>
             <option value="4" @selected(old('command') == 4)>معرفی شماره ادمین</option>
-            <option value="5" @selected(old('command') == 5)>بازگردانی دستگاه به حالت کارخانه</option>
-            <option value="6" @selected(old('command') == 6)>سایر دستورات</option>
+            <option value="5" @selected(old('command') == 5)>حذف شماره ادمین</option>
+            <option value="6" @selected(old('command') == 6)>حالت عملکرد</option>
+            <option value="7" @selected(old('command') == 7)>بازگردانی دستگاه به حالت کارخانه</option>
+            <option value="8" @selected(old('command') == 8)>سایر دستورات</option>
         </select>
         <x-input-error :messages="$errors->get('command')" class="mt-2"/>
     </div>
@@ -63,13 +65,51 @@
             </label>
             <small class="text-muted d-block">در این بخش، شماره ادمین را وارد کنید تا در صورت نیاز،
                 امکان دریافت اطلاعات از دستگاه فراهم شود.</small>
+            <small class="text-muted d-block">* توجه داشته باشید که پس از تنظیم شماره ادمین، تمامی پیامک‌ها و عملیات‌های
+                دستگاه تنها از طریق این شماره قابل اجرا خواهند بود.</small>
             <input class="form-control" id="selected-4" name="phones[0]" type="number"
                    value="{{ old('phones.0') }}"
                    placeholder="برای مثال: 09123456789">
             <x-input-error :messages="$errors->get('phones.0')" class="mt-2"/>
         </div>
-        <!-- Others Command -->
+        <!-- Working Mode -->
         <div class="mb-3" x-cloak x-show="parseInt(selected) === 6">
+            <div x-data="{
+                mode: 'WORK',
+                modes: {
+                    'WORK': {
+                        'description': 'در این حالت، ردیاب همیشه فعال است و به‌صورت دوره‌ای اطلاعات ارسال می‌کند.',
+                        'battery': 'مدت زمان شارژ: حدود 7 روز برای هر 10000mAh'
+                    },
+                    'MOVE': {
+                        'description': 'ردیاب فقط هنگام حرکت فعال می‌شود و در زمان توقف، به حالت خواب (Sleep Mode) می‌رود.</br>در این حالت، GPS خاموش می‌شود و GSM در حالت کم‌مصرف (Low Consumption) کار می‌کند.</br> برای بیدار کردن دستگاه می‌توان از لرزش، پیامک، یا تماس استفاده کرد. دستگاه پس از بیدار شدن، 5 دقیقه فعال خواهد بود.',
+                        'battery': ' مدت زمان شارژ: حدود 30 روز برای هر 10000mAh'
+                    },
+                    'STANDBY': {
+                        'description': 'در این حالت، ردیاب در حالت خاموش (Standby Mode) قرار می‌گیرد و فقط در صورت دریافت پیامک یا تماس، به‌مدت 5 دقیقه روشن می‌شود.</br>GPS خاموش است و GSM در حالت کم‌مصرف کار می‌کند.',
+                        'battery': 'مدت زمان شارژ: حدود 120 روز برای هر 10000mAh'
+                    }
+                }
+            }">
+                <label class="form-label" for="selected-1">حالت کاری دستگاه را انتخاب کنید
+                    <sup class="text-danger">*</sup>
+                </label>
+                <select class="form-select" name="mode" id="selected-1" x-model="mode">
+                    <option value="WORK" @selected(old('mode') == 'WORK')>حالت دائمی (فعال همیشه)</option>
+                    <option value="MOVE" @selected(old('mode') == 'MOVE')>حالت حرکت (فعال هنگام حرکت) - پیش‌فرض</option>
+                    <option value="STANDBY" @selected(old('mode') == 'STANDBY ')>حالت آماده‌به‌کار (فعال با پیامک یا تماس)</option>
+                </select>
+                <x-input-error :messages="$errors->get('mode')" class="mt-2"/>
+
+                <div x-show="mode" class="mt-1 ms-2">
+                    <small class="text-muted d-block" x-html="modes[mode].description"></small>
+                    <small class="text-muted d-block" x-html="modes[mode].battery"></small>
+                </div>
+
+            </div>
+        </div>
+        <!-- Others Command -->
+        <div class="mb-3" x-cloak x-show="parseInt(selected) === 8">
             <label class="form-label" for="selected-8">دستور مورد نظر را وارد کنید
                 <sup class="text-danger">*</sup>
             </label>
