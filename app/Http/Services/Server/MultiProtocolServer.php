@@ -5,6 +5,7 @@ namespace App\Http\Services\Server;
 use App\Http\Services\Protocol\ParserAbstract;
 use App\Http\Services\Protocol\ProtocolAbstract;
 use App\Http\Services\Protocol\Resource\ResourceAbstract;
+use App\Jobs\LogSuccessJob;
 use App\Jobs\StoreGpsDataJob;
 use App\Jobs\StoreTrackerInfoJob;
 use Illuminate\Support\Arr;
@@ -170,7 +171,10 @@ class MultiProtocolServer
             StoreGpsDataJob::dispatch($locationData)
                 ->onQueue('location')
                 ->chain([
-                    fn() => $this->loggers[$protocolName]->info("GPS data location stored successfully", ['serial' => $locationData['device_id']])
+                    new LogSuccessJob($protocolName, [
+                        'queue' => 'location',
+                        'serial' => $locationData['device_id']
+                    ])
                 ]);
 
         } catch (\Exception $e) {
@@ -198,7 +202,10 @@ class MultiProtocolServer
             StoreTrackerInfoJob::dispatch($heartbeatData)
                 ->onQueue('heartbeat')
                 ->chain([
-                    fn() => $this->loggers[$protocolName]->info("HeartBeat data stored successfully", ['serial' => $heartbeatData['device_id']])
+                    new LogSuccessJob($protocolName, [
+                        'queue' => 'location',
+                        'serial' => $heartbeatData['device_id']
+                    ])
                 ]);
 
         } catch (\Exception $e) {
