@@ -29,20 +29,13 @@ class MultiProtocolServer
     protected array $protocols = [];
 
     /**
-     * @var Logger $logger
+     * @var array $loggers
      */
-    protected Logger $logger;
+    protected array $loggers = [];
 
-    /**
-     * @var array $connections
-     */
-    protected array $connections = [];
 
     public function __construct()
     {
-        // Initialize logger
-        $this->logger = new Logger('MultiProtocolServer');
-        $this->logger->pushHandler(new StreamHandler('logs/server.log', Logger::DEBUG));
 
         // Automatically load protocol managers using ProtocolFactory
         $this->protocols = ProtocolFactory::list();
@@ -68,52 +61,50 @@ class MultiProtocolServer
     public function addServer(ProtocolAbstract $protocolManager): void
     {
         try {
+            // Set Logger for This Protocol
             $port = $protocolManager->port();
+            $protocolName = strtolower($protocolManager->code());
 
+            $this->loggers[$protocolName] = new Logger($protocolName);
+            $logFile = storage_path("logs/{$protocolName}.log");
+            $this->loggers[$protocolName]->pushHandler(new StreamHandler($logFile, Logger::DEBUG));
+
+            // Set Server Info
             $serverIP = config('server-info.server');
             $worker = new Worker("tcp://{$serverIP}:{$port}");
 
 
-            $worker->onMessage = function (TcpConnection $connection, $message) use ($protocolManager) {
+            $worker->onMessage = function (TcpConnection $connection, $message) use ($protocolManager, $protocolName) {
                 echo "Message Received at: " . jalaliDate(now(), format: "Y/m/d H:i:s") . "\n";
+                $this->loggers[$protocolName]->info("Message Received", ['message' => $this->readBuffer($message)]);
                 $this->handleMessage($protocolManager, $connection, $this->readBuffer($message));
             };
 
-            $worker->onConnect = function (TcpConnection $connection) use ($protocolManager) {
+            $worker->onConnect = function (TcpConnection $connection) use ($protocolManager, $protocolName) {
                 echo "New connection on protocol {$protocolManager->name()}\n";
-                $this->logger->info("New connection on protocol {$protocolManager->name()}");
-
-                $this->connections[$connection->id] = [
-                    'connection' => $connection,
-                    'last_activity' => time(), // Track connection time
-                ];
+                $this->loggers[$protocolName]->info("New Connection Established");
             };
 
-            $worker->onClose = function (TcpConnection $connection) use ($protocolManager) {
+            $worker->onClose = function (TcpConnection $connection) use ($protocolManager, $protocolName) {
                 echo "Connection closed on protocol {$protocolManager->name()}\n";
-                $this->logger->info("Connection closed on protocol {$protocolManager->name()}");
+                $this->loggers[$protocolName]->info("Connection Closed");
 
-                //                $connectionKey = "{$connection->getRemoteIp()}:{$connection->getRemotePort()}";
-                //                 ParserAbstract::removeSerial($connectionKey);
-                //                 echo json_encode(ParserAbstract::getAllSerials());
-
-                //                unset($this->connections[$connection->id]);
             };
 
-            $worker->onError = function ($connection, $code, $msg) use ($protocolManager) {
+            $worker->onError = function ($connection, $code, $msg) use ($protocolManager, $protocolName) {
                 echo "Error on protocol {$protocolManager->name()} : $msg - (Code: $code)";
-                $this->logger->error("Error on protocol {$protocolManager->name()} : $msg - (Code: $code)");
+                $this->loggers[$protocolName]->error("Error: $msg (Code: $code)");
 
-                //                unset($this->connections[$connection->id]);
             };
 
             $this->servers[] = $worker;
 
             echo "Server started for protocol {$protocolManager->name()} on port {$port}\n";
-            $this->logger->info("Server started for protocol {$protocolManager->name()} on port {$port}");
+            $this->loggers[$protocolName]->info("Server started on port {$port}");
+
+
         } catch (\Exception $e) {
             echo "Error running servers: " . $e->getMessage();
-            $this->logger->error("Error running servers: " . $e->getMessage());
             return;
         }
     }
@@ -129,32 +120,92 @@ class MultiProtocolServer
     protected function handleMessage(ProtocolAbstract $protocolManager, TcpConnection $connection, string $buffer): void
     {
         try {
-            $this->logger->info("Packet is: ", [$protocolManager->messages($buffer)]);
+            $protocolName = strtolower($protocolManager->code());
+            $this->loggers[$protocolName]->info("Packet received", ['packet' => $buffer]);
 
             $resources = $protocolManager->resources($buffer, $connection);
             if (empty($resources)) return;
 
             foreach ($resources as $resource) {
                 if ($resource->format() === 'location') {
-                    StoreGpsDataJob::dispatch($this->locationData($resource));
+                    $this->processLocationData($protocolName, $this->locationData($resource));
                 }
                 if ($resource->format() === 'heartBeat') {
-                    dump($this->heartBeatData($resource));
-                    StoreTrackerInfoJob::dispatch($this->heartBeatData($resource));
+                    $this->processHeartbeatData($protocolName, $this->heartBeatData($resource));
                 }
             }
 
             $lastResource = end($resources);
             if ($lastResource !== null && !empty($lastResource->response())) {
-                $connection->send($lastResource->response()); // Send protocol-specific response from last resource
+                $response = $lastResource->response();
+                $connection->send($response); // Send protocol-specific response from last resource
+
+                echo "Response sent to Client: {$this->readBuffer($response)}";
+                $this->loggers[$protocolName]->info("Response sent to Client", [
+                    'serial' => $lastResource->serial(),
+                    'format' => $lastResource->format(),
+                    'message' => $this->readBuffer($response)
+                ]);
             }
 
-            // Update last activity time for the connection
-            // $this->connections[$connection->id]['last_activity'] = time();
+        } catch (\Exception $e) {
+            $this->loggers[$protocolName]->error("Error processing message: " . $e->getMessage());
+            return;
+        }
+    }
+
+    /**
+     * @param string $protocolName
+     * @param array $locationData
+     * @return void
+     */
+    protected function processLocationData(string $protocolName, array $locationData): void
+    {
+        try {
+            $this->loggers[$protocolName]->info("Location data dispatched to queue", [
+                'queue' => 'location',
+                'data' => json_encode($locationData),
+            ]);
+
+            StoreGpsDataJob::dispatch($locationData)
+                ->onQueue('location')
+                ->chain([
+                    fn() => $this->loggers[$protocolName]->info("GPS data location stored successfully", ['serial' => $locationData['device_id']])
+                ]);
 
         } catch (\Exception $e) {
-            $this->logger->error("Error processing message: " . $e->getMessage());
-            return;
+            $this->loggers[$protocolName]->error("Failed to dispatch GPS data to queue", [
+                'serial' => $locationData['device_id'],
+                'error' => $e->getMessage()
+            ]);
+        }
+    }
+
+    /**
+     * @param string $protocolName
+     * @param array $heartbeatData
+     * @return void
+     */
+    protected function processHeartbeatData(string $protocolName, array $heartbeatData): void
+    {
+        try {
+            $this->loggers[$protocolName]->info("HeartBeat data dispatched to queue", [
+                'queue' => 'heartbeat',
+                'data' => json_encode($heartbeatData)
+            ]);
+
+
+            StoreTrackerInfoJob::dispatch($heartbeatData)
+                ->onQueue('heartbeat')
+                ->chain([
+                    fn() => $this->loggers[$protocolName]->info("HeartBeat data stored successfully", ['serial' => $heartbeatData['device_id']])
+                ]);
+
+        } catch (\Exception $e) {
+            $this->loggers[$protocolName]->error("Failed to dispatch GPS data to queue", [
+                'serial' => $heartbeatData['device_id'],
+                'error' => $e->getMessage()
+            ]);
         }
     }
 
@@ -200,9 +251,6 @@ class MultiProtocolServer
      */
     public function run(): void
     {
-        // Start Timer to check inactive connection
-        // check every 60 seconds
-        //        Timer::add(60, fn() => $this->checkInactiveConnections());
 
         global $argv;
         if (!isset($argv[1])) {
@@ -212,26 +260,6 @@ class MultiProtocolServer
 
         Worker::runAll();
     }
-
-    //    /**
-    //     * Check and close inactive connections.
-    //     */
-    //    protected function checkInactiveConnections(): void
-    //    {
-    //        $inactiveTimeout = 300; // Close connections inactive for 5 minutes (300 seconds)
-    //        $currentTime = time();
-    //
-    //        foreach ($this->connections as $connectionId => $connectionData) {
-    //            if ($currentTime - $connectionData['last_activity'] > $inactiveTimeout) {
-    //                $connection = $connectionData['connection'];
-    //                if ($connection) {
-    //                    $this->logger->info("Closing inactive connection: $connectionId");
-    //                    $connection->close();
-    //                    unset($this->connections[$connectionId]);
-    //                }
-    //            }
-    //        }
-    //    }
 
 
     /**
