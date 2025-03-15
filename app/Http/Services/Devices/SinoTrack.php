@@ -40,8 +40,9 @@ class SinoTrack implements DeviceInterface
             '2' => "805{$this->password} {interval}",
             '3' => "777{password}{$this->password}",
             '4' => "{phone}{$this->password} 1",
-            '5' => "RESET",
-            '6' => "{other}"
+            '5' => "D101#",
+            '6' => "RESET",
+            '7' => "{other}"
         ];
 
         $commandTemplate = $commands[$commandKey] ?? null;

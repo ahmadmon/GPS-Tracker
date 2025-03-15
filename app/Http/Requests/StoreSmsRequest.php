@@ -31,12 +31,13 @@ class StoreSmsRequest extends FormRequest
             'phones' => 'nullable|required_if:command,5|required_if:command,6|array|max:2',
             'phones.0' => 'nullable|required_if:command,5|required_if:command,6|numeric|digits:11',
             'phones.1' => 'nullable|numeric|digits:11',
-            'other' => 'nullable|required_if:command,8|string|regex:/^[A-Za-z0-9,]+$/'
         ];
         if ($this->device->brand === DeviceBrand::SINOTRACK) {
-            $rules['password'] = 'nullable|required_if:command,4|numeric|digits:4';
+            $rules['password'] = 'nullable|required_if:command,3|numeric|digits:4';
+            $rules['other'] = 'nullable|required_if:command,7|string|regex:/^[A-Za-z0-9,]+$/';
         } else {
             $rules['password'] = 'nullable|required_if:command,4|numeric|digits:6';
+            $rules['other'] = 'nullable|required_if:command,8|string|regex:/^[A-Za-z0-9,]+$/';
         }
 
         return $rules;

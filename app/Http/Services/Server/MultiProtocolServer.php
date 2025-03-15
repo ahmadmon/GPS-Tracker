@@ -93,7 +93,7 @@ class MultiProtocolServer
             };
 
             $worker->onError = function ($connection, $code, $msg) use ($protocolManager, $protocolName) {
-                echo "Error on protocol {$protocolManager->name()} : $msg - (Code: $code)";
+                echo "Error on protocol {$protocolManager->name()} : $msg - (Code: $code)\n";
                 $this->loggers[$protocolName]->error("Error: $msg (Code: $code)");
 
             };
@@ -105,7 +105,7 @@ class MultiProtocolServer
 
 
         } catch (\Exception $e) {
-            echo "Error running servers: " . $e->getMessage();
+            echo "Error running servers: " . $e->getMessage() . "\n";
             return;
         }
     }
@@ -141,7 +141,7 @@ class MultiProtocolServer
                 $response = $lastResource->response();
                 $connection->send($response); // Send protocol-specific response from last resource
 
-                echo "Response sent to Client: {$this->readBuffer($response)}";
+                echo "Response sent to Client: {$this->readBuffer($response)}\n";
                 $this->loggers[$protocolName]->info("Response sent to Client", [
                     'serial' => $lastResource->serial(),
                     'format' => $lastResource->format(),
