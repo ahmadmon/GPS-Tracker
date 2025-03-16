@@ -32,8 +32,10 @@ class SinoTrack implements DeviceInterface
         // 2 => Upload Time
         // 3 => Change device password
         // 4 => set Admin Number
-        // 5 => Hard Reset Factory
-        // 5 => Other Commands
+        // 5 => Remove Admin Number
+        // 6 => Working Mode
+        // 7 => Hard Reset Factory
+        // 8 => Other Commands
         $commands = [
             '0' => "804{$this->password} {$this->ip} {$this->port}",
             '1' => "803{$this->password} {apn}",
@@ -41,8 +43,9 @@ class SinoTrack implements DeviceInterface
             '3' => "777{password}{$this->password}",
             '4' => "{phone}{$this->password} 1",
             '5' => "D101#",
-            '6' => "RESET",
-            '7' => "{other}"
+            '6' => "{mode}{$this->password}",
+            '7' => "RESET",
+            '8' => "{other}"
         ];
 
         $commandTemplate = $commands[$commandKey] ?? null;

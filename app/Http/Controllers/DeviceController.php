@@ -197,7 +197,8 @@ class DeviceController extends BaseController
             'password' => $request->password,
             'passStatus' => $request->passStatus ? 'on' : 'off',
             'phones' => $this->checkPhone($request->phones, $device),
-            'other' => $request->other
+            'other' => $request->other,
+            'mode' => $request->mode
         ];
 
         $deviceManager = new DeviceManager($device);

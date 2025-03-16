@@ -75,7 +75,7 @@
         <!-- Working Mode -->
         <div class="mb-3" x-cloak x-show="parseInt(selected) === 6">
             <div x-data="{
-                mode: 'WORK',
+                mode: @js(old('mode', 'WORK')),
                 modes: {
                     'WORK': {
                         'description': 'در این حالت، ردیاب همیشه فعال است و به‌صورت دوره‌ای اطلاعات ارسال می‌کند.',
@@ -97,7 +97,7 @@
                 <select class="form-select" name="mode" id="selected-1" x-model="mode">
                     <option value="WORK" @selected(old('mode') == 'WORK')>حالت دائمی (فعال همیشه)</option>
                     <option value="MOVE" @selected(old('mode') == 'MOVE')>حالت حرکت (فعال هنگام حرکت) - پیش‌فرض</option>
-                    <option value="STANDBY" @selected(old('mode') == 'STANDBY ')>حالت آماده‌به‌کار (فعال با پیامک یا تماس)</option>
+                    <option value="STANDBY" @selected(old('mode') == 'STANDBY')>حالت آماده‌به‌کار (فعال با پیامک یا تماس)</option>
                 </select>
                 <x-input-error :messages="$errors->get('mode')" class="mt-2"/>
 
