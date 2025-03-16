@@ -27,15 +27,17 @@ class StoreSmsRequest extends FormRequest
             'apn' => 'nullable|required_if:command,1|string',
             'interval' => 'nullable|required_if:command,2|numeric|min:10',
             'passStatus' => 'nullable|in:false,on',
-//            'password' => 'nullable|required_if:command,4|numeric',
-            'phones' => 'nullable|required_if:command,5|required_if:command,6|array|max:2',
-            'phones.0' => 'nullable|required_if:command,5|required_if:command,6|numeric|digits:11',
-            'phones.1' => 'nullable|numeric|digits:11',
+            //            'password' => 'nullable|required_if:command,4|numeric',
         ];
         if ($this->device->brand === DeviceBrand::SINOTRACK) {
+            $rules['phones.0'] = 'nullable|required_if:command,4|numeric|digits:11';
             $rules['password'] = 'nullable|required_if:command,3|numeric|digits:4';
-            $rules['other'] = 'nullable|required_if:command,7|string|regex:/^[A-Za-z0-9,]+$/';
+            $rules['other'] = 'nullable|required_if:command,8|string|regex:/^[A-Za-z0-9,]+$/';
+            $rules['mode'] = 'nullable|required_if:command,6|string|in:WORK,MOVE,STANDBY';
         } else {
+            $rules['phones'] = 'nullable|required_if:command,5|required_if:command,6|array|max:2';
+            $rules['phones.0'] = 'nullable|required_if:command,5|required_if:command,6|numeric|digits:11';
+            $rules['phones.1'] = 'nullable|numeric|digits:11';
             $rules['password'] = 'nullable|required_if:command,4|numeric|digits:6';
             $rules['other'] = 'nullable|required_if:command,8|string|regex:/^[A-Za-z0-9,]+$/';
         }
@@ -43,7 +45,9 @@ class StoreSmsRequest extends FormRequest
         return $rules;
     }
 
-
+    /**
+     * @return array
+     */
     public function attributes(): array
     {
         return [
@@ -53,7 +57,8 @@ class StoreSmsRequest extends FormRequest
             'passStatus' => 'وضعیت رمزعبور',
             'phones' => 'شماره تماس ادمین',
             'phones.*' => 'شماره تماس ادمین',
-            'other' => 'سایر دستورات'
+            'other' => 'سایر دستورات',
+            'mode' => 'حالت عملکرد'
         ];
     }
 
@@ -72,6 +77,7 @@ class StoreSmsRequest extends FormRequest
             'phones.required_if' => "فیلد :attribute الزامی میباشد.",
             'phones.*.required_if' => "فیلد :attribute الزامی میباشد.",
             'other.required_if' => "فیلد :attribute الزامی میباشد.",
+            'mode.required_if' => "فیلد :attribute الزامی میباشد.",
             'other.regex' => 'مقدار وارد شده باید فقط شامل حروف و اعداد انگلیسی، و علامت کاما (,) باشد. استفاده از سایر عبارات مجاز نیست.',
         ];
     }
