@@ -77,7 +77,6 @@ class MultiProtocolServer
 
             $worker->onMessage = function (TcpConnection $connection, $message) use ($protocolManager, $protocolName) {
                 echo "Message Received at: " . jalaliDate(now(), format: "Y/m/d H:i:s") . "\n";
-                $this->loggers[$protocolName]->info("Message Received", ['message' => $this->readBuffer($message)]);
                 $this->handleMessage($protocolManager, $connection, $this->readBuffer($message));
             };
 
@@ -164,15 +163,14 @@ class MultiProtocolServer
     {
         try {
             $this->loggers[$protocolName]->info("Location data dispatched to queue", [
-                'queue' => 'location',
+                'queue' => StoreGpsDataJob::class,
                 'data' => json_encode($locationData),
             ]);
 
             StoreGpsDataJob::dispatch($locationData)
-                ->onQueue('location')
                 ->chain([
                     new LogSuccessJob($protocolName, [
-                        'queue' => 'location',
+                        'queue' => StoreGpsDataJob::class,
                         'serial' => $locationData['device_id']
                     ])
                 ]);
@@ -194,16 +192,15 @@ class MultiProtocolServer
     {
         try {
             $this->loggers[$protocolName]->info("HeartBeat data dispatched to queue", [
-                'queue' => 'heartbeat',
+                'queue' => StoreTrackerInfoJob::class,
                 'data' => json_encode($heartbeatData)
             ]);
 
 
             StoreTrackerInfoJob::dispatch($heartbeatData)
-                ->onQueue('heartbeat')
                 ->chain([
                     new LogSuccessJob($protocolName, [
-                        'queue' => 'location',
+                        'queue' => StoreTrackerInfoJob::class,
                         'serial' => $heartbeatData['device_id']
                     ])
                 ]);

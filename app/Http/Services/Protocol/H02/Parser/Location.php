@@ -14,6 +14,7 @@ class Location extends ParserAbstract
     {
         $this->cache = [];
 
+        dd($this->messageIsValid());
         if ($this->messageIsValid() === false) {
             return [];
         }
