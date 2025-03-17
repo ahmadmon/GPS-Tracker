@@ -10,8 +10,6 @@ use App\Http\Services\Protocol\ProtocolAbstract;
 
 class Manager extends ProtocolAbstract
 {
-    const PORT = 5024;
-
 
     /**
      * @return string
@@ -35,7 +33,7 @@ class Manager extends ProtocolAbstract
      */
     public function port(): int
     {
-        return self::PORT;
+        return config('protocols.protocols.GT06');
     }
 
 
