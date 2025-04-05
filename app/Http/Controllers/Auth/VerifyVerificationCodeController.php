@@ -17,11 +17,11 @@ class VerifyVerificationCodeController extends Controller
     {
         $user = User::where('phone', $phone)->first();
         if (!$user) {
-            return to_route('register')->with('error-alert', 'همچین کاربری پیدا نشد. لطفا ثبت نام کنید.');
+            return to_route('login')->with('error-alert', 'همچین کاربری پیدا نشد.');
         }
 
         $otpModel = $this->generateOtp($user->phone, $smsService);
-        $seconds = isset($otpModel) ? Carbon::parse($otpModel->expired_at)->diffInSeconds(Carbon::now()) : -180;
+        $seconds = isset($otpModel) ? Carbon::parse($otpModel->expired_at)->diffInSeconds(Carbon::now()) : -120;
         $duration = (int)number_format($seconds) * -1;
 
 
@@ -31,7 +31,7 @@ class VerifyVerificationCodeController extends Controller
     public function verify(Request $request, User $user)
     {
         $request->validate([
-            'otp_code' => 'required|numeric|digits:4|exists:verification_codes,otp'
+            'otp_code' => 'required|numeric|digits:4'
         ]);
 
         $typeNumber = $this->verifyOtp($request->otp_code, $user->id, $request->recovery);

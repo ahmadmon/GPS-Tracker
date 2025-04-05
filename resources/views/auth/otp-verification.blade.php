@@ -8,7 +8,7 @@
 @section('content')
     <div class="row m-0">
         <div class="col-xl-7 p-0">
-            <img class="bg-img-cover bg-center" src="{{ asset('assets/images/login/2.jpg') }}" alt="صفحه ورود"></div>
+            <img class="bg-img-cover bg-center" src="{{ asset('assets/images/login/gps-vector.svg') }}" alt="صفحه ورود"></div>
         <div class="col-xl-5 p-0">
             <div class="login-card login-dark">
                 <div>

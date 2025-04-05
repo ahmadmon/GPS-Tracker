@@ -24,7 +24,7 @@ trait VerificationCode
         $verificationCode = OtpCode::create([
             'user_id' => $user->id,
             'otp' => rand(1234, 9999),
-            'expired_at' => $now->addMinutes(3)
+            'expired_at' => $now->addMinutes(value: 2)
         ]);
 
         $smsService->setTo($mobile);
