@@ -58,7 +58,7 @@ return [
     "not_in" => ":attribute انتخاب شده، معتبر نیست",
     "numeric" => ":attribute باید شامل عدد باشد",
     "regex" => ":attribute یک فرمت معتبر نیست",
-    "required" => "فیلد :attribute الزامی است",
+    "required" => "فیلد :attribute الزامی است.",
     "required_if" => "فیلد :attribute هنگامی که :other برابر با :value است، الزامیست",
     "required_with" => ":attribute الزامی است زمانی که :values موجود است",
     "required_with_all" => ":attribute الزامی است زمانی که :values موجود است",
@@ -247,7 +247,8 @@ return [
         'notify_status' => 'وضعیت ارسال',
         'rule_confirmation' => 'قوانین',
         'otp_code' => 'کد ورود',
-        'command' => 'دستور'
+        'command' => 'دستور',
+        'vehicle_id' => 'وسیله نقلیه'
 
     ]
 ];

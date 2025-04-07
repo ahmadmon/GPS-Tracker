@@ -74,6 +74,15 @@ class User extends Authenticatable
         );
     }
 
+    /**
+     * @return void
+     *
+     */
+    protected static function booted(): void
+    {
+        static::created(fn($user) => $user->wallet()->create());
+    }
+
     protected function joinedCompaniesList(): Attribute
     {
         return Attribute::make(

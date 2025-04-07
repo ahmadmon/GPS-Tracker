@@ -129,7 +129,7 @@
 
                 <li>
                     <div class="cursor-pointer">
-                        <a href="#" class="text-muted">
+                        <a href="{{ route('profile.wallet') }}" class="text-muted">
                             <svg>
                                 <use href="{{ asset('assets/svg/icon-sprite.svg#wallet') }}"></use>
                             </svg>

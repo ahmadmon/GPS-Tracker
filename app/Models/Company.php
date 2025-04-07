@@ -14,6 +14,15 @@ class Company extends Model
 
     protected $guarded = ['id'];
 
+    /**
+     * @return void
+     *
+     */
+    protected static function booted(): void
+    {
+        static::created(fn($company) => $company->wallet()->create());
+    }
+
 
     public function manager(): BelongsTo
     {

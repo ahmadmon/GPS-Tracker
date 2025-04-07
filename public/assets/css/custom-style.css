@@ -373,3 +373,7 @@ section.leaflet-control-layers-list div.leaflet-control-layers-base label span s
         transform: translateX(0);
     }
 }
+
+.text-danger li {
+    color: inherit;
+}

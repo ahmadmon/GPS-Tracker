@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Wallet extends Model
 {
+    protected $guarded = ['id'];
+
     /**
      * Get the parent walletable model (user or company).
      */

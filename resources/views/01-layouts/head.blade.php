@@ -42,6 +42,20 @@
     <link id="color" rel="stylesheet" href="{{ asset('assets/css/color-1.css')}}" media="screen">
     <!-- Responsive css-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/responsive.css')}}">
+
+    <script defer src="{{ asset('assets/css/color-1.js') }}"></script>
+    <script defer src="{{ asset('assets/css/color-2.js') }}"></script>
+    <script defer src="{{ asset('assets/css/color-3.js') }}"></script>
+    <script defer src="{{ asset('assets/css/color-4.js') }}"></script>
+    <script defer src="{{ asset('assets/css/color-6.js') }}"></script>
+    <script defer src="{{ asset('assets/css/color-6.js') }}"></script>
+    <script defer src="{{ asset('assets/css/responsive.js') }}"></script>
+    <script defer src="{{ asset('assets/css/style.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('assets/css/color-6-new.css')}}">
+
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/responsive.css')}}">
+    <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/style.css')}}">
+    <!-- Custom css-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/custom-style.css')}}">
     @if(!isset($loadAlpineJs) || $loadAlpineJs !== false)
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>

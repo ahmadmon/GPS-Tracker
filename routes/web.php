@@ -8,6 +8,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use App\Livewire\MapPage;
+use App\Livewire\Wallet\WalletPage;
 use Illuminate\Support\Facades\Route;
 
 
@@ -51,6 +52,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('index');
         Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('change-password');
         Route::get('/forgot-password', [ProfileController::class, 'forgotPassword'])->name('forgot-password');
+        Route::get('/wallet', WalletPage::class)->name('wallet');
     });
 
 });
