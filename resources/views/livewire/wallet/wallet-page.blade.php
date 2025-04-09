@@ -49,12 +49,12 @@
                                                                 <div class="common-box1 common-align">
                                                                     <h5 class="d-block">موجودی:</h5>
                                                                 </div>
-                                                                <p class="mb-0 pt-2 fw-bolder h5">{{ priceFormat($wallet->amount) }}
-                                                                    تومان</p>
+                                                                <p class="mb-0 pt-2 fw-bolder h5">{{ persianPriceFormat($wallet->amount) }}</p>
                                                                 <div class="go-corner">
                                                                     <div class="go-arrow"></div>
                                                                 </div>
-                                                            </a></div>
+                                                            </a>
+                                                        </div>
                                                     </div>
                                                 </li>
 
@@ -77,7 +77,7 @@
                 </div>
                 <div class="col-xl-9 col-md-12 box-col-12">
                     <div class="email-right-aside bookmark-tabcontent">
-                        <div class="card email-body radius-left">
+                        <div class="card email-body rounded-3">
                             <div class="ps-0">
                                 <div class="tab-content">
                                     <div class="tab-pane fade active show" id="pills-created" role="tabpanel"
@@ -98,20 +98,133 @@
                                                 <div class="taskadd">
                                                     <div class="table-responsive">
                                                         <table class="table">
+                                                            @forelse($myTransactions as $transaction)
+                                                                <tr>
+                                                                    <td>
+                                                                    <span
+                                                                            class="badge common-align txt-{{ $transaction->type->badge()['color'] }} rounded-pill badge-l-{{ $transaction->type->badge()['color'] }} border border-{{ $transaction->type->badge()['color'] }} dana fw-bold w-50">
+                                                                        <i data-feather="plus-circle"
+                                                                           class="me-1 stroke-{{ $transaction->type->badge()['color'] }}"></i>
+                                                                        {{ $transaction->type->label() }}
+                                                                    </span>
+                                                                        <p class="project_name_0">{{ substr($transaction->description,30) }}</p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <h5 class="fw-bold txt-{{ $transaction->type->badge()['color'] }}">{{ priceFormat($transaction->amount) }} </h5>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span class="badge badge-{{ $transaction->status->badge()['color'] }} stroke-{{ $transaction->status->badge()['color'] }} dana">{{ $transaction->status->label() }}</span>
+                                                                    </td>
+                                                                    <td class="task-date">
+                                                                        {{ jalaliDate($transaction->created_at, format: "%d %B %Y , H:i") }}
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <p class="text-muted text-center">موجودی یافت نشد.
+                                                                    </p>
+                                                                </tr>
+                                                            @endforelse
+
                                                             <tr>
                                                                 <td>
-                                                                    <h6 class="task_title_0">Client meeting</h6>
-                                                                    <p class="project_name_0">General</p>
+                                                                    <span
+                                                                            class="badge common-align txt-danger rounded-pill badge-l-danger border border-danger dana fw-bold w-50">
+                                                                        <i data-feather="minus-circle"
+                                                                           class="me-1 stroke-danger"></i>
+                                                                        برداشت
+                                                                    </span>
+                                                                    <p class="project_name_0">پاره ای از
+                                                                        توضیحاتثیثثبدنثیصثیصصثزصث...</p>
                                                                 </td>
                                                                 <td>
-                                                                    <p class="task_desc_0">Lorem Ipsum is simply dummy
-                                                                        text of the printing and typesetting industry.
-                                                                        Lorem Ipsum has been</p>
+                                                                    <h5 class="fw-bold txt-danger">200,000 تومان</h5>
                                                                 </td>
-                                                                <td><a class="me-2" href="#"><i data-feather="link"></i></a><a
-                                                                        href="#"><i data-feather="more-horizontal"></i></a>
+                                                                <td>
+                                                                    <span
+                                                                            class="badge badge-success stroke-success dana">موفقیت آمیز</span>
                                                                 </td>
-                                                                <td><a href="#"><i data-feather="trash-2"></i></a></td>
+                                                                <td class="task-date">
+                                                                    18 فروردین ۱۴۰۴ , 22:12:30
+                                                                </td>
+                                                            </tr>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="email-right-aside bookmark-tabcontent">
+                        <div class="card email-body rounded-3">
+                            <div class="ps-0">
+                                <div class="tab-content">
+                                    <div class="tab-pane fade active show" id="pills-created" role="tabpanel"
+                                         aria-labelledby="pills-created-tab">
+                                        <div class="card mb-0">
+                                            <div class="card-header d-flex">
+                                                <h5 class="mb-0">
+                                                    <i class="" data-feather="dollar-sign"></i>
+                                                    لیست تراکنش های سازمان های شما
+                                                </h5>
+
+                                                <div class="card-header-right">
+                                                    <a href="#" class="me-4"><i class="me-2" data-feather="printer"></i>پرینت</a>
+                                                    <i class="icofont icofont-minus minimize-card"></i>
+                                                </div>
+                                            </div>
+                                            <div class="card-body p-0">
+                                                <div class="taskadd">
+                                                    <div class="table-responsive">
+                                                        <table class="table">
+                                                            <tr>
+                                                                <td>
+                                                                    <span
+                                                                            class="badge common-align txt-success rounded-pill badge-l-success border border-success dana fw-bold w-50">
+                                                                        <i data-feather="plus-circle"
+                                                                           class="me-1 stroke-success"></i>
+                                                                        واریز
+                                                                    </span>
+                                                                    <p class="project_name_0">پاره ای از
+                                                                        توضیحاتثیثثبدنثیصثیصصثزصث...</p>
+                                                                </td>
+                                                                <td>
+                                                                    <h5 class="fw-bold txt-success">450,000 تومان</h5>
+                                                                </td>
+                                                                <td>
+                                                                    <span
+                                                                            class="badge badge-success stroke-success dana">موفقیت آمیز</span>
+                                                                </td>
+                                                                <td class="task-date">
+                                                                    12 فروردین ۱۴۰۴ , 12:45:36
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td>
+                                                                    <span
+                                                                            class="badge common-align txt-danger rounded-pill badge-l-danger border border-danger dana fw-bold w-50">
+                                                                        <i data-feather="minus-circle"
+                                                                           class="me-1 stroke-danger"></i>
+                                                                        برداشت
+                                                                    </span>
+                                                                    <p class="project_name_0">پاره ای از
+                                                                        توضیحاتثیثثبدنثیصثیصصثزصث...</p>
+                                                                </td>
+                                                                <td>
+                                                                    <h5 class="fw-bold txt-danger">200,000 تومان</h5>
+                                                                </td>
+                                                                <td>
+                                                                    <span
+                                                                            class="badge badge-success stroke-success dana">موفقیت آمیز</span>
+                                                                </td>
+                                                                <td class="task-date">
+                                                                    18 فروردین ۱۴۰۴ , 22:12:30
+                                                                </td>
                                                             </tr>
                                                         </table>
                                                     </div>

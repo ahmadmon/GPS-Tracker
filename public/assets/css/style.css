@@ -19843,6 +19843,45 @@ select.crypto-select.primary {
   background-color: rgba(255, 170, 5, 0.1);
 }
 
+
+.badge-l-warning,.badge-l-warning:hover {
+    background-color: #fec
+}
+
+.badge-l-primary,.badge-l-primary:hover,.badge-light-primary,.badge-light-primary:hover {
+    background-color: rgba(115,102,255,.1)
+}
+
+.badge-l-dark,.badge-l-dark:hover {
+    background-color: #8d97af
+}
+
+.badge-light-dark,.badge-light-dark:hover {
+    background-color: rgba(63,71,90,.34);
+    color: #3f475a
+}
+
+.badge-l-light,.badge-l-light:hover {
+    background-color: #a6a6bb
+}
+
+.badge-l-info,.badge-l-info:hover {
+    background-color: #dbf2fd
+}
+
+.badge-l-success,.badge-l-success:hover {
+    background-color: #d5eed2
+}
+
+.badge-l-secondary,.badge-l-secondary:hover {
+    background-color: #d5d5d5
+}
+
+.badge-l-primary,.badge-l-primary:hover {
+    background-color: #fff
+}
+
+
 .table thead th {
   border-bottom: 2px solid #ecf3fa;
 }
@@ -43043,6 +43082,11 @@ html[dir=rtl] body.dark-only .page-wrapper .page-body-wrapper .page-body .card:n
     border-bottom-width: 1px!important
 }
 
+.common-align {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
 
 /**=====================
   5.9 Box-layout CSS Ends
