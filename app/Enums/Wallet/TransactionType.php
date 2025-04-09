@@ -7,6 +7,16 @@ enum TransactionType: string
     case CREDIT = 'credit';
     case DEBIT = 'debit';
 
+    public function isCredit(): bool
+    {
+        return $this === self::CREDIT;
+    }
+
+    public function isDebit(): bool
+    {
+        return $this === self::DEBIT;
+    }
+
     /**
      * @return string
      */

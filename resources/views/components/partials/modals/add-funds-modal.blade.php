@@ -34,6 +34,7 @@
                         <div class="mb-3 col-md-12 my-0">
                             <label for="wallet-amount">توضیحات</label>
                             <textarea class="form-control" autocomplete="off"
+                                      wire:model="description"
                                       placeholder="مثلاً: واریز برای استفاده از خرید اشتراک ماهانه..."></textarea>
                         </div>
                     </div>

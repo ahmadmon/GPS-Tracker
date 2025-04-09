@@ -49,7 +49,7 @@
                                                                 <div class="common-box1 common-align">
                                                                     <h5 class="d-block">موجودی:</h5>
                                                                 </div>
-                                                                <p class="mb-0 pt-2 fw-bolder h5">{{ persianPriceFormat($wallet->amount) }}</p>
+                                                                <p class="mb-0 pt-2 fw-bolder h5">{{ persianPriceFormat($wallet->balance) }}</p>
                                                                 <div class="go-corner">
                                                                     <div class="go-arrow"></div>
                                                                 </div>
@@ -76,6 +76,9 @@
                     </div>
                 </div>
                 <div class="col-xl-9 col-md-12 box-col-12">
+                    <x-partials.alert.success-alert />
+                    <x-partials.alert.error-alert />
+
                     <div class="email-right-aside bookmark-tabcontent">
                         <div class="card email-body rounded-3">
                             <div class="ps-0">
@@ -90,7 +93,7 @@
                                                 </h5>
 
                                                 <div class="card-header-right">
-                                                    <a href="#" class="me-4"><i class="me-2" data-feather="printer"></i>پرینت</a>
+{{--                                                    <a href="#" class="me-4"><i class="me-2" data-feather="printer"></i>پرینت</a>--}}
                                                     <i class="icofont icofont-minus minimize-card"></i>
                                                 </div>
                                             </div>
@@ -102,18 +105,18 @@
                                                                 <tr>
                                                                     <td>
                                                                     <span
-                                                                            class="badge common-align txt-{{ $transaction->type->badge()['color'] }} rounded-pill badge-l-{{ $transaction->type->badge()['color'] }} border border-{{ $transaction->type->badge()['color'] }} dana fw-bold w-50">
-                                                                        <i data-feather="plus-circle"
-                                                                           class="me-1 stroke-{{ $transaction->type->badge()['color'] }}"></i>
+                                                                            class="badge common-align txt-{{ $transaction->typeDisplay['color'] }} rounded-pill badge-l-{{ $transaction->typeDisplay['color'] }} border border-{{ $transaction->typeDisplay['color'] }} dana fw-bold w-50">
+                                                                        <i data-feather="{{ $transaction->typeDisplay['icon'] }}"
+                                                                           class="me-1 stroke-{{ $transaction->typeDisplay['color'] }}"></i>
                                                                         {{ $transaction->type->label() }}
                                                                     </span>
-                                                                        <p class="project_name_0">{{ substr($transaction->description,30) }}</p>
+                                                                        <p class="project_name_0">{{ str($transaction?->description)->limit(30) }}</p>
                                                                     </td>
                                                                     <td>
-                                                                        <h5 class="fw-bold txt-{{ $transaction->type->badge()['color'] }}">{{ priceFormat($transaction->amount) }} </h5>
+                                                                        <h5 class="fw-bold txt-{{ $transaction->typeDisplay['color'] }}">{{ priceFormat($transaction->amount) }} </h5>
                                                                     </td>
                                                                     <td>
-                                                                        <span class="badge badge-{{ $transaction->status->badge()['color'] }} stroke-{{ $transaction->status->badge()['color'] }} dana">{{ $transaction->status->label() }}</span>
+                                                                        <span class="badge badge-{{ $transaction->statusDisplay['color'] }} stroke-{{ $transaction->statusDisplay['color'] }} dana">{{ $transaction->statusDisplay['label'] }}</span>
                                                                     </td>
                                                                     <td class="task-date">
                                                                         {{ jalaliDate($transaction->created_at, format: "%d %B %Y , H:i") }}
@@ -121,33 +124,10 @@
                                                                 </tr>
                                                             @empty
                                                                 <tr>
-                                                                    <p class="text-muted text-center">موجودی یافت نشد.
-                                                                    </p>
+                                                                    <td colspan="4" class="text-muted text-center">تراکنشی یافت نشد :(
+                                                                    </td>
                                                                 </tr>
                                                             @endforelse
-
-                                                            <tr>
-                                                                <td>
-                                                                    <span
-                                                                            class="badge common-align txt-danger rounded-pill badge-l-danger border border-danger dana fw-bold w-50">
-                                                                        <i data-feather="minus-circle"
-                                                                           class="me-1 stroke-danger"></i>
-                                                                        برداشت
-                                                                    </span>
-                                                                    <p class="project_name_0">پاره ای از
-                                                                        توضیحاتثیثثبدنثیصثیصصثزصث...</p>
-                                                                </td>
-                                                                <td>
-                                                                    <h5 class="fw-bold txt-danger">200,000 تومان</h5>
-                                                                </td>
-                                                                <td>
-                                                                    <span
-                                                                            class="badge badge-success stroke-success dana">موفقیت آمیز</span>
-                                                                </td>
-                                                                <td class="task-date">
-                                                                    18 فروردین ۱۴۰۴ , 22:12:30
-                                                                </td>
-                                                            </tr>
                                                         </table>
                                                     </div>
                                                 </div>
@@ -173,7 +153,7 @@
                                                 </h5>
 
                                                 <div class="card-header-right">
-                                                    <a href="#" class="me-4"><i class="me-2" data-feather="printer"></i>پرینت</a>
+{{--                                                    <a href="#" class="me-4"><i class="me-2" data-feather="printer"></i>پرینت</a>--}}
                                                     <i class="icofont icofont-minus minimize-card"></i>
                                                 </div>
                                             </div>
@@ -181,51 +161,38 @@
                                                 <div class="taskadd">
                                                     <div class="table-responsive">
                                                         <table class="table">
-                                                            <tr>
-                                                                <td>
+                                                            @forelse($companiesTransactions as $transaction)
+                                                                <tr>
+                                                                    <td>
                                                                     <span
-                                                                            class="badge common-align txt-success rounded-pill badge-l-success border border-success dana fw-bold w-50">
+                                                                        class="badge common-align txt-{{ $transaction->type->badge()['color'] }} rounded-pill badge-l-{{ $transaction->type->badge()['color'] }} border border-{{ $transaction->type->badge()['color'] }} dana fw-bold w-50">
                                                                         <i data-feather="plus-circle"
-                                                                           class="me-1 stroke-success"></i>
-                                                                        واریز
+                                                                           class="me-1 stroke-{{ $transaction->type->badge()['color'] }}"></i>
+                                                                        {{ $transaction->type->label() }}
                                                                     </span>
-                                                                    <p class="project_name_0">پاره ای از
-                                                                        توضیحاتثیثثبدنثیصثیصصثزصث...</p>
-                                                                </td>
-                                                                <td>
-                                                                    <h5 class="fw-bold txt-success">450,000 تومان</h5>
-                                                                </td>
-                                                                <td>
-                                                                    <span
-                                                                            class="badge badge-success stroke-success dana">موفقیت آمیز</span>
-                                                                </td>
-                                                                <td class="task-date">
-                                                                    12 فروردین ۱۴۰۴ , 12:45:36
-                                                                </td>
-                                                            </tr>
-
-                                                            <tr>
-                                                                <td>
-                                                                    <span
-                                                                            class="badge common-align txt-danger rounded-pill badge-l-danger border border-danger dana fw-bold w-50">
-                                                                        <i data-feather="minus-circle"
-                                                                           class="me-1 stroke-danger"></i>
-                                                                        برداشت
-                                                                    </span>
-                                                                    <p class="project_name_0">پاره ای از
-                                                                        توضیحاتثیثثبدنثیصثیصصثزصث...</p>
-                                                                </td>
-                                                                <td>
-                                                                    <h5 class="fw-bold txt-danger">200,000 تومان</h5>
-                                                                </td>
-                                                                <td>
-                                                                    <span
-                                                                            class="badge badge-success stroke-success dana">موفقیت آمیز</span>
-                                                                </td>
-                                                                <td class="task-date">
-                                                                    18 فروردین ۱۴۰۴ , 22:12:30
-                                                                </td>
-                                                            </tr>
+                                                                        <p class="project_name_0">{{ str($transaction?->description)->limit(30) }}</p>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="#">
+                                                                            {{ $transaction->source?->name ?? '-' }}
+                                                                        </a>
+                                                                    </td>
+                                                                    <td>
+                                                                        <h5 class="fw-bold txt-{{ $transaction->type->badge()['color'] }}">{{ priceFormat($transaction->amount) }} </h5>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span class="badge badge-{{ $transaction->status->badge()['color'] }} stroke-{{ $transaction->status->badge()['color'] }} dana">{{ $transaction->status->label() }}</span>
+                                                                    </td>
+                                                                    <td class="task-date">
+                                                                        {{ jalaliDate($transaction->created_at, format: "%d %B %Y , H:i") }}
+                                                                    </td>
+                                                                </tr>
+                                                            @empty
+                                                                <tr>
+                                                                    <td colspan="4" class="text-muted text-center">تراکنشی یافت نشد :(
+                                                                    </td>
+                                                                </tr>
+                                                            @endforelse
                                                         </table>
                                                     </div>
                                                 </div>

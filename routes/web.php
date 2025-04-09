@@ -53,6 +53,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('change-password');
         Route::get('/forgot-password', [ProfileController::class, 'forgotPassword'])->name('forgot-password');
         Route::get('/wallet', WalletPage::class)->name('wallet');
+        Route::any('/wallet/payment-result/{transaction}/{payment}', [WalletPage::class, 'paymentCallback'])->name('callback-payment');
     });
 
 });
