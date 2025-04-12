@@ -59,7 +59,8 @@
                                 @else
                                     <div class="mb-3 col-md-6 my-0">
                                         <label for="company">سازمان</label>
-                                        <input class="form-control" :disabled="parseInt(type) === 0" type="text" readonly
+                                        <input class="form-control" :disabled="parseInt(type) === 0" type="text"
+                                               readonly
                                                value="{{ $user->companies()->first()->name }}" id="company">
                                     </div>
                                 @endif
@@ -76,9 +77,12 @@
                     </div>
                     <div class="d-flex justify-content-end">
                         <button class="btn btn-secondary" id="Bookmark" type="submit">
-                            <div class="d-flex justify-content-center align-items-center" wire:loading.class="d-none" wire:target="handleWallet">
+                            <div class="d-flex justify-content-center align-items-center" wire:loading.class="d-none"
+                                 wire:target="handleWallet">
                                 <span class="">پرداخت آنلاین</span>
-                                <i data-feather="external-link" class="ms-1"></i>
+                                <div class="d-inline" wire:ignore>
+                                    <i data-feather="external-link" class="ms-1"></i>
+                                </div>
                             </div>
 
                             <x-partials.loaders.livewire.spinner target="handleWallet"/>

@@ -6,6 +6,7 @@ use App\Http\Services\Payment\PaymentService;
 use App\Models\Company;
 use App\Models\Payment;
 use App\Models\User;
+use App\Models\Wallet;
 use App\Models\WalletTransaction;
 use Exception;
 use Illuminate\Http\RedirectResponse;
@@ -13,29 +14,57 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class WalletPage extends Component
 {
-    #[Validate('required|numeric|min:10000|max:50000000')]
+    /**
+     * Wallet charging variables
+     * -------------------------------------------
+     **/
+    #[Validate('required|numeric|min:10000|max:50000000', as: 'مبلغ')]
     public string $amount = "10,000";
-    #[Validate('nullable|string|min:5')]
-    public null|string $description = null;
-    #[Validate('required|numeric|in:0,1')]
+    #[Validate('nullable|string|min:5', as: 'توضیحات')]
+    public ?string $description = null;
+    #[Validate('required|numeric|in:0,1', as: 'نوع کیف پول')]
     public int $chargeTarget = 0; // 0 => user's wallet , 1 => company wallet
-    #[Validate('nullable|required_if:chargeTarget,1|numeric|exists:companies,id')]
-    public null|int $companyID = 0;
+    #[Validate('nullable|required_if:chargeTarget,1|numeric|exists:companies,id', as: 'سازمان')]
+    public ?int $companyID = null;
 
     public bool $isManager = false;
 
-    public function mount()
+    /**
+     * Filtering variables
+     * -------------------------------------------
+     **/
+    #[Url(as: 's')]
+    #[Validate('nullable|string', as: 'جستجو')]
+    public ?string $search = null;
+
+    #[Url(as: 'type')]
+    #[Validate('nullable|string|in:credit,debit,', as: 'نوع')]
+    public ?string $type = null;
+
+    #[Url(as: 'status')]
+    #[Validate('nullable|string|in:success,pending,failed,', as: 'وضعیت')]
+    public ?string $status = null;
+
+    #[Url(as: 'date')]
+    #[Validate('nullable|date', as: 'تاریخ')]
+    public ?string $date = null;
+
+
+
+    public function mount(): void
     {
         if (!auth()->user()->wallet) to_route('home');
 
         if (Auth::user()->subsets()->isNotEmpty()) {
             $this->isManager = true;
         }
+
     }
 
     #[Title('کیف پول من')]
@@ -57,14 +86,14 @@ class WalletPage extends Component
      */
     public function handleWallet(PaymentService $paymentService)
     {
+        $this->amount = $this->convertToInt($this->amount);
+        $this->validate();
+
+        // Creating transaction and payment record
+        $transaction = $this->createTransaction();
+        $payment = $this->createPayment($transaction);
+
         try {
-            $this->amount = str_replace(',', '', $this->amount);
-            $this->validate();
-
-            // Creating transaction and payment record
-            $transaction = $this->createTransaction();
-            $payment = $this->createPayment($transaction);
-
             // Transfer to payment gateway
             $paymentGateway = $paymentService->paymentPage($transaction, $payment);
             return redirect()->away($paymentGateway);
@@ -73,6 +102,36 @@ class WalletPage extends Component
             Log::error('payment failed', [$e->getMessage()]);
 
             return to_route('profile.wallet')->with('error-alert', "خطا در اتصال به درگاه پرداخت.\n لطفاً چند دقیقه دیگر مجدداً تلاش نمایید.");
+        }
+    }
+
+    /**
+     * Repayment for pending transactions
+     *
+     * @param string $transactionId
+     * @param PaymentService $paymentService
+     */
+    public function retryPayment(string $transactionId, PaymentService $paymentService)
+    {
+        $transaction = WalletTransaction::withOnly('payment')->findOrFail($transactionId);
+
+        // Transaction ownership check
+        if ($transaction->source_id !== Auth::id() || $transaction->source_type !== User::class) {
+            abort(403);
+        }
+
+        // Check status
+        if (!$transaction->status->isPending() || (!$transaction->payment || !$transaction->payment->status->isPending())) {
+            return to_route('profile.wallet')->with('error-alert', 'این تراکنش دیگر قابل پرداخت نیست.');
+        }
+
+        try {
+            $gatewayURL = $paymentService->paymentPage($transaction, $transaction->payment);
+            return redirect()->away($gatewayURL);
+
+        } catch (Exception $e) {
+            Log::error('Retry Payment Failed', ['message' => $e->getMessage()]);
+            return to_route('profile.wallet')->with('error-alert', 'اتصال مجدد به درگاه با خطا مواجه شد. لطفاً بعداً تلاش کنید.');
         }
     }
 
@@ -138,30 +197,40 @@ class WalletPage extends Component
 
     private function myTransactions()
     {
+//        dump($this->date);
         return WalletTransaction::where([
             'source_id' => Auth::id(),
             'source_type' => User::class
-        ])->take(7)
+        ])->when(!empty($this->search), fn($q) => $q->whereLike('amount', "{$this->search}"))
+            ->when($this->type, fn($q) => $q->where('type', $this->type))
+            ->when($this->status, fn($q) => $q->where('status', $this->status))
+//            ->when(!empty($this->date), fn($q) => $q->whereDate('created_at', $this->date))
+            ->take(7)
+            ->orderByDesc('updated_at')
             ->get();
     }
 
 
     private function companiesTransactions()
     {
-        return WalletTransaction::where([
-            'source_id' => Auth::id(),
-            'source_type' => Company::class
-        ])->take(7)
+        $companyIds = Auth::user()->companies()->pluck('id');
+
+        return WalletTransaction::where('source_type', Company::class)
+            ->whereIn('source_id', $companyIds)
+            ->withOnly('wallet')
+            ->take(7)
+            ->orderByDesc('updated_at')
             ->get();
     }
 
     private function createTransaction()
     {
-        return Auth::user()->wallet->transactions()->create([
+        return WalletTransaction::create([
             'type' => 'credit',
             'status' => 'pending',
             'amount' => (int)$this->amount,
             'description' => $this?->description ?? null,
+            'wallet_id' => $this->resolveWallet()->id,
             'source_type' => $this->chargeTarget ? Company::class : Auth::user()::class,
             'source_id' => $this->chargeTarget ? $this->companyID : Auth::id()
         ]);
@@ -176,6 +245,13 @@ class WalletPage extends Component
         ]);
     }
 
+    private function resolveWallet(): Wallet
+    {
+        return $this->chargeTarget
+            ? Company::findOrFail($this->companyID)->wallet
+            : Auth::user()->wallet;
+    }
+
     /**
      * @param int $amount
      * @param array $verifyResponse
@@ -185,7 +261,7 @@ class WalletPage extends Component
     private function successMessage(int $amount, array $verifyResponse, $balance): string
     {
         return sprintf(
-            "💳 عملیات شارژ کیف پول با موفقیت تکمیل شد\n\n" .
+            "💳 عملیات شارژ کیف پول با موفقیت تکمیل شد.\n\n" .
             "✳️ جزئیات تراکنش:\n" .
             "▫️ مبلغ: %s تومان\n" .
             "▫️ کد رهگیری: %s\n" .
@@ -211,7 +287,7 @@ class WalletPage extends Component
         $errorMessage = is_string($verifyResponse) ? $verifyResponse : null;
 
         return sprintf(
-            "❌ عملیات پرداخت ناموفق بود\n\n" .
+            "❌ عملیات پرداخت ناموفق بود.\n\n" .
             "✳️ جزئیات تراکنش:\n" .
             "▫️ مبلغ: %s تومان\n" .
             "▫️ کد رهگیری: %s\n" .
@@ -226,4 +302,12 @@ class WalletPage extends Component
     }
 
 
+    /**
+     * @param string $amount
+     * @return int
+     */
+    private function convertToInt(string $amount): int
+    {
+        return (int)str_replace(',', '', $amount);
+    }
 }
