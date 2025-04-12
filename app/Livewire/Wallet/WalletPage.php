@@ -8,13 +8,10 @@ use App\Models\Payment;
 use App\Models\User;
 use App\Models\WalletTransaction;
 use Exception;
-use Illuminate\Contracts\Pagination\CursorPaginator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
-use LaravelIdea\Helper\App\Models\_IH_WalletTransaction_C;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
@@ -25,10 +22,20 @@ class WalletPage extends Component
     public string $amount = "10,000";
     #[Validate('nullable|string|min:5')]
     public null|string $description = null;
+    #[Validate('required|numeric|in:0,1')]
+    public int $chargeTarget = 0; // 0 => user's wallet , 1 => company wallet
+    #[Validate('nullable|required_if:chargeTarget,1|numeric|exists:companies,id')]
+    public null|int $companyID = 0;
+
+    public bool $isManager = false;
 
     public function mount()
     {
         if (!auth()->user()->wallet) to_route('home');
+
+        if (Auth::user()->subsets()->isNotEmpty()) {
+            $this->isManager = true;
+        }
     }
 
     #[Title('کیف پول من')]
@@ -36,12 +43,11 @@ class WalletPage extends Component
     {
         $user = Auth::user();
 
-
         return view('livewire.wallet.wallet-page', [
             'user' => $user,
             'wallet' => $user->wallet,
             'myTransactions' => $this->myTransactions(),
-            'companiesTransactions' => $this->companiesTransactions()
+            'companiesTransactions' => $this->isManager ? $this->companiesTransactions() : []
         ]);
     }
 
@@ -52,10 +58,10 @@ class WalletPage extends Component
     public function handleWallet(PaymentService $paymentService)
     {
         try {
-
             $this->amount = str_replace(',', '', $this->amount);
             $this->validate();
 
+            // Creating transaction and payment record
             $transaction = $this->createTransaction();
             $payment = $this->createPayment($transaction);
 
@@ -129,29 +135,24 @@ class WalletPage extends Component
     |
     */
 
-    /**
-     * @return CursorPaginator
-     */
-    private function myTransactions(): CursorPaginator
+
+    private function myTransactions()
     {
-        return WalletTransaction::where('source_id', auth()->id())
-            ->where('source_type', User::class)
-            ->orderByDesc('created_at')
-            ->limit(7)
-            ->cursorPaginate();
+        return WalletTransaction::where([
+            'source_id' => Auth::id(),
+            'source_type' => User::class
+        ])->take(7)
+            ->get();
     }
 
-    /**
-     * @return CursorPaginator
-     */
-    private function companiesTransactions(): CursorPaginator
+
+    private function companiesTransactions()
     {
-        return WalletTransaction::where('source_id', auth()->id())
-            ->where('source_type', Company::class)
-            ->with('source')
-            ->orderByDesc('created_at')
-            ->limit(7)
-            ->cursorPaginate();
+        return WalletTransaction::where([
+            'source_id' => Auth::id(),
+            'source_type' => Company::class
+        ])->take(7)
+            ->get();
     }
 
     private function createTransaction()
@@ -161,8 +162,8 @@ class WalletPage extends Component
             'status' => 'pending',
             'amount' => (int)$this->amount,
             'description' => $this?->description ?? null,
-            'source_type' => Auth::user()::class,
-            'source_id' => Auth::id()
+            'source_type' => $this->chargeTarget ? Company::class : Auth::user()::class,
+            'source_id' => $this->chargeTarget ? $this->companyID : Auth::id()
         ]);
     }
 

@@ -31,11 +31,47 @@
                                    autocomplete="off">
                             <x-input-error :messages="$errors->get('amount')" class="mt-2"/>
                         </div>
+                        @if($isManager)
+                            <div class="row" x-data="{ type: $wire.chargeTarget ?? 0 }">
+                                <div class="mb-3 col-md-6 my-0">
+                                    <label for="charge-target">افزایش موجودی برای</label>
+                                    <select class="form-control form-select" wire:model="chargeTarget"
+                                            x-model="type"
+                                            id="charge-target">
+                                        <option value="0">کیف پول شخصی من</option>
+                                        <option value="1">کیف پول سازمان</option>
+                                    </select>
+                                    <x-input-error :messages="$errors->get('chargeTarget')" class="mt-2"/>
+
+                                </div>
+                                @if($user->companies->count() !== 1)
+                                    <div class="mb-3 col-md-6 my-0">
+                                        <label for="company">سازمان</label>
+                                        <select class="form-control form-select" :disabled="parseInt(type) === 0"
+                                                wire:model="companyID"
+                                                id="company">
+                                            @foreach($user->companies as $company)
+                                                <option value="{{ $company->id }}">{{ $company?->name }}</option>
+                                            @endforeach
+                                        </select>
+                                        <x-input-error :messages="$errors->get('companyID')" class="mt-2"/>
+                                    </div>
+                                @else
+                                    <div class="mb-3 col-md-6 my-0">
+                                        <label for="company">سازمان</label>
+                                        <input class="form-control" :disabled="parseInt(type) === 0" type="text" readonly
+                                               value="{{ $user->companies()->first()->name }}" id="company">
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
                         <div class="mb-3 col-md-12 my-0">
-                            <label for="wallet-amount">توضیحات</label>
+                            <label for="wallet-description">توضیحات</label>
                             <textarea class="form-control" autocomplete="off"
+                                      id="wallet-description"
                                       wire:model="description"
                                       placeholder="مثلاً: واریز برای استفاده از خرید اشتراک ماهانه..."></textarea>
+                            <x-input-error :messages="$errors->get('description')" class="mt-2"/>
                         </div>
                     </div>
                     <div class="d-flex justify-content-end">

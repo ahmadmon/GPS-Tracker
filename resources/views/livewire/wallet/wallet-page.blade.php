@@ -19,7 +19,7 @@
         </div>
     </div>
 
-
+{{--@dd($user)--}}
     <div class="container-fluid">
         <div class="email-wrap bookmark-wrap">
             <div class="row">
@@ -139,6 +139,7 @@
                         </div>
                     </div>
 
+                    @if($isManager)
                     <div class="email-right-aside bookmark-tabcontent">
                         <div class="card email-body rounded-3">
                             <div class="ps-0">
@@ -203,10 +204,11 @@
                             </div>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
         </div>
-        <x-partials.modals.add-funds-modal/>
+        <x-partials.modals.add-funds-modal :$isManager :$user/>
     </div>
 
 </div>
@@ -225,7 +227,6 @@
             const amountInput = document.getElementById('wallet-amount');
 
             if (amountInput) {
-                console.log(amountInput)
                 amountInput.focus()
                 amountInput.select()
             }

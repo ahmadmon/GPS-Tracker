@@ -101,7 +101,11 @@ class User extends Authenticatable
         return $this->hasMany(Vehicle::class, 'user_id');
     }
 
-    // related to The users Company (Joined by Company)
+    /**
+     * @return Collection
+     *
+     * related to The users Company (Joined by Company)
+     */
     public function subsets(): Collection
     {
         if (!$this->hasUserType('manager')) {
@@ -116,10 +120,14 @@ class User extends Authenticatable
         return $this->belongsToMany(Company::class, 'companies_user');
     }
 
-    // related to The Company manager
+    /**
+     * @return HasMany
+     *
+     * related to The Company manager
+     */
     public function companies(): HasMany
     {
-        return $this->hasMany(Company::class, 'user_id');
+        return $this->hasMany(Company::class, 'user_id')->where('status', 1);
     }
 
     public function geofences(): HasManyThrough
