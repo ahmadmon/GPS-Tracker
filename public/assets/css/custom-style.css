@@ -377,3 +377,8 @@ section.leaflet-control-layers-list div.leaflet-control-layers-base label span s
 .text-danger li {
     color: inherit;
 }
+
+.task-card-height {
+    height: 300px !important;
+    overflow-y: auto !important;
+}

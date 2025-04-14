@@ -30070,9 +30070,19 @@ html {
   }
 }
 @media only screen and (max-width: 767px) {
-  .taskadd table tr td:nth-child(2) {
-    min-width: 745px;
+  .taskadd table tr td:nth-child(4) {
+    min-width: 200px;
   }
+
+    .taskadd table tr td:nth-child(2) {
+        min-width: 130px;
+    } .taskadd table tr td:nth-child(5) {
+          min-width: 100px;
+      }
+
+    .taskadd table tr td:nth-child(6) {
+        min-width: 230px;
+    }
 }
 @media only screen and (max-width: 575px) {
   .taskadd table tr td:first-child {

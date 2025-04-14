@@ -7,6 +7,7 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\Wallet\UserWalletManagementController;
 use App\Livewire\MapPage;
 use App\Livewire\Wallet\WalletPage;
 use Illuminate\Support\Facades\Route;
@@ -47,6 +48,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('geofence', GeofenceController::class);
     Route::get('/geofence/change-status/{geofence}', [GeofenceController::class, 'changeStatus'])->name('geofence.change-status');
+
+    Route::prefix('wallet-management')->name('wallet-management.')->group(function (){
+        Route::get('/', [UserWalletManagementController::class, 'index'])->name('index');
+    });
 
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('index');

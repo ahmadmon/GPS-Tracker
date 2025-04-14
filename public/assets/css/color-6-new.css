@@ -52470,8 +52470,8 @@ div:where(.swal2-container) button:where(.swal2-close):hover {
 }
 
 @media only screen and (max-width: 767px) {
-    .taskadd table tr td:nth-child(2) {
-        min-width: 745px
+    .taskadd table tr td:nth-child(4) {
+        min-width: 280px
     }
 }
 

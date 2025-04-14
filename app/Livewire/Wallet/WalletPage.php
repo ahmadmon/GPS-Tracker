@@ -13,10 +13,12 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use Morilog\Jalali\Jalalian;
 
 class WalletPage extends Component
 {
@@ -39,22 +41,28 @@ class WalletPage extends Component
      * Filtering variables
      * -------------------------------------------
      **/
-    #[Url(as: 's')]
+    #[Url(as: 's', except: null)]
     #[Validate('nullable|string', as: 'جستجو')]
     public ?string $search = null;
 
-    #[Url(as: 'type')]
+    #[Url(as: 'type', except: null)]
     #[Validate('nullable|string|in:credit,debit,', as: 'نوع')]
     public ?string $type = null;
 
-    #[Url(as: 'status')]
+    #[Url(as: 'status', except: null)]
     #[Validate('nullable|string|in:success,pending,failed,', as: 'وضعیت')]
     public ?string $status = null;
 
-    #[Url(as: 'date')]
+    #[Url(as: 'date', except: null)]
     #[Validate('nullable|date', as: 'تاریخ')]
     public ?string $date = null;
 
+    /**
+     * Other variables
+     * -------------------------------------------
+     **/
+    public int $personalTake = 10;
+    public int $companyTake = 10;
 
 
     public function mount(): void
@@ -124,6 +132,7 @@ class WalletPage extends Component
         if (!$transaction->status->isPending() || (!$transaction->payment || !$transaction->payment->status->isPending())) {
             return to_route('profile.wallet')->with('error-alert', 'این تراکنش دیگر قابل پرداخت نیست.');
         }
+        $transaction->update(['created_at' => now()]);
 
         try {
             $gatewayURL = $paymentService->paymentPage($transaction, $transaction->payment);
@@ -186,6 +195,36 @@ class WalletPage extends Component
         }
     }
 
+    /**
+     * @param array|null $properties
+     * @return void
+     */
+    public function removeFilters(array $properties = null): void
+    {
+        if ($properties) {
+            $this->reset($properties);
+        } else {
+            $this->reset(['search', 'type', 'status', 'date']);
+        }
+        $this->dispatch('resetDatePicker');
+    }
+
+    /**
+     * @return void
+     */
+    public function loadMorePersonal(): void
+    {
+        $this->personalTake += 10;
+    }
+
+    /**
+     * @return void
+     */
+    public function loadMoreCompany(): void
+    {
+        $this->companyTake += 10;
+    }
+
     /*
     |--------------------------------------------------------------------------
     | Private Helper Functions
@@ -197,16 +236,16 @@ class WalletPage extends Component
 
     private function myTransactions()
     {
-//        dump($this->date);
+        $date = isset($this->date) ? Jalalian::fromFormat('Y-m-d', $this->date)->toCarbon() : null;
         return WalletTransaction::where([
             'source_id' => Auth::id(),
             'source_type' => User::class
         ])->when(!empty($this->search), fn($q) => $q->whereLike('amount', "{$this->search}"))
             ->when($this->type, fn($q) => $q->where('type', $this->type))
             ->when($this->status, fn($q) => $q->where('status', $this->status))
-//            ->when(!empty($this->date), fn($q) => $q->whereDate('created_at', $this->date))
-            ->take(7)
-            ->orderByDesc('updated_at')
+            ->when(isset($date), fn($q) => $q->whereDate('created_at', $date))
+            ->latest()
+            ->take($this->personalTake)
             ->get();
     }
 
@@ -214,12 +253,19 @@ class WalletPage extends Component
     private function companiesTransactions()
     {
         $companyIds = Auth::user()->companies()->pluck('id');
+        $date = isset($this->date) ? Jalalian::fromFormat('Y-m-d', $this->date)->toCarbon() : null;
+
 
         return WalletTransaction::where('source_type', Company::class)
             ->whereIn('source_id', $companyIds)
             ->withOnly('wallet')
-            ->take(7)
-            ->orderByDesc('updated_at')
+            ->when(!empty($this->search), fn($q) => $q->whereLike('amount', "{$this->search}")
+                ->orWhereHas('source', fn ($query) => $query->whereLike('name', "%{$this->search}%")))
+            ->when($this->type, fn($q) => $q->where('type', $this->type))
+            ->when($this->status, fn($q) => $q->where('status', $this->status))
+            ->when(isset($date), fn($q) => $q->whereDate('created_at', $date))
+            ->take($this->companyTake)
+            ->latest()
             ->get();
     }
 
@@ -309,5 +355,14 @@ class WalletPage extends Component
     private function convertToInt(string $amount): int
     {
         return (int)str_replace(',', '', $amount);
+    }
+
+    /**
+     * @return bool
+     */
+    #[Computed]
+    public function hasFilters(): bool
+    {
+        return $this->search || $this->type || $this->status || $this->date;
     }
 }

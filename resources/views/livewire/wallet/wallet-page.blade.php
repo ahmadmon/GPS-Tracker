@@ -28,7 +28,8 @@
             <div class="row">
                 <div class="col-xl-3 box-col-6">
                     <div class="md-sidebar">
-                        <div class="md-sidebar-aside job-left-aside custom-scrollbar">
+                        <a class="btn btn-primary md-sidebar-toggle" href="javascript:void(0)">فیلتر تراکنش ها</a>
+                        <div class="md-sidebar-aside job-left-aside custom-scrollbar" wire:ignore.self>
                             <div class="email-left-aside">
                                 <div class="card">
                                     <div class="card-body">
@@ -114,17 +115,31 @@
                                                 </li>
 
                                                 <li class="nav-item">
-                                                    <div class="mb-3" x-data="dateFlatpickr($refs.date)">
+                                                    <div class="mb-3">
                                                         <label for="date">تاریــخ تراکنش</label>
                                                         <div class="input-group flatpicker-calender">
                                                             <div class="input-group flatpicker-calender" wire:ignore>
                                                                 <input class="form-control" id="date" type="date"
-                                                                       wire:model.live="date" x-ref="date">
+                                                                       x-data="dateFlatpickr($el)"
+                                                                       placeholder="{{ jalaliDate(now()) }}"
+                                                                       wire:model="date">
                                                             </div>
                                                         </div>
                                                         <x-input-error :messages="$errors->get('date')" class="mt-2"/>
                                                     </div>
                                                 </li>
+
+                                                @if($this->hasFilters)
+                                                    <li class="nav-item mt-2">
+                                                        <button class="btn btn-primary btn-block w-100"
+                                                                wire:click="removeFilters">
+                                                        <span wire:ignore>
+                                                            <i data-feather="filter" class="me-1"></i>
+                                                            حذف فیلتــرها
+                                                        </span>
+                                                        </button>
+                                                    </li>
+                                                @endif
 
 
                                             </ul>
@@ -157,13 +172,14 @@
                                                     <i class="icofont icofont-minus minimize-card"></i>
                                                 </div>
                                             </div>
-                                            <div class="card-body p-0">
+                                            <div class="card-body p-0 task-card-height" x-data>
                                                 <div class="taskadd">
                                                     <div class="table-responsive">
                                                         <table class="table">
+                                                            <tbody>
                                                             @forelse($myTransactions as $transaction)
                                                                 <tr wire:key="{{ $transaction->id }}">
-                                                                    <td wire:ignore>
+                                                                    <td>
                                                                         <span
                                                                             class="badge common-align txt-{{ $transaction->typeDisplay['color'] }} rounded-pill badge-l-{{ $transaction->typeDisplay['color'] }} border border-{{ $transaction->typeDisplay['color'] }} dana fw-bold w-50">
                                                                             <i data-feather="{{ $transaction->typeDisplay['icon'] }}"
@@ -171,16 +187,17 @@
                                                                             {{ $transaction->type->label() }}
                                                                         </span>
                                                                         <div wire:ignore>
-                                                                            <p data-bs-toggle="tooltip"
-                                                                               data-bs-placement="top"
-                                                                               title="{{ $transaction?->description }}"
-                                                                               class="project_name_0">{{ str($transaction?->description)->limit(30) }}</p>
+                                                                            <small class="text-muted"
+                                                                                   data-bs-toggle="tooltip"
+                                                                                   data-bs-placement="bottom"
+                                                                                   title="{{ $transaction?->description }}"
+                                                                                   class="project_name_0">{{ str($transaction?->description)->limit(30) }}</small>
                                                                         </div>
                                                                     </td>
                                                                     <td>
-                                                                        <h5 class="fw-bold txt-{{ $transaction->typeDisplay['color'] }}">{{ priceFormat($transaction->amount) }}
+                                                                        <span class="fw-bold h6 txt-{{ $transaction->typeDisplay['color'] }}">{{ priceFormat($transaction->amount) }}
                                                                             <small style="font-size: 10px">تومان</small>
-                                                                        </h5>
+                                                                        </span>
                                                                     </td>
                                                                     <td>
                                                                         @php $isPending = (bool)$transaction->status->isPending(); @endphp
@@ -204,6 +221,11 @@
                                                                         {{ jalaliDate($transaction->created_at, format: "%d %B %Y , H:i") }}
                                                                     </td>
                                                                 </tr>
+                                                                <tr x-intersect.once="$wire.loadMorePersonal()">
+                                                                    <td class="text-center" colspan="4" wire:loading wire:target="loadMorePersonal">
+                                                                        درحال دریافت تراکنش ها...
+                                                                    </td>
+                                                                </tr>
                                                             @empty
                                                                 <tr>
                                                                     <td colspan="4" class="text-muted text-center">
@@ -211,6 +233,8 @@
                                                                     </td>
                                                                 </tr>
                                                             @endforelse
+
+                                                            </tbody>
                                                         </table>
                                                     </div>
                                                 </div>
@@ -241,25 +265,26 @@
                                                         <i class="icofont icofont-minus minimize-card"></i>
                                                     </div>
                                                 </div>
-                                                <div class="card-body p-0">
+                                                <div class="card-body p-0 task-card-height">
                                                     <div class="taskadd">
                                                         <div class="table-responsive">
                                                             @php $shownCompanies = [] @endphp
                                                             <table class="table">
                                                                 @forelse($companiesTransactions as $transaction)
                                                                     <tr wire:key="{{ $transaction->id }}">
-                                                                        <td>
-                                                                    <span
-                                                                        class="badge common-align txt-{{ $transaction->typeDisplay['color'] }} rounded-pill badge-l-{{ $transaction->typeDisplay['color'] }} border border-{{ $transaction->typeDisplay['color'] }} dana fw-bold w-50">
-                                                                        <i data-feather="{{ $transaction->typeDisplay['icon'] }}"
-                                                                           class="me-1 stroke-{{ $transaction->typeDisplay['color'] }}"></i>
-                                                                        {{ $transaction->type->label() }}
-                                                                    </span>
-                                                                            <div wire:ignore>
-                                                                                <p data-bs-toggle="tooltip"
-                                                                                   data-bs-placement="top"
-                                                                                   title="{{ $transaction?->description }}"
-                                                                                   class="project_name_0">{{ str($transaction?->description)->limit(30) }}</p>
+                                                                        <td wire:ignore>
+                                                                            <span
+                                                                                class="badge common-align txt-{{ $transaction->typeDisplay['color'] }} rounded-pill badge-l-{{ $transaction->typeDisplay['color'] }} border border-{{ $transaction->typeDisplay['color'] }} dana fw-bold w-50">
+                                                                                <i data-feather="{{ $transaction->typeDisplay['icon'] }}"
+                                                                                   class="me-1 stroke-{{ $transaction->typeDisplay['color'] }}"></i>
+                                                                                {{ $transaction->type->label() }}
+                                                                            </span>
+                                                                            <div>
+                                                                                <small class="text-muted"
+                                                                                       data-bs-toggle="tooltip"
+                                                                                       data-bs-placement="bottom"
+                                                                                       title="{{ $transaction?->description }}"
+                                                                                       class="project_name_0">{{ str($transaction?->description)->limit(30) }}</small>
                                                                             </div>
                                                                         </td>
                                                                         <td>
@@ -285,15 +310,20 @@
                                                                             @if(!in_array($transaction->source_id,$shownCompanies))
                                                                                 @php $shownCompanies[] = $transaction->source_id; @endphp
 
-                                                                                <p class="txt-linkedin"
-                                                                                   data-bs-toggle="tooltip"
-                                                                                   data-bs-placement="top"
-                                                                                   title="موجودی کیف پول">
+                                                                                <strong class="txt-linkedin"
+                                                                                        data-bs-toggle="tooltip"
+                                                                                        data-bs-placement="top"
+                                                                                        title="موجودی کیف پول">
                                                                                     {{ persianPriceFormat($transaction->source->wallet->balance ?? '-') }}
-                                                                                </p>
+                                                                                </strong>
                                                                             @else
 
                                                                             @endif
+                                                                        </td>
+                                                                    </tr>
+                                                                    <tr x-intersect.once="$wire.loadMoreCompany()">
+                                                                        <td class="text-center" colspan="4" wire:loading wire:target="loadMoreCompany">
+                                                                            درحال دریافت تراکنش ها...
                                                                         </td>
                                                                     </tr>
                                                                 @empty
@@ -357,26 +387,27 @@
         init() {
             this.initializeFlatpickr();
 
-            // $wire.on('locationUpdated', () => {
-            //     if (this.flatpickrInstance) {
-            //         this.flatpickrInstance.destroy();
-            //     }
-            //
-            //     this.initializeFlatpickr();
-            // });
+            $wire.on('resetDatePicker', () => {
+                if (this.flatpickrInstance) this.flatpickrInstance.clear();
+            })
         },
 
         initializeFlatpickr() {
             this.flatpickrInstance = flatpickr(input, {
                 locale: "fa",
                 altInput: true,
-                altFormat: 'Y/m/d',
+                altFormat: 'j F, Y',
+                dateFormat: 'Y-m-d',
+                defaultDate: input.value || null,
                 maxDate: "today",
                 disableMobile: true,
-                placeholder: @js(jalaliDate(now(), format: 'Y/m/d')),
-                onClose: (selectedDate, dateStr) => {
-                    console.log(selectedDate,dateStr)
-                    // $wire.set('dateTimeRange', dateStr);
+                onClose: (selectedDates, dateStr) => {
+                    console.log(selectedDates, dateStr);
+                    if (selectedDates.length) {
+                        $wire.set('date', dateStr)
+                    } else {
+                        $wire.removeFilters(['date']);
+                    }
                 }
             });
         }
