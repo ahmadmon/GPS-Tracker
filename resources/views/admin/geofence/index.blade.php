@@ -72,7 +72,7 @@
                                                 @endif
                                                 <p class="c-o-light text-muted"
                                                    data-bs-toggle="tooltip" data-bs-placement="top"
-                                                   data-bs-title="{{ $geofence?->description }}"
+                                                   data-bs-title="{{ $geofence->description ?? ' ' }}"
                                                 >{{ str($geofence?->description)->limit(35) }}</p>
                                             </div>
                                         </td>
@@ -156,7 +156,6 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
 
     <script>
         $('#basic-1').DataTable({

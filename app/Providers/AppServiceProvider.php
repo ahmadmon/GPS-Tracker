@@ -2,15 +2,7 @@
 
 namespace App\Providers;
 
-use App\Helpers\Hadis;
-use App\Http\Services\DeviceManager;
-use App\Http\Services\Notify\SMS\SmsService;
-use App\Models\Company;
-use App\Models\User;
-use App\Models\Wallet;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
+
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -28,6 +20,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-Auth::loginUsingId(155);
+//Auth::loginUsingId(155);
     }
 }

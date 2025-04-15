@@ -48,6 +48,9 @@
                                     <th>کاربر</th>
                                     <th>شماره تماس</th>
                                     <th>وضعیت</th>
+                                    @role(['super-admin','admin'])
+                                    <th>موجودی کیف پول</th>
+                                    @endrole
                                     <th>تاریخ عضویت</th>
                                     <th>عملیات</th>
                                 </tr>
@@ -70,6 +73,13 @@
                                         <td>
                                             <x-partials.alpine.change-status :status="(bool)$user->status" :url="route('user.change-status',$user->id)" />
                                         </td>
+                                        @role(['super-admin', 'admin'])
+                                        <td>
+                                            <a href="{{ route('wallet-management.show', $user->wallet) }}" target="_blank">
+                                                <strong>{{ priceFormat($user?->wallet?->balance) }} تومان</strong>
+                                            </a>
+                                        </td>
+                                        @endrole
                                         <td>
                                             <span class="text-muted">{{ jalaliDate($user->created_at) }}</span>
                                         </td>
@@ -119,7 +129,6 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
 
     <script>
         $('#basic-1').DataTable({

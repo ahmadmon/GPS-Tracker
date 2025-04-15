@@ -25,11 +25,11 @@ class UserController extends BaseController
         Acl::authorize('users-list');
 
         if ($this->role === 'manager') {
-            $users = User::orderByDesc('id')
-                ->whereIn('id', $this->userCompaniesSubsetsId)
+            $users = User::whereIn('id', $this->userCompaniesSubsetsId)
+                ->latest()
                 ->cursor();
         } else {
-            $users = User::orderByDesc('id')->cursor();
+            $users = User::with('wallet:balance,id')->latest()->cursor();
         }
 
 

@@ -244,7 +244,7 @@ class WalletPage extends Component
             ->when($this->type, fn($q) => $q->where('type', $this->type))
             ->when($this->status, fn($q) => $q->where('status', $this->status))
             ->when(isset($date), fn($q) => $q->whereDate('created_at', $date))
-            ->latest()
+            ->orderByDesc('updated_at')
             ->take($this->personalTake)
             ->get();
     }
@@ -265,7 +265,7 @@ class WalletPage extends Component
             ->when($this->status, fn($q) => $q->where('status', $this->status))
             ->when(isset($date), fn($q) => $q->whereDate('created_at', $date))
             ->take($this->companyTake)
-            ->latest()
+            ->orderByDesc('updated_at')
             ->get();
     }
 

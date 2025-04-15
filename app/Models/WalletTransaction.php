@@ -71,6 +71,16 @@ class WalletTransaction extends Model
         );
     }
 
+    /**
+     * @return void
+     */
+    protected static function booted(): void
+    {
+        static::created(
+            fn($transaction) => $transaction->update(['transaction_number' => 'TRX-' . str_pad($transaction->id, 6, 0, STR_PAD_LEFT)])
+        );
+    }
+
     public function wallet(): BelongsTo
     {
         return $this->belongsTo(Wallet::class);

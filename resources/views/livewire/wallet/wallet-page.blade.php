@@ -179,6 +179,7 @@
                                                             <tbody>
                                                             @forelse($myTransactions as $transaction)
                                                                 <tr wire:key="{{ $transaction->id }}">
+                                                                    <td class="text-muted">{{ $transaction->transaction_number }}</td>
                                                                     <td>
                                                                         <span
                                                                             class="badge common-align txt-{{ $transaction->typeDisplay['color'] }} rounded-pill badge-l-{{ $transaction->typeDisplay['color'] }} border border-{{ $transaction->typeDisplay['color'] }} dana fw-bold w-50">
@@ -272,6 +273,7 @@
                                                             <table class="table">
                                                                 @forelse($companiesTransactions as $transaction)
                                                                     <tr wire:key="{{ $transaction->id }}">
+                                                                        <td class="text-muted">{{ $transaction->transaction_number }}</td>
                                                                         <td wire:ignore>
                                                                             <span
                                                                                 class="badge common-align txt-{{ $transaction->typeDisplay['color'] }} rounded-pill badge-l-{{ $transaction->typeDisplay['color'] }} border border-{{ $transaction->typeDisplay['color'] }} dana fw-bold w-50">
@@ -321,11 +323,15 @@
                                                                             @endif
                                                                         </td>
                                                                     </tr>
-                                                                    <tr x-intersect.once="$wire.loadMoreCompany()">
-                                                                        <td class="text-center" colspan="4" wire:loading wire:target="loadMoreCompany">
-                                                                            درحال دریافت تراکنش ها...
-                                                                        </td>
-                                                                    </tr>
+                                                                    @if($transaction->count())
+                                                                        <tr x-intersect.once="$wire.loadMoreCompany()">
+                                                                            <td class="text-center" colspan="4"
+                                                                                wire:loading
+                                                                                wire:target="loadMoreCompany">
+                                                                                درحال دریافت تراکنش ها...
+                                                                            </td>
+                                                                        </tr>
+                                                                    @endif
                                                                 @empty
                                                                     <tr>
                                                                         <td colspan="6" class="text-muted text-center">
