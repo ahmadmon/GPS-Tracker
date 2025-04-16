@@ -51,6 +51,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::prefix('wallet-management')->name('wallet-management.')->group(function (){
         Route::get('/show/{wallet}', [WalletManagementController::class, 'show'])->name('show');
+        Route::get('/show/{wallet}/filter', [WalletManagementController::class, 'filter'])->name('show-filter');
+        Route::get('/show/{wallet}/create', [WalletManagementController::class, 'create'])->name('create');
+        Route::post('/show/{wallet}/store', [WalletManagementController::class, 'store'])->name('store');
+        Route::post('/show/{wallet}/send-to-gateway', [WalletManagementController::class, 'sendToGateway'])->name('send-to-gateway');
     });
 
     Route::prefix('profile')->name('profile.')->group(function () {

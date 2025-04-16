@@ -56,101 +56,117 @@
                                                     <p>{{ $user->phone }} | {{ $user->type['name'] }}</p>
                                                 </div>
                                             </div>
-                                            <ul class="nav main-menu mt-2" role="tablist">
-                                                <li class="nav-item effective-card">
-                                                    <div class="card common-hover">
-                                                        <div class="card-body p-2">
-                                                            <a class="effect-card d-block p-3"
-                                                               style="cursor:default;"
-                                                               href="javascript:void(0)">
-                                                                <div class="common-box1 common-align">
-                                                                    <h5 class="d-block">موجودی:</h5>
-                                                                </div>
-                                                                <p class="mb-0 pt-2 fw-bolder h5">{{ persianPriceFormat($wallet->balance) }}</p>
-                                                                <div class="go-corner">
-                                                                    <div class="go-arrow"></div>
-                                                                </div>
-                                                            </a>
-                                                        </div>
-                                                    </div>
-                                                </li>
-
-                                                <li class="nav-item">
-                                                    <a href="#"
-                                                       class="btn btn-primary-gradien d-flex justify-content-center btn-block w-100 mt-0">
-                                                        <i class="me-2" data-feather="plus-circle"></i>
-                                                        شارژ کیف‌ پول
-                                                    </a>
-                                                    <hr>
-                                                </li>
-
-                                                <li class="nav-item">
-                                                    <div class="mb-3">
-                                                        <label for="search">جستجو</label>
-                                                        <input type="text" id="search" class="form-control"
-                                                               placeholder="بر اساس مبلغ..."
-                                                               autocomplete="off">
-                                                        <x-input-error :messages="$errors->get('search')" class="mt-2"/>
-                                                    </div>
-                                                </li>
-
-                                                <li class="nav-item">
-                                                    <div class="mb-3">
-                                                        <label for="type">نــوع تراکنش</label>
-                                                        <select id="type" class="form-select">
-                                                            <option value="" selected>همه</option>
-                                                            <option
-                                                                value="{{ TransactionType::CREDIT }}">{{ TransactionType::CREDIT->label() }}</option>
-                                                            <option
-                                                                value="{{ TransactionType::DEBIT }}">{{ TransactionType::DEBIT->label() }}</option>
-                                                        </select>
-                                                        <x-input-error :messages="$errors->get('type')" class="mt-2"/>
-                                                    </div>
-                                                </li>
-
-                                                <li class="nav-item">
-                                                    <div class="mb-3">
-                                                        <label for="status">وضعیت پــرداخت</label>
-                                                        <select id="status" class="form-select">
-                                                            <option value="" selected>همه</option>
-                                                            <option
-                                                                value="{{ TransactionStatus::SUCCESS }}">{{ TransactionStatus::SUCCESS->label() }}</option>
-                                                            <option
-                                                                value="{{ TransactionStatus::PENDING }}">{{ TransactionStatus::PENDING->label() }}</option>
-                                                            <option
-                                                                value="{{ TransactionStatus::FAILED }}">{{ TransactionStatus::FAILED->label() }}</option>
-                                                        </select>
-                                                        <x-input-error :messages="$errors->get('status')" class="mt-2"/>
-                                                    </div>
-                                                </li>
-
-                                                <li class="nav-item">
-                                                    <div class="mb-3">
-                                                        <label for="date">تاریــخ تراکنش</label>
-                                                        <div class="input-group flatpicker-calender">
-                                                            <div class="input-group flatpicker-calender">
-                                                                <input class="form-control" id="date" type="date"
-                                                                       x-data="dateFlatpickr($el)"
-                                                                       placeholder="{{ jalaliDate(now()) }}">
+                                            <form action="{{ route('wallet-management.show-filter', $wallet) }}"
+                                                  method="GET" id="filter-form">
+                                                <ul class="nav main-menu mt-2" role="tablist">
+                                                    <li class="nav-item effective-card">
+                                                        <div class="card common-hover">
+                                                            <div class="card-body p-2">
+                                                                <a class="effect-card d-block p-3"
+                                                                   style="cursor:default;"
+                                                                   href="javascript:void(0)">
+                                                                    <div class="common-box1 common-align">
+                                                                        <h5 class="d-block">موجودی:</h5>
+                                                                    </div>
+                                                                    <p class="mb-0 pt-2 fw-bolder h5">{{ persianPriceFormat($wallet->balance) }}</p>
+                                                                    <div class="go-corner">
+                                                                        <div class="go-arrow"></div>
+                                                                    </div>
+                                                                </a>
                                                             </div>
                                                         </div>
-                                                        <x-input-error :messages="$errors->get('date')" class="mt-2"/>
-                                                    </div>
-                                                </li>
+                                                    </li>
 
-                                                {{--                                                @if($this->hasFilters)--}}
-                                                <li class="nav-item mt-2">
-                                                    <button class="btn btn-primary btn-block w-100">
+                                                    <li class="nav-item">
+                                                        <a href="{{ route('wallet-management.create', $wallet) }}"
+                                                           class="btn btn-primary-gradien d-flex justify-content-center btn-block w-100 mt-0">
+                                                            <i class="me-2" data-feather="plus-circle"></i>
+                                                            شارژ کیف‌ پول
+                                                        </a>
+                                                        <hr>
+                                                    </li>
+
+                                                    <li class="nav-item">
+                                                        <div class="mb-3" x-data>
+                                                            <label for="type">نــوع تراکنش</label>
+                                                            @php
+                                                                $types = [
+                                                                    '' => 'همه',
+                                                                    TransactionType::CREDIT->value => TransactionType::CREDIT->label(),
+                                                                    TransactionType::DEBIT->value => TransactionType::DEBIT->label(),
+                                                                ];
+                                                                $selectedType = request('type');
+                                                            @endphp
+
+                                                            <select id="type" name="type" class="form-select"
+                                                                    @change="$el.closest('form').submit()">
+                                                                @foreach($types as $value => $label)
+                                                                    <option
+                                                                        value="{{ $value }}" @selected($selectedType === $value)>
+                                                                        {{ $label }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                            <x-input-error :messages="$errors->get('type')"
+                                                                           class="mt-2"/>
+                                                        </div>
+                                                    </li>
+
+                                                    <li class="nav-item">
+                                                        <div class="mb-3" x-data>
+                                                            <label for="status">وضعیت پــرداخت</label>
+                                                            @php
+                                                                $statuses = [
+                                                                    '' => 'همه',
+                                                                    TransactionStatus::SUCCESS->value => TransactionStatus::SUCCESS->label(),
+                                                                    TransactionStatus::PENDING->value => TransactionStatus::PENDING->label(),
+                                                                    TransactionStatus::FAILED->value => TransactionStatus::FAILED->label(),
+                                                                ];
+                                                                $selectedStatus = request('status');
+                                                            @endphp
+                                                            <select id="status" class="form-select" name="status"
+                                                                    @change="$el.closest('form').submit()">
+                                                                @foreach($statuses as $value => $label)
+                                                                    <option
+                                                                        value="{{ $value }}" @selected($selectedStatus === $value)>{{ $label }}</option>
+                                                                @endforeach
+
+                                                            </select>
+                                                            <x-input-error :messages="$errors->get('status')"
+                                                                           class="mt-2"/>
+                                                        </div>
+                                                    </li>
+
+                                                    <li class="nav-item">
+                                                        <div class="mb-3">
+                                                            <label for="date">تاریــخ تراکنش</label>
+                                                            <div class="input-group flatpicker-calender">
+                                                                <div class="input-group flatpicker-calender">
+                                                                    <input class="form-control" id="date" type="date"
+                                                                           name="date" value="{{ request('date') }}"
+                                                                           x-data="dateFlatpickr($el)"
+                                                                           placeholder="{{ jalaliDate(now()) }}">
+                                                                </div>
+                                                            </div>
+                                                            <x-input-error :messages="$errors->get('date')"
+                                                                           class="mt-2"/>
+                                                        </div>
+                                                    </li>
+
+                                                    @if($hasFilters ?? false)
+                                                        <li class="nav-item mt-2">
+                                                            <a href="{{ route('wallet-management.show', $wallet) }}" class="btn btn-outline-danger btn-block justify-content-center w-100">
                                                         <span>
                                                             <i data-feather="filter" class="me-1"></i>
                                                             حذف فیلتــرها
                                                         </span>
-                                                    </button>
-                                                </li>
-                                                {{--                                                @endif--}}
+                                                            </a>
+                                                        </li>
+                                                    @endif
 
 
-                                            </ul>
+                                                </ul>
+                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -302,12 +318,9 @@
                         defaultDate: input.value || null,
                         maxDate: "today",
                         disableMobile: true,
-                        onClose: (selectedDates, dateStr) => {
-                            console.log(selectedDates, dateStr);
+                        onClose: (selectedDates) => {
                             if (selectedDates.length) {
-                                // $wire.set('date', dateStr)
-                            } else {
-                                // $wire.removeFilters(['date']);
+                                input.closest('form').submit()
                             }
                         }
                     });

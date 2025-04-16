@@ -5,7 +5,6 @@
 
 @section('content')
 
-{{--    @dd($errors->all())--}}
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">

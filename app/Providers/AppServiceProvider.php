@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 
+use App\Models\WalletTransaction;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
