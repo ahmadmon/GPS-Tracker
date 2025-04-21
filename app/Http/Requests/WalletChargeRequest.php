@@ -24,7 +24,6 @@ class WalletChargeRequest extends FormRequest
         return [
             'amount' => 'required|numeric|min:10000|max:50000000',
             'description' => 'nullable|string|min:5',
-            'type' => 'required|string|in:credit,debit'
         ];
     }
 
@@ -48,7 +47,6 @@ class WalletChargeRequest extends FormRequest
     {
         return [
             'amount' => 'مبلغ',
-            'type' => 'نوع تراکنش'
         ];
     }
 

@@ -244,8 +244,10 @@
                                                                     @else
                                                                         <button
                                                                             x-data="{ label: @js($transaction->statusDisplay['label']) }"
+                                                                            @click="$dispatch('open-retry-payment-modal', { id: @js($transaction->id), walletId: @js($wallet->id) })"
                                                                             @mouseenter="label = 'پرداخت مجدد'"
                                                                             @mouseleave="label = @js($transaction->statusDisplay['label'])"
+                                                                            data-bs-toggle="modal" data-bs-target="#exampleModalToggle" data-bs-dismiss="modal"
                                                                             type="button" @class(["cursor-pointer btn btn-sm btn-warning p-1"])>
                                                                             <span x-text="label"></span>
                                                                         </button>
@@ -277,6 +279,8 @@
             </div>
         </div>
     </div>
+
+    <x-partials.modals.retry-payment-modal />
 
 @endsection
 
@@ -324,6 +328,47 @@
                             }
                         }
                     });
+                }
+            }));
+
+            // fetch transaction
+            //------------------------------------------------------
+            Alpine.data('retryPaymentModal', () => ({
+                transactionId: null,
+                walletId: null,
+                transaction: null,
+                url: null,
+                loading: false,
+                error: null,
+
+
+                async fetchTransaction(id) {
+                    this.loading = true;
+                    this.transactionId = id;
+
+                    try {
+                        const response = await fetch(`/wallet-management/show/${this.walletId}/get-transaction/${id}`);
+                        const data = await response.json();
+                        this.transaction = data.transaction;
+                        this.url = data.url;
+                    } catch (e) {
+                        this.error = "خطا در دریافت اطلاعات تراکنش";
+                    }
+
+                    this.loading = false;
+                },
+
+                init() {
+                    this.$watch('transactionId', id => {
+                        if (id) {
+                            this.fetchTransaction(id);
+                        }
+                    });
+
+                    window.addEventListener('open-retry-payment-modal', e => {
+                        this.transactionId = e.detail.id;
+                        this.walletId = e.detail.walletId;
+                    })
                 }
             }))
         })

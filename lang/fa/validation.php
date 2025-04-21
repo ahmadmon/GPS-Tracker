@@ -248,7 +248,8 @@ return [
         'rule_confirmation' => 'قوانین',
         'otp_code' => 'کد ورود',
         'command' => 'دستور',
-        'vehicle_id' => 'وسیله نقلیه'
+        'vehicle_id' => 'وسیله نقلیه',
+        'trx-status' => 'وضعیت تراکنش'
 
     ]
 ];
