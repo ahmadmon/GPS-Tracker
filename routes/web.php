@@ -7,6 +7,7 @@ use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\Wallet\PaymentCallbackController;
 use App\Http\Controllers\Wallet\WalletManagementController;
 use App\Livewire\MapPage;
 use App\Livewire\Wallet\WalletPage;
@@ -56,7 +57,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/show/{wallet}/store', [WalletManagementController::class, 'store'])->name('store');
         Route::post('/show/{wallet}/send-to-gateway', [WalletManagementController::class, 'sendToGateway'])->name('send-to-gateway');
         Route::any('/show/{wallet}/get-transaction/{transaction}', [WalletManagementController::class, 'getTransaction'])->name('get-transaction');
-        Route::post('/show/{wallet}/change-transaction-status/{transaction}', [WalletManagementController::class, 'changeTransactionStatus'])->name('change-transaction-status');
+        Route::post('/show/{wallet}/retry-payment-gateway/{transaction:transaction_number}', [WalletManagementController::class, 'retryPayment'])->name('retry-payment-gateway');
+        Route::post('/show/{wallet}/change-transaction-status/{transaction:transaction_number}', [WalletManagementController::class, 'changeTransactionStatus'])->name('change-transaction-status');
     });
 
     Route::prefix('profile')->name('profile.')->group(function () {
@@ -64,8 +66,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('change-password');
         Route::get('/forgot-password', [ProfileController::class, 'forgotPassword'])->name('forgot-password');
         Route::get('/wallet', WalletPage::class)->name('wallet');
-        Route::any('/wallet/payment-result/{transaction}/{payment}', [WalletPage::class, 'paymentCallback'])->name('callback-payment');
     });
+
+    Route::any('/wallet/payment-result/{transaction}/{payment}', PaymentCallbackController::class)->name('wallet.callback-payment');
 
 });
 

@@ -150,7 +150,7 @@
                                             <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
                                         @endif
                                     </td>
-                                    <td>
+                                    <td data-sort="{{ $user->created_at->toDateTimeString() }}">
                                         <span class="text-muted">{{ jalaliDate($user->created_at) }}</span>
                                     </td>
                                     @if(can('manage-subsets'))

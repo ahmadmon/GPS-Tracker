@@ -142,7 +142,7 @@
                                             <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
                                         @endif
                                     </td>
-                                    <td>{{ jalaliDate($device?->connected_at,time:true) }}</td>
+                                    <td data-sort="{{ $device->connected_at }}">{{ jalaliDate($device?->connected_at,time:true) }}</td>
                                     <td x-data="{ show: false }">
                                         <div class="btn-group" x-cloak x-show="!show">
                                             <button class="btn dropdown-toggle" type="button"
@@ -268,16 +268,29 @@
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatables/datatable.custom.js') }}"></script>
     <script>
-        $('#basic-1').DataTable({
-            "language": {
-                "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
+        $(document).ready(function() {
+            // Destroy previous instance of DataTable if it exists, then reinitialize it
+            if ($.fn.dataTable.isDataTable('#basic-1')) {
+                $('#basic-1').DataTable().destroy();
             }
+
+            $('#basic-1').DataTable({
+                order: [[4, 'desc']], // ترتیب بر اساس ستون تاریخ
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
+                }
+            });
+
+            if ($.fn.dataTable.isDataTable('#basic-2')) {
+                $('#basic-2').DataTable().destroy();
+            }
+
+            $('#basic-2').DataTable({
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
+                }
+            });
         });
 
-        $('#basic-2').DataTable({
-            "language": {
-                "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
-            }
-        });
     </script>
 @endpush

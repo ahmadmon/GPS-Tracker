@@ -121,7 +121,7 @@ class WalletPage extends Component
      */
     public function retryPayment(string $transactionId, PaymentService $paymentService)
     {
-        $transaction = WalletTransaction::withOnly('payment')->findOrFail($transactionId);
+        $transaction = WalletTransaction::with('payment')->findOrFail($transactionId);
 
         // Transaction ownership check
         if ($transaction->source_id !== Auth::id() || $transaction->source_type !== User::class) {

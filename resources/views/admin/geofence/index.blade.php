@@ -107,7 +107,7 @@
                                                 فاقد محدودیت زمانی
                                             @endif
                                         </td>
-                                        <td>
+                                        <td data-sort="{{ $geofence->created_at->toDateTimeString() }}">
                                             <span class="text-muted">{{ jalaliDate($geofence->created_at) }}</span>
                                         </td>
                                         <td x-data="{ show: false }">
@@ -159,7 +159,7 @@
 
     <script>
         $('#basic-1').DataTable({
-            order: [[{{ $sort }}, 'asc']],
+            order: [[{{ $sort }}, 'desc']],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
             }

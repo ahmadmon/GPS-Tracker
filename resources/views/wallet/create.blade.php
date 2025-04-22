@@ -6,7 +6,7 @@
 
 @extends('01-layouts.master')
 
-@section('title', "شارژ کیف پول {$type}")
+@section('title',$isUser ? 'کاربر' : 'سازمان' . "شارژ کیف پول ")
 
 @push('styles')
 
@@ -28,10 +28,10 @@
                         </li>
                         <li class="breadcrumb-item dana">
                             <a href="{{ route('wallet-management.show', $wallet->id) }}">
-                                جزئیات کیف پول {{ $type }}
+                                جزئیات کیف پول {{ $isUser ? 'کاربر' : 'سازمان' }}
                             </a>
                         </li>
-                        <li class="breadcrumb-item dana">شارژ کیف پول {{ $type }}</li>
+                        <li class="breadcrumb-item dana">شارژ کیف پول {{ $isUser ? 'کاربر' : 'سازمان' }}</li>
                     </ol>
                 </div>
             </div>
@@ -51,16 +51,25 @@
                                     <div class="card-body">
                                         <div class="email-app-sidebar left-bookmark task-sidebar">
                                             <div class="media">
-                                                <div class="media-size-email"><img class="me-3 rounded-circle"
-                                                                                   src="{{ asset('assets/images/avtar/user.png') }}"
-                                                                                   alt=""></div>
-                                                <div class="media-body">
-                                                    <h6 class="f-w-600">{{ $wallet->walletable?->name }}</h6>
-                                                    <p>{{ $wallet->walletable?->phone }} | {{ $wallet->walletable?->type['name'] }}</p>
-                                                </div>
+                                                @if($isUser)
+                                                    <div class="media-size-email"><img class="me-3 rounded-circle"
+                                                                                       src="{{ asset('assets/images/avtar/user.png') }}"
+                                                                                       alt=""></div>
+                                                    <div class="media-body">
+                                                        <h6 class="f-w-600">{{ $entity->name }}</h6>
+                                                        <p>{{ $entity->phone }} | {{ $entity->type['name'] }}</p>
+                                                    </div>
+                                                @else
+                                                    <div class="media-size-email">
+                                                        <img class="me-3 rounded-circle img-70 object-fit-cover"
+                                                             src="{{ asset($entity->logo) }}" alt="">
+                                                    </div>
+                                                    <div class="media-body">
+                                                        <h6 class="f-w-600">{{ $entity->name }}</h6>
+                                                        <p>{{ $entity->contact_number }} | {{ $entity->manager->name }}</p>
+                                                    </div>
+                                                @endif
                                             </div>
-                                            <form action="{{ route('wallet-management.show-filter', $wallet) }}"
-                                                  method="GET" id="filter-form">
                                                 <ul class="nav main-menu mt-2" role="tablist">
                                                     <li class="nav-item effective-card">
                                                         <div class="card common-hover">
@@ -89,7 +98,6 @@
                                                         <hr>
                                                     </li>
                                                 </ul>
-                                            </form>
                                         </div>
                                     </div>
                                 </div>
@@ -153,7 +161,7 @@
                                                 @click.prevent="$el.closest('form').action = manualCredit; $el.closest('form').submit()"
                                                 data-bs-toggle="tooltip"
                                                 data-bs-placement="top"
-                                                title="با کلیک بر روی این دکمه، می‌توانید به صورت مستقیم و بدون نیاز به درگاه پرداخت، موجودی کیف پول {{ $type }} را افزایش دهید."
+                                                title="با کلیک بر روی این دکمه، می‌توانید به صورت مستقیم و بدون نیاز به درگاه پرداخت، موجودی کیف پول موردنظر را افزایش دهید."
                                                 type="submit">
                                             <span class="">افزایش اعتبار</span>
                                         </button>

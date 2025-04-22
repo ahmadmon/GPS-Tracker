@@ -27,7 +27,12 @@
                                 </svg>
                             </a>
                         </li>
-                        <li class="breadcrumb-item dana">جزئیات کیف پول کاربر</li>
+                        <li class="breadcrumb-item dana">
+                            <a href="{{ route($isUser ? 'user.index' : 'company.index') }}">
+                                لیست {{ $isUser ? 'کاربران' : 'سازمان ها' }}
+                            </a>
+                        </li>
+                        <li class="breadcrumb-item dana">جزئیات کیف پول {{ $isUser ? 'کاربر' : 'سازمان' }}</li>
                     </ol>
                 </div>
             </div>
@@ -48,13 +53,24 @@
                                     <div class="card-body">
                                         <div class="email-app-sidebar left-bookmark task-sidebar">
                                             <div class="media">
-                                                <div class="media-size-email"><img class="me-3 rounded-circle"
-                                                                                   src="{{ asset('assets/images/avtar/user.png') }}"
-                                                                                   alt=""></div>
-                                                <div class="media-body">
-                                                    <h6 class="f-w-600">{{ $user->name }}</h6>
-                                                    <p>{{ $user->phone }} | {{ $user->type['name'] }}</p>
-                                                </div>
+                                                @if($isUser)
+                                                    <div class="media-size-email"><img class="me-3 rounded-circle"
+                                                                                       src="{{ asset('assets/images/avtar/user.png') }}"
+                                                                                       alt=""></div>
+                                                    <div class="media-body">
+                                                        <h6 class="f-w-600">{{ $entity->name }}</h6>
+                                                        <p>{{ $entity->phone }} | {{ $entity->type['name'] }}</p>
+                                                    </div>
+                                                @else
+                                                    <div class="media-size-email">
+                                                        <img class="me-3 rounded-circle img-70 object-fit-cover"
+                                                             src="{{ asset($entity->logo) }}" alt="">
+                                                    </div>
+                                                    <div class="media-body">
+                                                        <h6 class="f-w-600">{{ $entity->name }}</h6>
+                                                        <p>{{ $entity->contact_number }} | {{ $entity->manager->name }}</p>
+                                                    </div>
+                                                @endif
                                             </div>
                                             <form action="{{ route('wallet-management.show-filter', $wallet) }}"
                                                   method="GET" id="filter-form">
@@ -188,7 +204,7 @@
                                             <div class="card-header d-flex">
                                                 <h5 class="mb-0">
                                                     <i class="" data-feather="dollar-sign"></i>
-                                                    لیست تراکنش های کاربر
+                                                    لیست تراکنش های {{ $isUser ? 'کاربر' : 'سازمان' }}
                                                 </h5>
 
                                                 <div class="card-header-right">
@@ -254,7 +270,7 @@
                                                                     @endif
 
                                                                 </td>
-                                                                <td class="task-date">
+                                                                <td class="task-date" data-sort="{{ $transaction->created_at->toDateTimeString() }}">
                                                                     {{ jalaliDate($transaction->created_at, format: "%d %B %Y , H:i") }}
                                                                 </td>
                                                             </tr>
@@ -338,6 +354,7 @@
                 walletId: null,
                 transaction: null,
                 url: null,
+                gatewayUrl: null,
                 loading: false,
                 error: null,
 
@@ -351,6 +368,7 @@
                         const data = await response.json();
                         this.transaction = data.transaction;
                         this.url = data.url;
+                        this.gatewayUrl = data.gatewayUrl;
                     } catch (e) {
                         this.error = "خطا در دریافت اطلاعات تراکنش";
                     }

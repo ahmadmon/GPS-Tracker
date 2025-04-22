@@ -80,7 +80,7 @@
                                             </a>
                                         </td>
                                         @endrole
-                                        <td>
+                                        <td data-sort="{{ $user->created_at->toDateTimeString() }}">
                                             <span class="text-muted">{{ jalaliDate($user->created_at) }}</span>
                                         </td>
                                         <td x-data="{ show: false }">
@@ -125,6 +125,10 @@
         </div>
     </div>
 
+    @php
+        $sort = auth()->user()->hasRole(['user', 'manager']) ? 3 : 4;
+    @endphp
+
 @endsection
 
 @push('scripts')
@@ -132,7 +136,7 @@
 
     <script>
         $('#basic-1').DataTable({
-            order: [[3, 'asc']],
+            order: [[{{ $sort }}, 'desc']],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
             }

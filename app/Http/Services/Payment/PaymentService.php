@@ -25,9 +25,9 @@ class PaymentService
     {
         $invoice = new Invoice;
         $invoice->amount((int)$transaction->amount);
-        $invoice->detail(['title' => "سمفا - سامانه هوشمند ردیابی GPS", 'description' => "شارژ کیف پول کاربر جهت استفاده در سامانه سمفا"]);
+        $invoice->detail(['title' => "سمفا - سامانه هوشمند ردیابی GPS", 'description' => "شارژ کیف پول جهت استفاده در سامانه سمفا"]);
 
-        $callBackRoute = route('profile.callback-payment', [$transaction, $payment]);
+        $callBackRoute = route('wallet.callback-payment', [$transaction, $payment]);
 
         $paymentProcessor = Payment::callbackUrl($callBackRoute)
             ->purchase($invoice, function ($driver, $transactionId) use ($payment) {

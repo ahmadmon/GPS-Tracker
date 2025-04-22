@@ -9,6 +9,10 @@
 
 @section('content')
 
+    @php
+        $sort = auth()->user()->hasRole(['user', 'manager']) ? 4 : 5;
+    @endphp
+
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
@@ -52,6 +56,9 @@
                                     @endnotRole
                                     <th>شماره تماس</th>
                                     <th>وضعیت</th>
+                                    @role(['super-admin','admin'])
+                                    <th>موجودی کیف پول</th>
+                                    @endrole
                                     <th>تاریخ ایجاد</th>
                                     <th>عملیات</th>
                                 </tr>
@@ -86,7 +93,15 @@
                                             <x-partials.alpine.change-status :status="(bool)$company->status"
                                                                              :url="route('company.change-status',$company->id)"/>
                                         </td>
+                                        @role(['super-admin', 'admin'])
                                         <td>
+                                            <a href="{{ route('wallet-management.show', $company->wallet) }}"
+                                               target="_blank">
+                                                <strong>{{ priceFormat($company?->wallet?->balance) }} تومان</strong>
+                                            </a>
+                                        </td>
+                                        @endrole
+                                        <td data-sort="{{ $company->created_at->toDateTimeString() }}">
                                             <span class="text-muted">{{ jalaliDate($company->created_at) }}</span>
                                         </td>
                                         <td x-data="{ show: false }">
@@ -117,12 +132,12 @@
                                                 </ul>
                                             </div>
                                             <x-partials.btns.confirm-rmv-btn
-                                                    url="{{ route('company.destroy', $company->id) }}"/>
+                                                url="{{ route('company.destroy', $company->id) }}"/>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center">داده ای یافت نشد.</td>
+                                        <td colspan="{{ $sort+1 }}" class="text-center">داده ای یافت نشد.</td>
                                     </tr>
                                 @endforelse
                                 </tbody>
@@ -142,7 +157,7 @@
 
     <script>
         $('#basic-1').DataTable({
-            order: [[4, 'asc']],
+            order: [[{{ $sort }}, 'desc']],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
             }

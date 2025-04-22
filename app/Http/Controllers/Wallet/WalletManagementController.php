@@ -22,11 +22,15 @@ class WalletManagementController extends Controller
     public function show(Wallet $wallet)
     {
         $transactions = $wallet->transactions()->latest()->cursor();
+        $wallet->load('walletable');
+        $walletable = $wallet->walletable;
 
-        return view('wallet.user.show', [
+
+        return view('wallet.show', [
             'wallet' => $wallet,
             'transactions' => $transactions,
-            'user' => $wallet->walletable,
+            'isUser' => $walletable instanceof User,
+            'entity' => $walletable,
         ]);
     }
 
@@ -41,6 +45,7 @@ class WalletManagementController extends Controller
         $date = !is_null($request->input('date')) ? Jalalian::fromFormat('Y-m-d', $request->input('date'))->toCarbon() : null;
 
         $wallet->load('transactions');
+        $walletable = $wallet->walletable;
 
         $transactions = $wallet->transactions()
             ->when(isset($type), fn($q) => $q->where('type', $type))
@@ -50,10 +55,11 @@ class WalletManagementController extends Controller
             ->cursor();
 
 
-        return view('wallet.user.show', [
+        return view('wallet.show', [
             'wallet' => $wallet,
             'transactions' => $transactions,
-            'user' => $wallet->walletable,
+            'isUser' => $walletable instanceof User,
+            'entity' => $walletable,
             'hasFilters' => $this->hasFilters($request)
         ]);
     }
@@ -61,9 +67,12 @@ class WalletManagementController extends Controller
 
     public function create(Wallet $wallet)
     {
+        $walletable = $wallet->walletable;
+
         return view('wallet.create', [
             'wallet' => $wallet->load('walletable'),
-            'type' => $wallet->walletable_type === User::class ? 'کاربر' : 'سازمان'
+            'entity' => $walletable,
+            'isUser' => $walletable instanceof User
         ]);
     }
 
@@ -94,6 +103,26 @@ class WalletManagementController extends Controller
             Log::error('payment failed', [$e->getMessage()]);
 
             return to_route('profile.wallet')->with('error-alert', "خطا در اتصال به درگاه پرداخت.\n لطفاً چند دقیقه دیگر مجدداً تلاش نمایید.");
+        }
+    }
+
+    public function retryPayment(string $walletId, string $transactionNumber, PaymentService $paymentService)
+    {
+        $transaction = WalletTransaction::with('payment')->where('transaction_number', $transactionNumber)->first();
+
+        // Check status
+        if (!$transaction->status->isPending() || (!$transaction->payment || !$transaction->payment->status->isPending())) {
+            return to_route('profile.wallet')->with('error-alert', 'این تراکنش دیگر قابل پرداخت نیست.');
+        }
+        $transaction->update(['created_at' => now()]);
+
+        try {
+            $gatewayURL = $paymentService->paymentPage($transaction, $transaction->payment);
+            return redirect()->away($gatewayURL);
+
+        } catch (\Exception $e) {
+            Log::error('Retry Payment Failed', ['message' => $e->getMessage()]);
+            return to_route('profile.wallet')->with('error-alert', 'اتصال مجدد به درگاه با خطا مواجه شد. لطفاً بعداً تلاش کنید.');
         }
     }
 
@@ -135,7 +164,8 @@ class WalletManagementController extends Controller
     {
         return response()->json([
             'transaction' => $transaction,
-            'url' => route('wallet-management.change-transaction-status', [$wallet->id, $transaction->id])
+            'url' => route('wallet-management.change-transaction-status', [$wallet->id, $transaction->transaction_number]),
+            'gatewayUrl' => route('wallet-management.retry-payment-gateway', [$wallet->id, $transaction->transaction_number])
         ]);
     }
 

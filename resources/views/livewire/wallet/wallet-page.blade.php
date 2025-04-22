@@ -151,8 +151,12 @@
                     </div>
                 </div>
                 <div class="col-xl-9 col-md-12 box-col-12">
-                    <x-partials.alert.success-alert/>
-                    <x-partials.alert.error-alert/>
+                    <div wire:ignore>
+                        <x-partials.alert.success-alert/>
+                    </div>
+                    <div wire:ignore>
+                        <x-partials.alert.error-alert/>
+                    </div>
 
                     <div class="email-right-aside bookmark-tabcontent">
                         <div class="card email-body rounded-3">
@@ -196,7 +200,8 @@
                                                                         </div>
                                                                     </td>
                                                                     <td>
-                                                                        <span class="fw-bold h6 txt-{{ $transaction->typeDisplay['color'] }}">{{ priceFormat($transaction->amount) }}
+                                                                        <span
+                                                                            class="fw-bold h6 txt-{{ $transaction->typeDisplay['color'] }}">{{ priceFormat($transaction->amount) }}
                                                                             <small style="font-size: 10px">تومان</small>
                                                                         </span>
                                                                     </td>
@@ -223,7 +228,8 @@
                                                                     </td>
                                                                 </tr>
                                                                 <tr x-intersect.once="$wire.loadMorePersonal()">
-                                                                    <td class="text-center" colspan="4" wire:loading wire:target="loadMorePersonal">
+                                                                    <td class="text-center" colspan="4" wire:loading
+                                                                        wire:target="loadMorePersonal">
                                                                         درحال دریافت تراکنش ها...
                                                                     </td>
                                                                 </tr>
