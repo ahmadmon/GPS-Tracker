@@ -245,7 +245,7 @@
                                                                                class="project_name_0">{{ str($transaction?->description)->limit(30) }}</small>
                                                                     </div>
                                                                 </td>
-                                                                <td>
+                                                                <td data-sort="{{ $transaction->amount }}">
                                                                         <span
                                                                             class="fw-bold h6 txt-{{ $transaction->typeDisplay['color'] }}">{{ priceFormat($transaction->amount) }}
                                                                             <small style="font-size: 10px">تومان</small>
@@ -276,7 +276,7 @@
                                                             </tr>
                                                         @empty
                                                             <tr>
-                                                                <td colspan="4" class="text-muted text-center">
+                                                                <td colspan="5" class="text-muted text-center">
                                                                     تراکنشی یافت نشد :(
                                                                 </td>
                                                             </tr>

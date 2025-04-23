@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Support\Facades\Cache;
 
 class WalletTransaction extends Model
 {
@@ -77,7 +78,11 @@ class WalletTransaction extends Model
     protected static function booted(): void
     {
         static::created(
-            fn($transaction) => $transaction->update(['transaction_number' => 'TRX-' . str_pad($transaction->id, 6, 0, STR_PAD_LEFT)])
+            function ($transaction) {
+                $transaction->update(['transaction_number' => 'TRX-' . str_pad($transaction->id, 6, 0, STR_PAD_LEFT)]);
+                Cache::forget('transactions-list');
+            }
+
         );
     }
 

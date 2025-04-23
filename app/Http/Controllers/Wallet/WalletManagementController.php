@@ -21,7 +21,7 @@ class WalletManagementController extends Controller
 {
     public function show(Wallet $wallet)
     {
-        $transactions = $wallet->transactions()->latest()->cursor();
+        $transactions = Cache::remember('transactions-list', 60, fn() => $wallet->transactions()->latest()->get());
         $wallet->load('walletable');
         $walletable = $wallet->walletable;
 

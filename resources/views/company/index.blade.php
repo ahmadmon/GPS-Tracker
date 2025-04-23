@@ -94,7 +94,7 @@
                                                                              :url="route('company.change-status',$company->id)"/>
                                         </td>
                                         @role(['super-admin', 'admin'])
-                                        <td>
+                                        <td data-sort="{{ $company?->wallet?->balance }}">
                                             <a href="{{ route('wallet-management.show', $company->wallet) }}"
                                                target="_blank">
                                                 <strong>{{ priceFormat($company?->wallet?->balance) }} تومان</strong>

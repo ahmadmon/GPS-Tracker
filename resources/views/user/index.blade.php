@@ -74,7 +74,7 @@
                                             <x-partials.alpine.change-status :status="(bool)$user->status" :url="route('user.change-status',$user->id)" />
                                         </td>
                                         @role(['super-admin', 'admin'])
-                                        <td>
+                                        <td data-sort="{{ $user?->wallet?->balance }}">
                                             <a href="{{ route('wallet-management.show', $user->wallet) }}" target="_blank">
                                                 <strong>{{ priceFormat($user?->wallet?->balance) }} تومان</strong>
                                             </a>
