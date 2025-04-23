@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
@@ -57,6 +59,14 @@ class User extends Authenticatable
         };
 
         return $this->user_type == $userType;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSubscription(): bool
+    {
+        return $this->subscription()->where('status', 'active')->exists();
     }
 
     protected function type(): Attribute
@@ -141,6 +151,11 @@ class User extends Authenticatable
     public function wallet(): MorphOne
     {
         return $this->morphOne(Wallet::class, 'walletable');
+    }
+
+    public function subscription(): MorphOne
+    {
+        return $this->morphOne(Subscription::class, 'subscribable');
     }
 
 

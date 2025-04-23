@@ -6,13 +6,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Support\Facades\Cache;
 
 class Company extends Model
 {
-    use HasFactory;
 
     protected $guarded = ['id'];
+
+
+    /**
+     * @return bool
+     */
+    public function hasSubscription(): bool
+    {
+        return $this->subscription()->where('status', 'active')->exists();
+    }
+
 
     /**
      * @return void
@@ -40,5 +51,10 @@ class Company extends Model
     public function wallet(): MorphOne
     {
         return $this->morphOne(Wallet::class, 'walletable');
+    }
+
+    public function subscription(): MorphOne
+    {
+        return $this->morphOne(Subscription::class, 'subscribable');
     }
 }

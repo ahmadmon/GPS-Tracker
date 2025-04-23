@@ -6,14 +6,14 @@ use App\Http\Services\Notify\SMS\SmsService;
 use App\Models\User;
 use App\Traits\VerificationCode;
 use Carbon\Carbon;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
-use Livewire\Attributes\Url;
+use Jantinnerezo\LivewireAlert\Enums\Position;
+use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 class ChangeUserInfo extends Component
 {
-    use LivewireAlert, VerificationCode;
+    use VerificationCode;
 
     #[Validate('required|string|min:3|max:255')]
     public string $name;
@@ -97,16 +97,12 @@ class ChangeUserInfo extends Component
 
     private function showAlert($type, $message): void
     {
-        $this->alert($type, $message, [
-            'position' => 'top',
-            'timer' => 3000,
-            'toast' => true,
-            'customClass' => [
-                'popup' => 'colored-toast',
-                'icon' => 'white'
-            ],
-            'showCancelButton' => false,
-            'showConfirmButton' => false
-        ]);
+
+        LivewireAlert::title($message)
+            ->position(Position::Top)
+            ->$type()
+            ->toast()
+            ->timer(3000)
+            ->show();
     }
 }
