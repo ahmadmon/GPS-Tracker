@@ -2,6 +2,7 @@
 
 use App\Facades\Acl;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Morilog\Jalali\Jalalian;
 
 function jalaliDate($date, $time = false, $format = "%d %B %Y", $ago = false)
@@ -183,6 +184,16 @@ function calculateHaversineDistance($lat1, $lon1, $lat2, $lon2): float|int
     $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
 
     return $earthRadius * $c;
+}
+
+/**
+ * @param string $cache
+ * @return void
+ */
+function forgetCache(string $cache): void
+{
+    if (Cache::has($cache))
+        Cache::forget($cache);
 }
 
 function can(string $permission): bool

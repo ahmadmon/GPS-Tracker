@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('price')->index();
             $table->unsignedInteger('duration')->nullable();
             $table->unsignedTinyInteger('is_lifetime')->default(0)->comment('0 => false, 1 => true');
-            $table->enum('type', ['personal', 'company'])->nullable();
+            $table->enum('type', ['personal', 'company', 'both'])->comment("'personal', 'company', 'both'");
             $table->unsignedTinyInteger('status')->default(1)->comment('0 => false, 1 => true');
             $table->timestamps();
         });

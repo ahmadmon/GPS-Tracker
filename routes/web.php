@@ -5,6 +5,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SubscriptionPlanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Wallet\PaymentCallbackController;
@@ -49,6 +50,10 @@ Route::middleware(['auth'])->group(function () {
 
     Route::resource('geofence', GeofenceController::class);
     Route::get('/geofence/change-status/{geofence}', [GeofenceController::class, 'changeStatus'])->name('geofence.change-status');
+
+    Route::resource('subscription-plan', SubscriptionPlanController::class)->parameters(['subscription-plan' => 'slug']);
+    Route::get('/subscription-plan/change-status/{subscriptionPlan}', [SubscriptionPlanController::class, 'changeStatus'])->name('subscription-plan.change-status');
+
 
     Route::prefix('wallet-management')->name('wallet-management.')->group(function () {
         Route::get('/show/{wallet}', [WalletManagementController::class, 'show'])->name('show');

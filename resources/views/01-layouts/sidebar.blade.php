@@ -126,6 +126,24 @@
                             </ul>
                         </li>
                     @endif
+
+                    <li class="sidebar-list">
+                        <a @class(['sidebar-link sidebar-title', 'active' => Route::is('subscription-plan.*')]) href="javascript:void(0)">
+                            <i data-feather="star"></i>
+                            <span>مدیریت اشتراک</span></a>
+                        <ul class="sidebar-submenu">
+                            <li>
+                                <a href="#"><span>لیست اشتراک کاربران</span></a>
+                            </li>
+                            <li>
+                                <a href="#"><span>لیست اشتراک سازمان ها</span></a>
+                            </li>
+                            @if(true)
+                                <li><a href="{{ route('subscription-plan.index') }}"><span>مدیریت طرح اشتراک</span></a></li>
+                            @endif
+                        </ul>
+                    </li>
+
                 </ul>
             </div>
             <div class="right-arrow" id="right-arrow"><i data-feather="arrow-right"></i></div>
