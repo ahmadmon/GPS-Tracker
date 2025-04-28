@@ -19,9 +19,21 @@ use Morilog\Jalali\Jalalian;
 
 class WalletManagementController extends Controller
 {
-    public function show(Wallet $wallet)
+    public function show(Request $request, Wallet $wallet)
     {
-        $transactions = Cache::remember('transactions-list', 60, fn() => $wallet->transactions()->latest()->get());
+        // Get filter parameters from URL
+        $type = $request->input('type');
+        $status = $request->input('status');
+        $date = !is_null($request->input('date')) ? Jalalian::fromFormat('Y-m-d', $request->input('date'))->toCarbon() : null;
+
+        // Get transactions and apply filters using query parameters
+        $transactions = $wallet->transactions()
+            ->when(isset($type), fn($q) => $q->where('type', $type))
+            ->when(isset($status), fn($q) => $q->where('status', $status))
+            ->when(isset($date), fn($q) => $q->whereDate('created_at', $date))
+            ->latest()
+            ->get();
+
         $wallet->load('walletable');
         $walletable = $wallet->walletable;
 
@@ -31,6 +43,7 @@ class WalletManagementController extends Controller
             'transactions' => $transactions,
             'isUser' => $walletable instanceof User,
             'entity' => $walletable,
+            'hasFilters' => $this->hasFilters($request)
         ]);
     }
 

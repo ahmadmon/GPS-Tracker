@@ -9,6 +9,7 @@ use App\Http\Controllers\SubscriptionPlanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Wallet\PaymentCallbackController;
+use App\Http\Controllers\Wallet\SubscriptionController;
 use App\Http\Controllers\Wallet\WalletManagementController;
 use App\Livewire\MapPage;
 use App\Livewire\Wallet\WalletPage;
@@ -55,15 +56,14 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/subscription-plan/change-status/{subscriptionPlan}', [SubscriptionPlanController::class, 'changeStatus'])->name('subscription-plan.change-status');
 
 
-    Route::prefix('wallet-management')->name('wallet-management.')->group(function () {
-        Route::get('/show/{wallet}', [WalletManagementController::class, 'show'])->name('show');
-        Route::get('/show/{wallet}/filter', [WalletManagementController::class, 'filter'])->name('show-filter');
-        Route::get('/show/{wallet}/create', [WalletManagementController::class, 'create'])->name('create');
-        Route::post('/show/{wallet}/store', [WalletManagementController::class, 'store'])->name('store');
-        Route::post('/show/{wallet}/send-to-gateway', [WalletManagementController::class, 'sendToGateway'])->name('send-to-gateway');
-        Route::any('/show/{wallet}/get-transaction/{transaction}', [WalletManagementController::class, 'getTransaction'])->name('get-transaction');
-        Route::post('/show/{wallet}/retry-payment-gateway/{transaction:transaction_number}', [WalletManagementController::class, 'retryPayment'])->name('retry-payment-gateway');
-        Route::post('/show/{wallet}/change-transaction-status/{transaction:transaction_number}', [WalletManagementController::class, 'changeTransactionStatus'])->name('change-transaction-status');
+    Route::prefix('wallet-management/show/{wallet}')->name('wallet-management.')->group(function () {
+        Route::get('/', [WalletManagementController::class, 'show'])->name('show');
+        Route::get('/create', [WalletManagementController::class, 'create'])->name('create');
+        Route::post('/store', [WalletManagementController::class, 'store'])->name('store');
+        Route::post('/send-to-gateway', [WalletManagementController::class, 'sendToGateway'])->name('send-to-gateway');
+        Route::any('/get-transaction/{transaction}', [WalletManagementController::class, 'getTransaction'])->name('get-transaction');
+        Route::post('/retry-payment-gateway/{transaction:transaction_number}', [WalletManagementController::class, 'retryPayment'])->name('retry-payment-gateway');
+        Route::post('/change-transaction-status/{transaction:transaction_number}', [WalletManagementController::class, 'changeTransactionStatus'])->name('change-transaction-status');
     });
 
     Route::prefix('profile')->name('profile.')->group(function () {
@@ -71,6 +71,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('change-password');
         Route::get('/forgot-password', [ProfileController::class, 'forgotPassword'])->name('forgot-password');
         Route::get('/wallet', WalletPage::class)->name('wallet');
+
+        Route::prefix('subscription')->name('subscription.')->group(function (){
+            Route::get('/{wallet?}', [SubscriptionController::class, 'index'])->name('index');
+            Route::post('/{wallet}/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscribe');
+        });
     });
 
     Route::any('/wallet/payment-result/{transaction}/{payment}', PaymentCallbackController::class)->name('wallet.callback-payment');

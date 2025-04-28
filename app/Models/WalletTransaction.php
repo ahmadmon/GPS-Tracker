@@ -77,13 +77,16 @@ class WalletTransaction extends Model
      */
     protected static function booted(): void
     {
+
         static::created(
             function ($transaction) {
                 $transaction->update(['transaction_number' => 'TRX-' . str_pad($transaction->id, 6, 0, STR_PAD_LEFT)]);
-                Cache::forget('transactions-list');
-            }
+                forgetCache('transactions-list');
+            });
 
-        );
+        $cacheKey = 'transactions-list';
+        static::updated(fn() => forgetCache($cacheKey));
+        static::deleted(fn() => forgetCache($cacheKey));
     }
 
     public function wallet(): BelongsTo

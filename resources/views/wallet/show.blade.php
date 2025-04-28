@@ -72,7 +72,7 @@
                                                     </div>
                                                 @endif
                                             </div>
-                                            <form action="{{ route('wallet-management.show-filter', $wallet) }}"
+                                            <form action="{{ route('wallet-management.show', $wallet) }}"
                                                   method="GET" id="filter-form">
                                                 <ul class="nav main-menu mt-2" role="tablist">
                                                     <li class="nav-item effective-card">
