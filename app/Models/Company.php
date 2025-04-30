@@ -16,14 +16,6 @@ class Company extends Model
     protected $guarded = ['id'];
 
 
-    /**
-     * @return bool
-     */
-    public function hasSubscription(): bool
-    {
-        return $this->subscription()->where('status', 'active')->exists();
-    }
-
 
     /**
      * @return void
@@ -51,10 +43,5 @@ class Company extends Model
     public function wallet(): MorphOne
     {
         return $this->morphOne(Wallet::class, 'walletable');
-    }
-
-    public function subscription(): MorphOne
-    {
-        return $this->morphOne(Subscription::class, 'subscribable');
     }
 }

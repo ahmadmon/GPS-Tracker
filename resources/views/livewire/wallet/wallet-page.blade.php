@@ -42,6 +42,16 @@
                                                     <h6 class="f-w-600">{{ $user->name }}</h6>
                                                     <p>{{ $user->phone }} | {{ $user->type['name'] }}</p>
                                                 </div>
+
+                                                @if($user->isSubscriber())
+                                                <div wire:ignore>
+                                                    <span
+                                                        class="badge bg-warning fw-bold dana d-flex align-items-center justify-content-around">
+                                                        <i data-feather="star" class="me-1 mb-2"></i>
+                                                        دارای اشتراک
+                                                    </span>
+                                                </div>
+                                                @endif
                                             </div>
                                             <ul class="nav main-menu mt-2" role="tablist">
                                                 <li class="nav-item effective-card">
@@ -157,7 +167,7 @@
                     <div wire:ignore>
                         <x-partials.alert.error-alert/>
                     </div>
-
+                    <!-- User Transactions -->
                     <div class="email-right-aside bookmark-tabcontent">
                         <div class="card email-body rounded-3">
                             <div class="ps-0">
@@ -235,8 +245,15 @@
                                                                 </tr>
                                                             @empty
                                                                 <tr>
-                                                                    <td colspan="4" class="text-muted text-center">
-                                                                        تراکنشی یافت نشد :(
+                                                                    <td colspan="4">
+                                                                        <div
+                                                                            class="d-flex flex-column justify-content-center align-items-center">
+                                                                            <img
+                                                                                src="{{ asset('assets/images/custom/no-transaction-history-yet-concept-illustration-removebg-preview.png') }}"
+                                                                                width="200" height="200" alt="">
+                                                                            <p class="text-muted text-center">تراکنشی
+                                                                                یافت نشد :(</p>
+                                                                        </div>
                                                                     </td>
                                                                 </tr>
                                                             @endforelse
@@ -254,6 +271,7 @@
                     </div>
 
                     @if($isManager)
+                        <!-- Manager Transactions -->
                         <div class="email-right-aside bookmark-tabcontent">
                             <div class="card email-body rounded-3">
                                 <div class="ps-0">
@@ -340,8 +358,14 @@
                                                                     @endif
                                                                 @empty
                                                                     <tr>
-                                                                        <td colspan="6" class="text-muted text-center">
-                                                                            تراکنشی یافت نشد :(
+                                                                        <td colspan="6">
+                                                                            <div class="d-flex flex-column justify-content-center align-items-center">
+                                                                                <img
+                                                                                    src="{{ asset('assets/images/custom/no-transaction-history-yet-concept-illustration-removebg-preview.png') }}"
+                                                                                    width="200" height="200" alt="">
+                                                                                <p class="text-muted text-center">تراکنشی
+                                                                                    یافت نشد :(</p>
+                                                                            </div>
                                                                         </td>
                                                                     </tr>
                                                                 @endforelse

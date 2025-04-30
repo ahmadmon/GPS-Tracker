@@ -43,6 +43,9 @@
                     </div>
                 </div>
             </div>
+
+            <x-partials.alert.success-alert />
+            <x-partials.alert.error-alert />
             <div class="col-md-7 xl-60">
                 <div class="faq-wrap">
                     <div class="col-lg-12">

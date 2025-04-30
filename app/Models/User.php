@@ -61,14 +61,6 @@ class User extends Authenticatable
         return $this->user_type == $userType;
     }
 
-    /**
-     * @return bool
-     */
-    public function hasSubscription(): bool
-    {
-        return $this->subscription()->where('status', 'active')->exists();
-    }
-
     protected function type(): Attribute
     {
         return Attribute::make(
@@ -153,9 +145,13 @@ class User extends Authenticatable
         return $this->morphOne(Wallet::class, 'walletable');
     }
 
-    public function subscription(): MorphOne
+
+    /**
+     * @return bool
+     */
+    public function isSubscriber(): bool
     {
-        return $this->morphOne(Subscription::class, 'subscribable');
+        return $this->wallet->hasSubscription();
     }
 
 

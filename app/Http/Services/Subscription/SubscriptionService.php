@@ -6,19 +6,20 @@ use App\Models\Company;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Models\Wallet;
 use Carbon\Carbon;
 
 class SubscriptionService
 {
     /**
-     * @param User|Company $subscribable
+     * @param Wallet $wallet
      * @param SubscriptionPlan $plan
-     * @return Company|User
+     * @return Subscription
      */
-    public function subscribe(User|Company $subscribable, SubscriptionPlan $plan): Company|User
+    public function subscribe(Wallet $wallet, SubscriptionPlan $plan): Subscription
     {
-        return $subscribable->create([
-            'subscribe_plan_id' => $plan->id,
+        return $wallet->subscription()->create([
+            'subscription_plan_id' => $plan->id,
             'start_at' => Carbon::now(),
             'end_at' => Carbon::now()->addDays($plan->duration),
             'status' => 'active',
@@ -26,15 +27,18 @@ class SubscriptionService
     }
 
     /**
-     * @param Company $company
+     * @param Wallet $wallet
      * @return void
      */
-    public function subscribeSubsets(Company $company): void
+    public function subscribeSubsets(Wallet $wallet): void
     {
+        $company = $wallet->walletable;
         $company->load('users');
+
         $plan = $company->subscription->plan;
 
-        $company->users->map(fn(User $user) => $this->subscribe($user, $plan));
+        if ($company instanceof Company)
+            $company->users->map(fn(User $user) => $this->subscribe($wallet, $plan));
     }
 
     /**
@@ -63,9 +67,13 @@ class SubscriptionService
         ]);
     }
 
-    public function activeSubscription(User|Company $subscribable)
+    /**
+     * @param Wallet $wallet
+     * @return bool
+     */
+    public function activeSubscription(Wallet $wallet): bool
     {
-        return $subscribable->subscription()->where('status', 'active')->first();
+        return $wallet->subscription()->where('status', 'active')->exists();
     }
 
 }

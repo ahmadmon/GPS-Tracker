@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Wallet;
 
 use App\Enums\Subscription\Plan\PlanType;
+use App\Facades\Subscription;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SubscribeRequest;
 use App\Http\Services\Subscription\SubscriptionService;
@@ -13,6 +14,7 @@ use App\Models\Wallet;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class SubscriptionController extends Controller
 {
@@ -36,13 +38,50 @@ class SubscriptionController extends Controller
     }
 
 
-    public function subscribe(SubscribeRequest $request, Wallet $wallet, SubscriptionService $subscriptionService)
+    public function subscribe(SubscribeRequest $request, Wallet $wallet)
     {
         $inputs = (object)$request->validated();
         $plan = SubscriptionPlan::findOrFail((int)$inputs->plan);
-        $subscribable = $wallet->walletable;
+        $price = $plan->price;
 
-        $subscribe = $subscriptionService->subscribe($subscribable, $inputs->plan);
+        if ($wallet->balance >= $price) {
+            $trxInfo = [
+                'amount' => $price,
+                'description' => "برداشت برای خرید اشتراک {$plan->name}"
+            ];
+            DB::transaction(function () use ($wallet, $price, $plan, $trxInfo) {
 
+                $wallet->decrement('balance', $price);
+                $this->createTransaction($trxInfo, $wallet);
+
+                Subscription::subscribe($wallet, $plan);
+            });
+
+            return to_route('profile.wallet')->with('success-alert', "✅ خرید اشتراک با موفقیت انجام شد!\n شما اکنون دسترسی کامل به بخش های سامانه را دارید.\n\n برای مشاهده جزئیات بیشتر اشتراک, به جزئیات اشتراک مراجعه کنید.");
+        } else {
+            $walletPageUrl = route('profile.wallet');
+            return back()->with('error-alert', "❌ خرید اشتراک ناموفق بود!<br> 💳به نظر می‌رسد موجودی کیف پول شما کافی نیست. برای افزایش موجودی کیف پول، لطفاً به لینک زیر مراجعه کنید: <br><a href='{$walletPageUrl}' >افزایش موجودی</a>");
+        }
+
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Private Helper Functions
+    |--------------------------------------------------------------------------
+    |
+    |
+    */
+
+    private function createTransaction(array $info, Wallet $wallet)
+    {
+        $wallet->transactions()->create([
+            'source_id' => $wallet->walletable_id,
+            'source_type' => $wallet->walletable_type,
+            'type' => 'debit',
+            'status' => 'success',
+            'amount' => $info['amount'],
+            'description' => $info['description'] ?? null,
+        ]);
     }
 }
