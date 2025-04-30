@@ -6,13 +6,10 @@ use App\Enums\Subscription\Plan\PlanType;
 use App\Facades\Subscription;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SubscribeRequest;
-use App\Http\Services\Subscription\SubscriptionService;
-use App\Models\Company;
+use App\Models\Subscription as SubscriptionModel;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
 use App\Models\Wallet;
-use Carbon\Carbon;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -30,7 +27,7 @@ class SubscriptionController extends Controller
             ->latest()
             ->get();
 
-        return view('profile.subscription', [
+        return view('profile.subscription.index', [
             'plans' => $plans,
             'wallet' => $wallet,
             'isUser' => $isUser
@@ -63,6 +60,15 @@ class SubscriptionController extends Controller
             return back()->with('error-alert', "❌ خرید اشتراک ناموفق بود!<br> 💳به نظر می‌رسد موجودی کیف پول شما کافی نیست. برای افزایش موجودی کیف پول، لطفاً به لینک زیر مراجعه کنید: <br><a href='{$walletPageUrl}' >افزایش موجودی</a>");
         }
 
+    }
+
+
+    public function show(?string $id = null)
+    {
+        dd();
+        $subscription = !empty($wallet) ? Auth::user()->wallet->subscription : SubscriptionModel::where('wallet_id', $id)->firstOrFail();
+
+        return view('profile.subscription.show', compact('subscription'));
     }
 
     /*

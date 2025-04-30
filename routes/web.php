@@ -75,6 +75,9 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('subscription')->name('subscription.')->group(function (){
             Route::get('/{wallet?}', [SubscriptionController::class, 'index'])->name('index');
             Route::post('/{wallet}/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscribe');
+            Route::get('/show', function (){
+                dd('hiiiii');
+            })->name('show');
         });
     });
 

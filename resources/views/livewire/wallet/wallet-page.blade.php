@@ -44,13 +44,14 @@
                                                 </div>
 
                                                 @if($user->isSubscriber())
-                                                <div wire:ignore>
+                                                <a href="{{ route('profile.subscription.show') }}" wire:ignore>
                                                     <span
+                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="مشاهده جزئیات اشتراک"
                                                         class="badge bg-warning fw-bold dana d-flex align-items-center justify-content-around">
                                                         <i data-feather="star" class="me-1 mb-2"></i>
                                                         دارای اشتراک
                                                     </span>
-                                                </div>
+                                                </a>
                                                 @endif
                                             </div>
                                             <ul class="nav main-menu mt-2" role="tablist">
@@ -189,7 +190,7 @@
                                             <div class="card-body p-0 task-card-height" x-data>
                                                 <div class="taskadd">
                                                     <div class="table-responsive">
-                                                        <table class="table">
+                                                        <table class="table text-nowrap">
                                                             <tbody>
                                                             @forelse($myTransactions as $transaction)
                                                                 <tr wire:key="{{ $transaction->id }}">
@@ -294,7 +295,7 @@
                                                     <div class="taskadd">
                                                         <div class="table-responsive">
                                                             @php $shownCompanies = [] @endphp
-                                                            <table class="table">
+                                                            <table class="table text-nowrap">
                                                                 @forelse($companiesTransactions as $transaction)
                                                                     <tr wire:key="{{ $transaction->id }}">
                                                                         <td class="text-muted">{{ $transaction->transaction_number }}</td>

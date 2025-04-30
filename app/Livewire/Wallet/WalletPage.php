@@ -236,7 +236,8 @@ class WalletPage extends Component
 
     private function myTransactions()
     {
-        $date = isset($this->date) ? Jalalian::fromFormat('Y-m-d', $this->date)->toCarbon() : null;
+        $date = !empty($this->date) ? Jalalian::fromFormat('Y-m-d', $this->date)->toCarbon() : null;
+
         return WalletTransaction::where([
             'source_id' => Auth::id(),
             'source_type' => User::class
@@ -253,7 +254,7 @@ class WalletPage extends Component
     private function companiesTransactions()
     {
         $companyIds = Auth::user()->companies()->pluck('id');
-        $date = isset($this->date) ? Jalalian::fromFormat('Y-m-d', $this->date)->toCarbon() : null;
+        $date = !empty($this->date) ? Jalalian::fromFormat('Y-m-d', $this->date)->toCarbon() : null;
 
 
         return WalletTransaction::where('source_type', Company::class)
