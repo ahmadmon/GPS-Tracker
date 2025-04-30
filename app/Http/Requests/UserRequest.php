@@ -42,11 +42,11 @@ class UserRequest extends FormRequest
 
         if (Acl::hasRole(['manager'])) {
             $rules['user_type'] = 'required|numeric|in:0,1,3';
-            $rules['company_id'] = $isStoreRoute ? 'required|numeric|exists:companies,id' : 'nullable|numeric|exists:companies,id';
+            $rules['company_id'] = $isStoreRoute ? 'required|numeric|required_if:user_type,0|exists:companies,id' : 'nullable|numeric|exists:companies,id';
 
         } else {
             $rules['user_type'] = 'required|numeric|in:0,1,2,3';
-            $rules['company_id'] = $isStoreRoute ? 'nullable|required_if:user_type,0|required_if:user_type,1|numeric|exists:companies,id' : 'nullable|numeric|exists:companies,id';
+            $rules['company_id'] = 'nullable|numeric|exists:companies,id';
 
         }
 

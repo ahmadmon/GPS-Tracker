@@ -5,7 +5,6 @@
 
 @section('content')
 
-{{--    @dd($errors->all())--}}
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
@@ -86,18 +85,18 @@
                     <div x-data="{ selected: @js(old('user_type', 0)) }">
 
                         <div class="col-12 mb-3">
-                        <label class="form-label" for="user_type">نوع کاربر
-                            <sup class="text-danger">*</sup>
-                        </label>
+                            <label class="form-label" for="user_type">نوع کاربر
+                                <sup class="text-danger">*</sup>
+                            </label>
                             <select class="form-select" name="user_type" id="user_type" x-model="selected">
-                            <option value="0" selected @selected(old('user_type') == 0)>کاربر</option>
-                            <option value="1" @selected(old('user_type') == 1)>ادمین</option>
+                                <option value="0" selected @selected(old('user_type') == 0)>کاربر</option>
+                                <option value="1" @selected(old('user_type') == 1)>ادمین</option>
                                 @notRole(['manager'])
-                            <option value="2" @selected(old('user_type') == 2)>سوپر ادمین</option>
+                                <option value="2" @selected(old('user_type') == 2)>سوپر ادمین</option>
                                 @endnotRole
-                            <option value="3" @selected(old('user_type') == 3)>مدیر سازمان</option>
-                        </select>
-                        <x-input-error :messages="$errors->get('user_type')" class="mt-2"/>
+                                <option value="3" @selected(old('user_type') == 3)>مدیر سازمان</option>
+                            </select>
+                            <x-input-error :messages="$errors->get('user_type')" class="mt-2"/>
                             @if(can('user-permissions'))
                                 <div class="d-block">
                                     <small class="text-muted">لطفا نام کاربری و نقش را مشابه هم انتخاب کنید.</small>
@@ -106,16 +105,16 @@
                         </div>
 
                         <div class="col-12 mb-3" x-cloak x-show="[0,1].includes(parseInt(selected))">
-                        <label class="form-label" for="user_id">عضو سازمان
-                            <sup class="text-danger">*</sup>
-                        </label>
+                            <label class="form-label" for="user_id">عضو سازمان
+                                <sup class="text-danger">*</sup>
+                            </label>
                             @php
                                 $options = $companies->mapWithKeys(fn($item) => [$item->id => implode(' - ', [$item->name , $item?->manager?->name])])->toArray();
                             @endphp
                             <x-partials.alpine.input.select-option :$options
-                                                               name="company_id"/>
-                        <x-input-error :messages="$errors->get('company_id')" class="mt-2"/>
-                    </div>
+                                                                   name="company_id"/>
+                            <x-input-error :messages="$errors->get('company_id')" class="mt-2"/>
+                        </div>
 
                     </div>
 
@@ -339,7 +338,7 @@
                             this.selectAll();
                             break;
                         case 'user':
-                            this.selectedPermissions = [32, 33, 37, 38, 39, 40, 41, 42, 44, 57, 58, 59, 60, 61, 62];
+                            this.selectedPermissions = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,43, 44, 57, 58, 59, 60, 61, 62];
                             break
                         case 'admin':
                             this.selectedPermissions = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 57, 58, 59, 60, 61, 62, 63];

@@ -17,7 +17,7 @@ class ProtocolFactory
     public static function list(): array
     {
         return [
-//            'gt06' => GT06Manager::class,
+            'gt06' => GT06Manager::class,
             'h02' => H02Manger::class
         ];
     }
