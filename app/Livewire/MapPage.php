@@ -10,6 +10,7 @@ use App\Models\Trip;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Jantinnerezo\LivewireAlert\Enums\Position;
 use Jantinnerezo\LivewireAlert\LivewireAlert;
 use JetBrains\PhpStorm\NoReturn;
 use Livewire\Attributes\Title;
@@ -21,7 +22,6 @@ use Morilog\Jalali\Jalalian;
 #[Title('نقشه')]
 class MapPage extends Component
 {
-    use LivewireAlert;
 
     #[Url(as: 'q')]
     #[Validate('string', as: 'جستجو')]
@@ -227,17 +227,12 @@ class MapPage extends Component
 
 
         if ($this->trips->isEmpty()) {
-            $this->alert('warning', 'سفری در این تاریخ یافت نشد!', [
-                'position' => 'top',
-                'timer' => 3000,
-                'toast' => true,
-                'customClass' => [
-                    'popup' => 'colored-toast',
-                    'icon' => 'white'
-                ],
-                'showCancelButton' => false,
-                'showConfirmButton' => false
-            ]);
+            LivewireAlert::title('سفری در این تاریخ یافت نشد!')
+                ->warning()
+                ->position(Position::Top)
+                ->toast()
+                ->timer(3000)
+                ->show();
         }
 
         $this->dispatch('trips-fetched', $this->trips);
@@ -266,17 +261,12 @@ class MapPage extends Component
         $device = DeviceStatus::with(['device', 'device.user:name', 'device.vehicle:name'])->where('device_id', $id)->first();
 
         if (!$device) {
-            $this->alert('error', 'وضعیت دستگاه یافت نشد.', [
-                'position' => 'top',
-                'timer' => 3000,
-                'toast' => true,
-                'customClass' => [
-                    'popup' => 'colored-toast',
-                    'icon' => 'white'
-                ],
-                'showCancelButton' => false,
-                'showConfirmButton' => false
-            ]);
+            LivewireAlert::title('وضعیت دستگاه یافت نشد.')
+                ->warning()
+                ->position(Position::Top)
+                ->toast()
+                ->timer(3000)
+                ->show();
         }
 
         $this->deviceStatus = $device;
