@@ -98,15 +98,15 @@
                         <select class="form-select" name="brand" id="brand">
                             <option value="">برند را انتخاب کنید...</option>
                             <option
-                                value="{{ DeviceBrand::SINOTRACK }}" @selected(old('brand', $device->brand) == DeviceBrand::SINOTRACK)>
+                                value="{{ DeviceBrand::SINOTRACK->value }}" @selected(old('brand', $device->brand->value) == DeviceBrand::SINOTRACK->value)>
                                 سینوترک (sinotrack)
                             </option>
                             <option
-                                value="{{ DeviceBrand::WANWAY }}" @selected(old('brand', $device->brand) == DeviceBrand::WANWAY)>
+                                value="{{ DeviceBrand::WANWAY->value }}" @selected(old('brand', $device->brand->value) == DeviceBrand::WANWAY->value)>
                                 ون وی (wan way)
                             </option>
                             <option
-                                value="{{ DeviceBrand::CONCOX }}" @selected(old('brand', $device->brand) == DeviceBrand::CONCOX)>
+                                value="{{ DeviceBrand::CONCOX->value }}" @selected(old('brand', $device->brand->value) == DeviceBrand::CONCOX->value)>
                                 کانکاکس (concox)
                             </option>
                         </select>

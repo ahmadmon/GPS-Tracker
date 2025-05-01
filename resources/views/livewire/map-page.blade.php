@@ -531,7 +531,7 @@
 
 
             this.map.createPane('data-point');
-            this.map.getPane('data-point').style.zIndex = 850;
+            this.map.getPane('data-point').style.zIndex = 690;
 
             this.map.on('zoomend', () => this.currentZoom = this.map.getZoom());
 
@@ -991,6 +991,7 @@
                             pane: 'data-point',
                             color: "#3388ff",
                             fillOpacity: 0.5,
+                            zIndexOffset: -1
                         }).addTo(this.map);
 
                         circle.on('click', (event) => {

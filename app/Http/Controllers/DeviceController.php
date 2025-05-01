@@ -12,6 +12,7 @@ use App\Models\Trip;
 use App\Models\User;
 use App\Models\Vehicle;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class DeviceController extends BaseController
@@ -55,6 +56,8 @@ class DeviceController extends BaseController
         if ($this->role === 'manager') {
             $users = User::where('status', 1)->whereIn('id', $this->userCompaniesSubsetsId)->cursor();
             $vehicles = Vehicle::where('status', 1)->whereIn('user_id', $this->userCompaniesSubsetsId)->cursor();
+        } elseif ($this->role === 'user') {
+            $vehicles = Auth::user()->vehicles;
         } else {
             $users = User::where('status', 1)->cursor();
             $vehicles = Vehicle::where('status', 1)->cursor();
@@ -62,7 +65,7 @@ class DeviceController extends BaseController
 
 
         return view('devices.create', [
-            'users' => $users,
+            'users' => $users ?? [],
             'vehicles' => $vehicles
         ]);
     }
@@ -131,13 +134,15 @@ class DeviceController extends BaseController
         if ($this->role === 'manager') {
             $users = User::where('status', 1)->whereIn('id', $this->userCompaniesSubsetsId)->cursor();
             $vehicles = Vehicle::where('status', 1)->whereIn('user_id', $this->userCompaniesSubsetsId)->cursor();
+        } elseif ($this->role === 'user') {
+            $vehicles = Auth::user()->vehicles;
         } else {
             $users = User::where('status', 1)->cursor();
             $vehicles = Vehicle::where('status', 1)->cursor();
         }
 
         return view('devices.edit', [
-            'users' => $users,
+            'users' => $users ?? [],
             'device' => $device,
             'vehicles' => $vehicles
         ]);
