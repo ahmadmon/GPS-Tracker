@@ -32,7 +32,12 @@
     <div class="container-fluid">
         <div class="card">
             <div class="card-header">
-                <h5>جزئیات اشتراک شما</h5>
+                @if($isUser)
+                    <h5>جزئیات اشتراک شما</h5>
+                @else
+                    @php $company = $subscription->wallet?->walletable @endphp
+                    <h5>جزئیات اشتراک  <a href="{{ route('company.show', $company->id) }}" class="h5 fw-bold txt-primary">{{ $company?->name }}</a></h5>
+                @endif
             </div>
             <div class="card-block row">
                 <div class="col-sm-12 col-lg-12 col-xl-12">

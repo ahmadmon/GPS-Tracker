@@ -56,25 +56,36 @@
                                     @endnotRole
                                     <th>شماره تماس</th>
                                     <th>وضعیت</th>
-                                    @role(['super-admin','admin'])
                                     <th>موجودی کیف پول</th>
-                                    @endrole
                                     <th>تاریخ ایجاد</th>
                                     <th>عملیات</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @forelse($companies as $company)
+                                    @php
+                                        $isSubscriber = $company->isSubscriber();
+                                    @endphp
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
+                                                @if($isSubscriber)
+                                                    <a href="{{ route('profile.subscription.show', $company->wallet->id) }}" class="d-inline">
+                                                    <span
+                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="مشاهده جزئیات اشتراک"
+                                                        class="badge bg-warning">
+                                                        <i data-feather="star"></i>
+                                                    </span>
+                                                    </a>
+                                                @endif
                                                 <div class="currency-icon warning">
                                                     <img class="img-fluid" width="32" height="32"
                                                          src="{{ $company->logo ?? asset('assets/images/custom/workplace-64px.png') }}"
                                                          alt="">
                                                 </div>
-                                                <div><a class="f-14 mb-0 f-w-500 c-light"
-                                                        href="{{ route('company.show', $company->id) }}">{{ $company->name }}</a>
+                                                <div>
+                                                    <a class="f-14 mb-0 f-w-500 c-light"
+                                                       href="{{ route('company.show', $company->id) }}">{{ $company->name }}</a>
                                                     <p class="c-o-light text-muted cursor-pointer"
                                                        data-bs-toggle="tooltip" data-bs-placement="top"
                                                        data-bs-title="{{ $company?->address }}">{{ str($company?->address)->limit(35) }}</p>
@@ -97,6 +108,13 @@
                                         <td data-sort="{{ $company?->wallet?->balance }}">
                                             <a href="{{ route('wallet-management.show', $company->wallet) }}"
                                                target="_blank">
+                                                <strong>{{ priceFormat($company?->wallet?->balance) }} تومان</strong>
+                                            </a>
+                                        </td>
+                                        @endrole
+                                        @role(['manager'])
+                                        <td data-sort="{{ $company?->wallet?->balance }}">
+                                            <a href="{{ route('profile.wallet') }}">
                                                 <strong>{{ priceFormat($company?->wallet?->balance) }} تومان</strong>
                                             </a>
                                         </td>
@@ -128,6 +146,15 @@
                                                         <a class="dropdown-item"
                                                            href="{{ route('company.manage-subsets', $company->id) }}">مدیریت
                                                             زیرمجموعه ها</a>
+                                                    @endif
+                                                    @if($isSubscriber)
+                                                        <a class="dropdown-item"
+                                                           href="{{ route('profile.subscription.show', $company->wallet->id) }}">جزيیات
+                                                            اشتراک</a>
+                                                    @else
+                                                        <a class="dropdown-item"
+                                                           href="{{ route('profile.subscription.index', $company->wallet->id) }}">خرید
+                                                            اشتراک</a>
                                                     @endif
                                                 </ul>
                                             </div>

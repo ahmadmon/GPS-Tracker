@@ -16,7 +16,6 @@ class Company extends Model
     protected $guarded = ['id'];
 
 
-
     /**
      * @return void
      *
@@ -43,5 +42,10 @@ class Company extends Model
     public function wallet(): MorphOne
     {
         return $this->morphOne(Wallet::class, 'walletable');
+    }
+
+    public function isSubscriber(): bool
+    {
+        return (bool)$this->wallet->hasSubscription();
     }
 }

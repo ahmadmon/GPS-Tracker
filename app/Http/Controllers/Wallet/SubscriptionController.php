@@ -43,16 +43,22 @@ class SubscriptionController extends Controller
         $price = $plan->price;
 
         if ($wallet->balance >= $price) {
-            $trxInfo = [
-                'amount' => $price,
-                'description' => "برداشت برای خرید اشتراک {$plan->name}"
-            ];
-            DB::transaction(function () use ($wallet, $price, $plan, $trxInfo) {
+            DB::transaction(function () use ($wallet, $price, $plan) {
 
                 $wallet->decrement('balance', $price);
-                $this->createTransaction($trxInfo, $wallet);
 
-                Subscription::subscribe($wallet, $plan);
+                $this->createTransaction([
+                    'amount' => $price,
+                    'description' => "برداشت برای خرید اشتراک {$plan->name}"
+                ], $wallet);
+
+
+                if ($wallet->walletable instanceof User) {
+                    Subscription::subscribe($wallet, $plan);// activation subscribes for User
+                } else {
+                    Subscription::subscribe($wallet, $plan); // activation subscribes for Company
+                    Subscription::subscribeSubsets($wallet, $plan); // activation subscribes for manger and subsets
+                }
             });
 
             return to_route('profile.wallet')->with('success-alert', "✅ خرید اشتراک با موفقیت انجام شد!\n شما اکنون دسترسی کامل به بخش های سامانه را دارید.\n\n برای مشاهده جزئیات بیشتر اشتراک, به جزئیات اشتراک مراجعه کنید.");
@@ -66,9 +72,14 @@ class SubscriptionController extends Controller
 
     public function show(?string $id = null)
     {
-        $subscription = SubscriptionModel::with('plan')->where('wallet_id', is_null($id) ? Auth::user()->wallet->id : $id)->firstOrFail();
+        $subscription = SubscriptionModel::with(['plan', 'wallet.walletable:id,name'])
+            ->where('wallet_id', is_null($id) ? Auth::user()->wallet->id : $id)
+            ->firstOrFail();
 
-        return view('profile.subscription.show', compact('subscription'));
+        $isUser = $subscription->wallet->walletable instanceof User;
+
+
+        return view('profile.subscription.show', compact('subscription', 'isUser'));
     }
 
     public function toggleAutoActivation(SubscriptionModel $subscription)

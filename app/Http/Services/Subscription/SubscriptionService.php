@@ -28,17 +28,22 @@ class SubscriptionService
 
     /**
      * @param Wallet $wallet
+     * @param SubscriptionPlan $plan
      * @return void
      */
-    public function subscribeSubsets(Wallet $wallet): void
+    public function subscribeSubsets(Wallet $wallet, SubscriptionPlan $plan): void
     {
         $company = $wallet->walletable;
-        $company->load('users');
+        $company->load(['users', 'manager']);
 
-        $plan = $company->subscription->plan;
 
-        if ($company instanceof Company)
-            $company->users->map(fn(User $user) => $this->subscribe($wallet, $plan));
+        if ($company instanceof Company) {
+            $company->users->push($company->manager)->map(function (User $user) use ($plan) {
+                if (!$user->isSubscriber()) {
+                    $this->subscribe($user->wallet, $plan);
+                }
+            });
+        }
     }
 
     /**

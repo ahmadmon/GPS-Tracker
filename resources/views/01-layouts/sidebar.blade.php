@@ -128,15 +128,15 @@
                     @endif
 
                     <li class="sidebar-list">
-                        <a @class(['sidebar-link sidebar-title', 'active' => Route::is('subscription-plan.*')]) href="javascript:void(0)">
+                        <a @class(['sidebar-link sidebar-title', 'active' => Route::is('subscription-plan.*') || Route::is('subscription-management.*')]) href="javascript:void(0)">
                             <i data-feather="star"></i>
                             <span>مدیریت اشتراک</span></a>
                         <ul class="sidebar-submenu">
                             <li>
-                                <a href="#"><span>لیست اشتراک کاربران</span></a>
+                                <a href="{{ route('subscription-management.index', ['type' => 'user']) }}"><span>لیست اشتراک کاربران</span></a>
                             </li>
                             <li>
-                                <a href="#"><span>لیست اشتراک سازمان ها</span></a>
+                                <a href="{{ route('subscription-management.index', ['type' => 'company']) }}"><span>لیست اشتراک سازمان ها</span></a>
                             </li>
                             @if(true)
                                 <li><a href="{{ route('subscription-plan.index') }}"><span>مدیریت طرح اشتراک</span></a></li>

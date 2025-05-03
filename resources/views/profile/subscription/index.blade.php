@@ -44,23 +44,31 @@
                     </div>
                 </div>
 
-                @role(['manager'])
-                <div class="alert alert-primary d-flex align-items-center" role="alert">
-                    <div data-feather="alert-circle" class="me-1"></div>
-                    <div>
-                        <h5 class="txt-light">مدیر محترم،  برای خرید اشتراک برای سازمان خود، لطفاً مراحل زیر را دنبال فرمایید:</h5>
-                        <ol class="list-unstyled p-2">
-                            <li class="txt-light">به قسمت <a href="{{ route('company.index') }}" class="alert-link text-dark text-decoration-underline">لیست سازمان‌ها</a> مراجعه کنید.</li>
-                            <li class="txt-light">در قسمت عملیات، گزینه <span class="text-dark alert-link">خرید اشتراک</span> کلیک کنید.</li>
-                            <li class="txt-light">پلن اشتراک مورد نظر را انتخاب کرده و خرید را تکمیل کنید.</li>
-                        </ol>
+                @if($isUser)
+                    @role(['manager'])
+                    <div class="alert alert-primary d-flex align-items-center" role="alert">
+                        <div data-feather="alert-circle" class="me-1"></div>
+                        <div>
+                            <h5 class="txt-light">مدیر محترم، برای خرید اشتراک برای سازمان خود، لطفاً مراحل زیر را دنبال
+                                فرمایید:</h5>
+                            <ol class="list-unstyled p-2">
+                                <li class="txt-light">به قسمت <a href="{{ route('company.index') }}"
+                                                                 class="alert-link text-dark text-decoration-underline">لیست
+                                        سازمان‌ها</a> مراجعه کنید.
+                                </li>
+                                <li class="txt-light">در قسمت عملیات، گزینه <span class="text-dark alert-link">خرید اشتراک</span>
+                                    کلیک کنید.
+                                </li>
+                                <li class="txt-light">پلن اشتراک مورد نظر را انتخاب کرده و خرید را تکمیل کنید.</li>
+                            </ol>
+                        </div>
                     </div>
-                </div>
-                @endrole
+                    @endrole
+                @endif
             </div>
 
-            <x-partials.alert.success-alert />
-            <x-partials.alert.error-alert />
+            <x-partials.alert.success-alert/>
+            <x-partials.alert.error-alert/>
             <div class="col-md-7 xl-60">
                 <div class="faq-wrap">
                     <div class="col-lg-12">
@@ -177,7 +185,8 @@
                     <div class="d-flex mt-2">
                         <div class="text-end icon-state">
                             <label class="switch mb-0">
-                                <input type="checkbox" name="is_activated_automatically"><span class="switch-state bg-primary"></span>
+                                <input type="checkbox" name="is_activated_automatically"><span
+                                    class="switch-state bg-primary"></span>
                             </label>
                         </div>
                         <label class="col-form-label m-l-10">تمدید خودکار اشتراک</label>

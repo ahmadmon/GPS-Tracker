@@ -5,6 +5,7 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\SubscriptionManagementController;
 use App\Http\Controllers\SubscriptionPlanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
@@ -66,6 +67,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/change-transaction-status/{transaction:transaction_number}', [WalletManagementController::class, 'changeTransactionStatus'])->name('change-transaction-status');
     });
 
+    Route::resource('subscription-management', SubscriptionManagementController::class);
+
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('index');
         Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('change-password');
@@ -73,7 +76,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/wallet', WalletPage::class)->name('wallet');
 
         Route::prefix('subscription')->name('subscription.')->group(function (){
-            Route::get('/show', [SubscriptionController::class, 'show'])->name('show');
+            Route::get('/show/{id?}', [SubscriptionController::class, 'show'])->name('show');
             Route::any('/toggle-auto-activation/{subscription}', [SubscriptionController::class, 'toggleAutoActivation'])->name('toggle-auto-activation');
             Route::get('/{wallet?}', [SubscriptionController::class, 'index'])->name('index');
             Route::post('/{wallet}/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscribe');
