@@ -45,7 +45,7 @@ class SubscriptionPlanController extends Controller
      */
     public function show(string $id)
     {
-        abort(404);
+        dd('its plan controller');
     }
 
     /**

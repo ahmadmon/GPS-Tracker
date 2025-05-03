@@ -21,7 +21,7 @@ class SubscriptionService
         return $wallet->subscription()->create([
             'subscription_plan_id' => $plan->id,
             'start_at' => Carbon::now(),
-            'end_at' => Carbon::now()->addDays($plan->duration),
+            'end_at' => Carbon::now()->addDays($plan->duration)->endOfDay(),
             'status' => 'active',
         ]);
     }
@@ -50,7 +50,7 @@ class SubscriptionService
         $subscription->load('plan:duration');
 
         return $subscription->update([
-            'end_at' => Carbon::now()->addDays($subscription->plan->duration),
+            'end_at' => Carbon::now()->addDays($subscription->plan->duration)->endOfDay(),
             'status' => 'active'
         ]);
     }

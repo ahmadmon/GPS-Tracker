@@ -56,7 +56,7 @@
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @forelse($plans as $plan)
+                                @foreach($plans as $plan)
                                     <tr>
                                         <td data-sort="{{ $plan->created_at }}">
                                             <div class="d-flex align-items-center gap-2">
@@ -103,11 +103,7 @@
                                             {{--                                            @endif--}}
                                         </td>
                                     </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center">داده ای یافت نشد.</td>
-                                    </tr>
-                                @endforelse
+                                    @endforeach
                                 </tbody>
                             </table>
                         </div>

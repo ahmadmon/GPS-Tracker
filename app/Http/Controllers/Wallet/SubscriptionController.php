@@ -18,10 +18,11 @@ class SubscriptionController extends Controller
     public function index(?Wallet $wallet = null)
     {
         $wallet = is_null($wallet) ? Auth::user()->wallet : $wallet;
+        if ($wallet->hasSubscription()) return to_route('profile.subscription.show'); // Checking if the wallet owner is a subscriber?
+
         $isUser = $wallet->walletable instanceof User;
 
         $specificType = array_values(array_filter(PlanType::values(), fn($value) => $value !== ($isUser ? PlanType::COMPANY->value : PlanType::PERSONAL->value)));
-
         $plans = SubscriptionPlan::where('status', 1)
             ->whereIn('type', $specificType)
             ->latest()
@@ -65,10 +66,17 @@ class SubscriptionController extends Controller
 
     public function show(?string $id = null)
     {
-        dd();
-        $subscription = !empty($wallet) ? Auth::user()->wallet->subscription : SubscriptionModel::where('wallet_id', $id)->firstOrFail();
+        $subscription = SubscriptionModel::with('plan')->where('wallet_id', is_null($id) ? Auth::user()->wallet->id : $id)->firstOrFail();
 
         return view('profile.subscription.show', compact('subscription'));
+    }
+
+    public function toggleAutoActivation(SubscriptionModel $subscription)
+    {
+        $subscription->is_activated_automatically = $subscription->is_activated_automatically == 0 ? 1 : 0;
+        $subscription->save();
+
+        return response()->json(['status' => true, 'data' => (bool)$subscription->is_activated_automatically]);
     }
 
     /*

@@ -1,3 +1,4 @@
+@php use App\Facades\Acl; @endphp
 @extends('01-layouts.master')
 
 @section('title', 'خرید اشتراک')
@@ -20,7 +21,7 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item dana">
-                            <a href="{{ route('wallet-management.show', auth()->user()->wallet->id) }}">کیف پول من</a>
+                            <a href="{{ route('profile.wallet') }}">کیف پول من</a>
                         </li>
                         <li class="breadcrumb-item dana">خرید اشتراک</li>
                     </ol>
@@ -42,6 +43,20 @@
                         <h1 class="mb-0 mt-4 ms-2">طـــرح موردنظر خود را انتخاب کنید!</h1>
                     </div>
                 </div>
+
+                @role(['manager'])
+                <div class="alert alert-primary d-flex align-items-center" role="alert">
+                    <div data-feather="alert-circle" class="me-1"></div>
+                    <div>
+                        <h5 class="txt-light">مدیر محترم،  برای خرید اشتراک برای سازمان خود، لطفاً مراحل زیر را دنبال فرمایید:</h5>
+                        <ol class="list-unstyled p-2">
+                            <li class="txt-light">به قسمت <a href="{{ route('company.index') }}" class="alert-link text-dark text-decoration-underline">لیست سازمان‌ها</a> مراجعه کنید.</li>
+                            <li class="txt-light">در قسمت عملیات، گزینه <span class="text-dark alert-link">خرید اشتراک</span> کلیک کنید.</li>
+                            <li class="txt-light">پلن اشتراک مورد نظر را انتخاب کرده و خرید را تکمیل کنید.</li>
+                        </ol>
+                    </div>
+                </div>
+                @endrole
             </div>
 
             <x-partials.alert.success-alert />
@@ -87,7 +102,7 @@
                                     <div class="card-body">
                                         اگر گزینه تمدید خودکار را فعال کرده باشید و موجودی کیف پول شما کافی باشد، اشتراک
                                         شما به طور خودکار تمدید می‌شود. در غیر این صورت، باید اشتراک خود را به صورت دستی
-                                        تمدید کنید. برای لغو اشتراک هم می‌توانید از بخش تنظیمات اقدام کنید.
+                                        تمدید کنید. برای لغو اشتراک هم می‌توانید از بخش جزئیات اشتراک اقدام کنید.
                                     </div>
                                 </div>
                             </div>

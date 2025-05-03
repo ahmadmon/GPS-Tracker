@@ -174,8 +174,12 @@
                     <ul class="profile-dropdown onhover-show-div">
                         <li><a href="{{ route('profile.index') }}"><i data-feather="user"></i><span>حساب </span></a>
                         </li>
-                        <li><a href="{{ route('profile.subscription.index') }}"><i data-feather="star"></i><span>خرید اشتراک </span></a>
-                        </li>
+                        @unless(auth()->user()->isSubscriber())
+                            <li><a href="{{ route('profile.subscription.index') }}"><i data-feather="star"></i><span>خرید اشتراک </span></a>
+                        @else
+                            <li><a href="{{ route('profile.subscription.show') }}"><i data-feather="star"></i><span>جزئیات اشتراک</span></a>
+                            </li>
+                        @endunless
                         <li>
                             <form action="{{ route('logout') }}" method="post" class="d-inline">
                                 @csrf

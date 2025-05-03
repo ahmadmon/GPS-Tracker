@@ -32,7 +32,7 @@ class Wallet extends Model
         return $this->hasOne(Subscription::class);
     }
 
-    public function hasSubscription()
+    public function hasSubscription(): bool
     {
         return SubscriptionFacade::activeSubscription($this);
     }

@@ -2,14 +2,17 @@
 
 namespace App\Models;
 
+use App\Enums\Subscription\SubscriptionStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class Subscription extends Model
 {
     protected $guarded = ['id'];
+
+    protected $casts = [
+        'status' => SubscriptionStatus::class
+    ];
 
 
     public function wallet(): BelongsTo
@@ -17,13 +20,8 @@ class Subscription extends Model
         return $this->belongsTo(Wallet::class);
     }
 
-//    public function subscriber(): HasOneThrough
-//    {
-//        return $this->hasOneThrough($this->wallet->walletable_type, Wallet::class);
-//    }
-
     public function plan(): BelongsTo
     {
-        return $this->belongsTo(SubscriptionPlan::class);
+        return $this->belongsTo(SubscriptionPlan::class, 'subscription_plan_id');
     }
 }

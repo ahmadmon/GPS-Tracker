@@ -41,15 +41,13 @@ function randomColor()
     return $color;
 }
 
-function dayCount($startDate, $endDate)
+function dayCount($endDate, $startDate = null)
 {
     $startDate = Carbon::parse($startDate) ?? Carbon::now();
     $endDate = Carbon::parse($endDate);
 
 
-    $diffinDays = $startDate->diffInDays($endDate);
-
-    return $diffinDays;
+    return $startDate->diffInDays($endDate);
 }
 
 function priceFormat($price): string

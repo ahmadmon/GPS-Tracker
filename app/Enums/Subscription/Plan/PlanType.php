@@ -49,7 +49,7 @@ enum PlanType: string
             ],
             self::COMPANY => [
                 'name' => 'سازمانی',
-                'color' => 'green'
+                'color' => 'info'
             ],
             self::BOTH => [
                 'name' => 'عمومی',

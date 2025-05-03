@@ -113,7 +113,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive text-nowrap">
-                        <table class="display" id="basic-1">
+                        <table class="display" id="devices">
                             <thead>
                             <tr>
                                 <th>نام</th>
@@ -125,7 +125,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @forelse($user->devices as $device)
+                            @foreach($user->devices as $device)
                                 <tr>
                                     <td>
                                         <div class="d-flex flex-column">
@@ -174,11 +174,7 @@
                                         @endif
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="text-center">داده ای یافت نشد.</td>
-                                </tr>
-                            @endforelse
+                            @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -200,7 +196,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive custom-scrollbar text-nowrap">
-                        <table class="display" id="basic-2">
+                        <table class="display" id="vehicles">
                             <thead>
                             <tr>
                                 <th>وسیله نقلیه</th>
@@ -270,22 +266,26 @@
     <script>
         $(document).ready(function() {
             // Destroy previous instance of DataTable if it exists, then reinitialize it
-            if ($.fn.dataTable.isDataTable('#basic-1')) {
-                $('#basic-1').DataTable().destroy();
+            const devicesTb = $('#devices');
+            const vehiclesTb = $('#vehicles');
+
+
+            if ($.fn.dataTable.isDataTable('#devices')) {
+                devicesTb.DataTable().clear().destroy();
             }
 
-            $('#basic-1').DataTable({
-                order: [[4, 'desc']], // ترتیب بر اساس ستون تاریخ
+            devicesTb.DataTable({
+                order: [[4, 'desc']],
                 "language": {
                     "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
                 }
             });
 
-            if ($.fn.dataTable.isDataTable('#basic-2')) {
-                $('#basic-2').DataTable().destroy();
+            if ($.fn.dataTable.isDataTable('#vehicles')) {
+                vehiclesTb.DataTable().destroy();
             }
 
-            $('#basic-2').DataTable({
+            vehiclesTb.DataTable({
                 "language": {
                     "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
                 }
