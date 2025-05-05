@@ -38,7 +38,8 @@
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
                 @if(can('create-vehicle'))
-                    <a href="{{ route('subscription-plan.create') }}" class="btn btn-primary mb-4">+ اعطای اشتراک</a>
+                    <a href="{{ route('subscription-management.create', ['type' => request('type')]) }}"
+                       class="btn btn-primary mb-4">+ اعطای اشتراک</a>
                 @endif
                 <div class="card">
                     <div class="card-header pb-0 card-no-border">
@@ -74,12 +75,12 @@
                                         </td>
                                         <td>
                                             <span
-                                                class="badge badge-{{ $subscription->status->badge()->color }} dana rounded-pill">{{ $subscription->status->label() }}</span>
+                                                    class="badge badge-{{ $subscription->status->badge()->color }} dana rounded-pill">{{ $subscription->status->label() }}</span>
                                         </td>
                                         <td>
                                             <x-partials.alpine.change-status
-                                                :status="(bool)$subscription->is_activated_automatically"
-                                                :url="route('profile.subscription.toggle-auto-activation', $subscription->id)"/>
+                                                    :status="(bool)$subscription->is_activated_automatically"
+                                                    :url="route('profile.subscription.toggle-auto-activation', $subscription->id)"/>
                                         </td>
                                         <td x-data="{ show: false }">
                                             <div class="btn-group" x-cloak x-show="!show">

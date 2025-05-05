@@ -32,6 +32,7 @@
     <div class="container-fluid">
         <x-partials.alert.success-alert/>
         <x-partials.alert.error-alert/>
+        <x-partials.alert.warning-alert/>
         <div class="row">
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
@@ -65,17 +66,19 @@
                                                 </a>
                                                 @notRole(['manager'])
                                                 <small
-                                                        class="text-muted">{{ $user->type['name'] }}</small>
+                                                    class="text-muted">{{ $user->type['name'] }}</small>
                                                 @endnotRole
                                             </div>
                                         </td>
                                         <td>{{ $user->phone }}</td>
                                         <td>
-                                            <x-partials.alpine.change-status :status="(bool)$user->status" :url="route('user.change-status',$user->id)" />
+                                            <x-partials.alpine.change-status :status="(bool)$user->status"
+                                                                             :url="route('user.change-status',$user->id)"/>
                                         </td>
                                         @role(['super-admin', 'admin'])
                                         <td data-sort="{{ $user?->wallet?->balance }}">
-                                            <a href="{{ route('wallet-management.show', $user->wallet) }}" target="_blank">
+                                            <a href="{{ route('wallet-management.show', $user->wallet) }}"
+                                               target="_blank">
                                                 <strong>{{ priceFormat($user?->wallet?->balance) }} تومان</strong>
                                             </a>
                                         </td>
@@ -106,7 +109,7 @@
                                             </div>
                                             @if(can('delete-user'))
                                                 <x-partials.btns.confirm-rmv-btn
-                                                        url="{{ route('user.destroy', $user->id) }}"/>
+                                                    url="{{ route('user.destroy', $user->id) }}"/>
                                             @endif
                                         </td>
                                     </tr>

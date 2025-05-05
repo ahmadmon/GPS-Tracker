@@ -16,13 +16,14 @@ class SubscriptionService
      * @param SubscriptionPlan $plan
      * @return Subscription
      */
-    public function subscribe(Wallet $wallet, SubscriptionPlan $plan): Subscription
+    public function subscribe(Wallet $wallet, SubscriptionPlan $plan, bool $AutoRenew = false): Subscription
     {
         return $wallet->subscription()->create([
             'subscription_plan_id' => $plan->id,
             'start_at' => Carbon::now(),
             'end_at' => Carbon::now()->addDays($plan->duration)->endOfDay(),
             'status' => 'active',
+            'is_activated_automatically' => $AutoRenew ? 1 : 0
         ]);
     }
 

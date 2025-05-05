@@ -43,7 +43,7 @@ class SubscriptionController extends Controller
         $price = $plan->price;
 
         if ($wallet->balance >= $price) {
-            DB::transaction(function () use ($wallet, $price, $plan) {
+            DB::transaction(function () use ($wallet, $price, $plan, $inputs) {
 
                 $wallet->decrement('balance', $price);
 
@@ -54,9 +54,9 @@ class SubscriptionController extends Controller
 
 
                 if ($wallet->walletable instanceof User) {
-                    Subscription::subscribe($wallet, $plan);// activation subscribes for User
+                    Subscription::subscribe($wallet, $plan, $inputs->auto_renew);// activation subscribes for User
                 } else {
-                    Subscription::subscribe($wallet, $plan); // activation subscribes for Company
+                    Subscription::subscribe($wallet, $plan, $inputs->auto_renew); // activation subscribes for Company
                     Subscription::subscribeSubsets($wallet, $plan); // activation subscribes for manger and subsets
                 }
             });

@@ -121,7 +121,7 @@
                                         <button class="btn btn-link collapsed ps-0 dana" data-bs-toggle="collapse"
                                                 data-bs-target="#ques-3" aria-expanded="false" aria-controls="ques-3"><i
                                                 data-feather="help-circle"></i> اگر اشتراک من تمام شود، چه اتفاقی
-                                            می‌افتد؟؟
+                                            می‌افتد؟
                                         </button>
                                     </h5>
                                 </div>
@@ -185,13 +185,13 @@
                     <div class="d-flex mt-2">
                         <div class="text-end icon-state">
                             <label class="switch mb-0">
-                                <input type="checkbox" name="is_activated_automatically"><span
+                                <input type="checkbox" name="auto_renew"><span
                                     class="switch-state bg-primary"></span>
                             </label>
                         </div>
                         <label class="col-form-label m-l-10">تمدید خودکار اشتراک</label>
                     </div>
-                    <x-input-error :messages="$errors->get('is_activated_automatically')" class="mt-2"/>
+                    <x-input-error :messages="$errors->get('auto_renew')" class="mt-2"/>
                 </form>
             </div>
             <div class="col-12">

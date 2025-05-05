@@ -29,7 +29,7 @@ class UserController extends BaseController
                 ->latest()
                 ->cursor();
         } else {
-            $users = User::with('wallet:balance,id')->latest()->cursor();
+            $users = User::with('wallet')->latest()->get();
         }
 
 
@@ -227,6 +227,7 @@ class UserController extends BaseController
     {
         Acl::authorize('delete-user', $user);
 
+        $user->wallet()->delete();
         $user->delete();
 
         return back()->with('success-alert', 'کاربر با موفقیت حذف گردید.');
