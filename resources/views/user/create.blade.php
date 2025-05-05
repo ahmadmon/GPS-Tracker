@@ -161,6 +161,7 @@
                                        $roles = $roles->reject(fn($role) => in_array($role->title,['developer', 'super-admin']));
                                 }
                                     $defaultRoleId = $roles->first()->id;
+                                    dd($roles);
                             @endphp
                             <div class="d-flex align-items-center justify-content-between flex-wrap"
                                  x-data="{ role: @json( (int)old('role', $defaultRoleId) ) }">
@@ -168,7 +169,7 @@
                                     <div class="form-check">
                                         <input class="form-check-input" id="role-{{ $role->id }}"
                                                value="{{ $role->id }}"
-                                               :checked="parseInt(role) === {{ (int)$role->id }}"
+                                               :checked="parseInt(role) === @json((int)$role->id)"
                                                @change="$dispatch('updated-role', { roleName: '{{ $role->title }}' })"
                                                type="radio" name="role">
                                         <label class="form-check-label cursor-pointer" for="role-{{ $role->id }}"
@@ -284,71 +285,74 @@
 
 @endsection
 
-@push('scripts')
-    <script>
-        window.addEventListener('alpine:init', () => {
-            Alpine.data('permissionsList', () => ({
-                permissions: @json($permissions),
-                selectedPermissions: @json(old('permissions', [])),
+@if(can('user-permissions'))
 
-                init() {
-                    if (this.selectedPermissions.length === 0) {
-                        this.handleDispatch('{{ $roles->firstWhere('id', old('role', $defaultRoleId))->title ?? null }}')
+    @push('scripts')
+        <script>
+            window.addEventListener('alpine:init', () => {
+                Alpine.data('permissionsList', () => ({
+                    permissions: @json($permissions),
+                    selectedPermissions: @json(old('permissions', [])),
+
+                    init() {
+                        if (this.selectedPermissions.length === 0) {
+                            this.handleDispatch('{{ $roles->firstWhere('id', old('role', $defaultRoleId))->title ?? null }}')
+                        }
+
+                        if (this.selectedPermissions.length > 0) {
+                            this.selectedPermissions = this.selectedPermissions.flat().map(item => parseInt(item));
+                        }
+                    },
+
+                    selectAll() {
+                        this.selectedPermissions = Object.values(this.permissions).flat().map(permission => permission.id)
+                    },
+
+                    deselectAll() {
+                        this.selectedPermissions = [];
+                    },
+
+                    toggleGroup(group) {
+                        const groupIds = this.permissions[group].map(permission => permission.id)
+                        if (groupIds.every(id => this.selectedPermissions.includes(id))) {
+                            this.selectedPermissions = this.selectedPermissions.filter(id => !groupIds.includes(id));
+                        } else {
+                            this.selectedPermissions = [...new Set([...this.selectedPermissions, ...groupIds])];
+                        }
+                    },
+
+                    togglePermission(id) {
+                        if (this.selectedPermissions.includes(id)) {
+                            this.selectedPermissions = this.selectedPermissions.filter(permissionId => permissionId !== id);
+                        } else {
+                            this.selectedPermissions.push(id);
+                        }
+                    },
+
+                    handleDispatch($roleName) {
+                        switch ($roleName) {
+                            case 'super-admin':
+                                this.selectAll();
+                                break;
+                            case 'manager':
+                                this.selectAll();
+                                break;
+                            case 'developer':
+                                this.selectAll();
+                                break;
+                            case 'user':
+                                this.selectedPermissions = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 57, 58, 59, 60, 61, 62];
+                                break
+                            case 'admin':
+                                this.selectedPermissions = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 57, 58, 59, 60, 61, 62, 63];
+                                break;
+                            default:
+                                this.deselectAll();
+                        }
                     }
 
-                    if (this.selectedPermissions.length > 0) {
-                        this.selectedPermissions = this.selectedPermissions.flat().map(item => parseInt(item));
-                    }
-                },
-
-                selectAll() {
-                    this.selectedPermissions = Object.values(this.permissions).flat().map(permission => permission.id)
-                },
-
-                deselectAll() {
-                    this.selectedPermissions = [];
-                },
-
-                toggleGroup(group) {
-                    const groupIds = this.permissions[group].map(permission => permission.id)
-                    if (groupIds.every(id => this.selectedPermissions.includes(id))) {
-                        this.selectedPermissions = this.selectedPermissions.filter(id => !groupIds.includes(id));
-                    } else {
-                        this.selectedPermissions = [...new Set([...this.selectedPermissions, ...groupIds])];
-                    }
-                },
-
-                togglePermission(id) {
-                    if (this.selectedPermissions.includes(id)) {
-                        this.selectedPermissions = this.selectedPermissions.filter(permissionId => permissionId !== id);
-                    } else {
-                        this.selectedPermissions.push(id);
-                    }
-                },
-
-                handleDispatch($roleName) {
-                    switch ($roleName) {
-                        case 'super-admin':
-                            this.selectAll();
-                            break;
-                        case 'manager':
-                            this.selectAll();
-                            break;
-                        case 'developer':
-                            this.selectAll();
-                            break;
-                        case 'user':
-                            this.selectedPermissions = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42,43, 44, 57, 58, 59, 60, 61, 62];
-                            break
-                        case 'admin':
-                            this.selectedPermissions = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 57, 58, 59, 60, 61, 62, 63];
-                            break;
-                        default:
-                            this.deselectAll();
-                    }
-                }
-
-            }))
-        })
-    </script>
-@endpush
+                }))
+            })
+        </script>
+    @endpush
+@endif
