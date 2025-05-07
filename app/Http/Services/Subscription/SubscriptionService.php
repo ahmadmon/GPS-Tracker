@@ -32,7 +32,8 @@ class SubscriptionService
      * @param SubscriptionPlan $plan
      * @return void
      */
-    public function subscribeSubsets(Wallet $wallet, SubscriptionPlan $plan): void
+    public function
+    subscribeSubsets(Wallet $wallet, SubscriptionPlan $plan): void
     {
         $company = $wallet->walletable;
         $company->load(['users', 'manager']);

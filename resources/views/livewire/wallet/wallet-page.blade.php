@@ -168,6 +168,10 @@
                     <div wire:ignore>
                         <x-partials.alert.error-alert/>
                     </div>
+
+                    <div wire:ignore>
+                        <x-partials.alert.no-subescriber/>
+                    </div>
                     <!-- User Transactions -->
                     <div class="email-right-aside bookmark-tabcontent">
                         <div class="card email-body rounded-3">

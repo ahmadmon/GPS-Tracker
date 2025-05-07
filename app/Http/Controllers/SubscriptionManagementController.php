@@ -153,11 +153,12 @@ class SubscriptionManagementController extends Controller
         $failedCount = count($failedEntities);
 
         $typeMsg = $isUser ? 'کاربران' : 'سازمان‌های';
+        $failedTypeMsg = $isUser ? 'کاربر' : 'سازمان';
         $msg = "اشتراک {$planName} به {$typeMsg} انتخاب‌شده اختصاص داده شد.";
 
         if ($failedCount === $totalEntities) {
             $alertType = 'error';
-            $msg = "هیچ {$typeMsg}ی موفق به دریافت اشتراک {$planName} نشد. لطفا موجودی کیف پول‌ها را بررسی کنید.";
+            $msg = "هیچ {$failedTypeMsg}ی موفق به دریافت اشتراک {$planName} نشد.\n لطفا موجودی کیف پول‌ها را بررسی کنید.";
         } elseif ($failedCount > 0) {
             $alertType = 'warning';
             $failedList = implode('، ', $failedEntities);

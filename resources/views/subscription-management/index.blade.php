@@ -34,6 +34,8 @@
 
     <div class="container-fluid">
         <x-partials.alert.success-alert/>
+        <x-partials.alert.error-alert/>
+        <x-partials.alert.warning-alert/>
         <div class="row">
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
@@ -63,8 +65,11 @@
                                 @foreach($subscriptions as $subscription)
                                     <tr>
                                         <td data-sort="{{ $subscription->created_at }}">
+                                            @php
+                                                $route = route($isUser ? 'user.show' : 'company.show', $subscription->wallet?->walletable?->id);
+                                            @endphp
                                             <a class="f-14 mb-0 f-w-700"
-                                               href="#">{{ $subscription->wallet?->walletable?->name }}</a>
+                                               href="{{ $route }}">{{ $subscription->wallet?->walletable?->name }}</a>
                                         </td>
                                         <td>{{ $subscription->plan->name }}</td>
                                         <td>{{ jalaliDate($subscription->start_at, format: "%d %B %Y H:i") }}</td>

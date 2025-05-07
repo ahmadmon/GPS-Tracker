@@ -12,6 +12,7 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Wallet\PaymentCallbackController;
 use App\Http\Controllers\Wallet\SubscriptionController;
 use App\Http\Controllers\Wallet\WalletManagementController;
+use App\Http\Middleware\CheckSubscription;
 use App\Livewire\MapPage;
 use App\Livewire\Wallet\WalletPage;
 use Illuminate\Support\Facades\Route;
@@ -19,44 +20,44 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
 
+    Route::middleware(CheckSubscription::class)->group(function () {
+        // <!-- Dashboard -->
+        Route::get('/', [DashboardController::class, 'index'])->name('home');
+        Route::get('/get-total-distance/{days}', [DashboardController::class, 'getAvgTotalDistance'])->name('get-avg-total-distance');
 
-    Route::get('/', [DashboardController::class, 'index'])->name('home');
-    Route::get('/get-total-distance/{days}', [DashboardController::class, 'getAvgTotalDistance'])->name('get-avg-total-distance');
-//    Route::get('/', function () {
-//        if (session('warning-alert')) {
-//            $user = Auth::user();
-//            return redirect('/map')->with('warning-alert', "{$user->name} عزیز خوش آمدید!\nبرای شروع کار با حساب کاربری جدید خود، لطفاً رمز عبور اولیه خود را با یک رمز عبور قوی و امن جایگزین کنید.\nبرای تغییر رمزعبور، می‌توانید به بخش مدیریت حساب خود مراجعه کنید.");
-//        } else {
-//            return redirect('/map');
-//        }
-//    })->name('home');
+        // <!-- Map -->
+        Route::get('/map', MapPage::class)->name('map');
 
-    Route::get('/map', MapPage::class)->name('map');
+        // <!-- Device -->
+        Route::resource('device', DeviceController::class);
+        Route::get('/device/device-setting/{device}', [DeviceController::class, 'deviceSetting'])->name('device.device-setting');
+        Route::post('/device/store-sms/{device}', [DeviceController::class, 'storeSMS'])->name('device.store-sms');
+        Route::get('/device/change-status/{device}', [DeviceController::class, 'changeStatus'])->name('device.change-status');
 
-    Route::resource('device', DeviceController::class);
-    Route::get('/device/device-setting/{device}', [DeviceController::class, 'deviceSetting'])->name('device.device-setting');
-    Route::post('/device/store-sms/{device}', [DeviceController::class, 'storeSMS'])->name('device.store-sms');
-    Route::get('/device/change-status/{device}', [DeviceController::class, 'changeStatus'])->name('device.change-status');
-//    Route::get('/device/get-location/{id}', [DeviceController::class, 'location'])->name('device.get-location');
+        // <!-- Vehicle -->
+        Route::resource('vehicle', VehicleController::class);
+        Route::get('/vehicle/change-status/{vehicle}', [VehicleController::class, 'changeStatus'])->name('vehicle.change-status');
 
-    Route::resource('vehicle', VehicleController::class);
-    Route::get('/vehicle/change-status/{vehicle}', [VehicleController::class, 'changeStatus'])->name('vehicle.change-status');
+        // <!-- User -->
+        Route::resource('user', UserController::class);
+        Route::get('/user/change-status/{user}', [UserController::class, 'changeStatus'])->name('user.change-status');
 
-    Route::resource('user', UserController::class);
-    Route::get('/user/change-status/{user}', [UserController::class, 'changeStatus'])->name('user.change-status');
+        // <!-- Company -->
+        Route::resource('company', CompanyController::class);
+        Route::delete('company/remove-subsets/{company}/{id}', [CompanyController::class, 'removeSubsets'])->name('company.remove-subsets');
+        Route::get('company/manage-subsets/{company}', [CompanyController::class, 'manageSubsets'])->name('company.manage-subsets');
+        Route::get('/company/change-status/{company}', [CompanyController::class, 'changeStatus'])->name('company.change-status');
 
-    Route::resource('company', CompanyController::class);
-    Route::delete('company/remove-subsets/{company}/{id}', [CompanyController::class, 'removeSubsets'])->name('company.remove-subsets');
-    Route::get('company/manage-subsets/{company}', [CompanyController::class, 'manageSubsets'])->name('company.manage-subsets');
-    Route::get('/company/change-status/{company}', [CompanyController::class, 'changeStatus'])->name('company.change-status');
+        // <!-- Geofence -->
+        Route::resource('geofence', GeofenceController::class);
+        Route::get('/geofence/change-status/{geofence}', [GeofenceController::class, 'changeStatus'])->name('geofence.change-status');
+    });
 
-    Route::resource('geofence', GeofenceController::class);
-    Route::get('/geofence/change-status/{geofence}', [GeofenceController::class, 'changeStatus'])->name('geofence.change-status');
-
+    // <!-- Subscription Plan -->
     Route::resource('subscription-plan', SubscriptionPlanController::class)->parameters(['subscription-plan' => 'slug']);
     Route::get('/subscription-plan/change-status/{subscriptionPlan}', [SubscriptionPlanController::class, 'changeStatus'])->name('subscription-plan.change-status');
 
-
+    // <!-- Wallet Management -->
     Route::prefix('wallet-management/show/{wallet}')->name('wallet-management.')->group(function () {
         Route::get('/', [WalletManagementController::class, 'show'])->name('show');
         Route::get('/create', [WalletManagementController::class, 'create'])->name('create');
@@ -67,15 +68,17 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/change-transaction-status/{transaction:transaction_number}', [WalletManagementController::class, 'changeTransactionStatus'])->name('change-transaction-status');
     });
 
+    // <!-- Subscription Management -->
     Route::resource('subscription-management', SubscriptionManagementController::class);
 
+    // <!-- Profile -->
     Route::prefix('profile')->name('profile.')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('index');
         Route::post('/change-password', [ProfileController::class, 'changePassword'])->name('change-password');
         Route::get('/forgot-password', [ProfileController::class, 'forgotPassword'])->name('forgot-password');
         Route::get('/wallet', WalletPage::class)->name('wallet');
 
-        Route::prefix('subscription')->name('subscription.')->group(function (){
+        Route::prefix('subscription')->name('subscription.')->group(function () {
             Route::get('/show/{id?}', [SubscriptionController::class, 'show'])->name('show');
             Route::any('/toggle-auto-activation/{subscription}', [SubscriptionController::class, 'toggleAutoActivation'])->name('toggle-auto-activation');
             Route::get('/{wallet?}', [SubscriptionController::class, 'index'])->name('index');

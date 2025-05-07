@@ -63,7 +63,7 @@
                                     @endnotRole
                                     @if($company->isSubscriber())
                                         <a href="{{ route('profile.subscription.show', $company->wallet->id) }}"
-                                           class="d-inline-block">
+                                           class="d-flex">
                                                     <span
                                                         data-bs-toggle="tooltip" data-bs-placement="top"
                                                         title="مشاهده جزئیات اشتراک"
@@ -152,7 +152,7 @@
                                                     <span class="badge bg-warning"><i data-feather="star"></i></span>
                                                 </div>
                                             @endif
-                                            <div>
+                                            <div class="d-grid">
                                             <span class="fw-bold">
                                                 {{ $user->name }}
                                             </span>
