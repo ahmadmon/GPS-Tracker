@@ -3,6 +3,7 @@
 namespace App\Livewire\Wallet;
 
 use App\Http\Services\Payment\PaymentService;
+use App\Jobs\SendSms;
 use App\Models\Company;
 use App\Models\Payment;
 use App\Models\User;
@@ -36,6 +37,13 @@ class WalletPage extends Component
     public ?int $companyID = null;
 
     public bool $isManager = false;
+
+    protected function messages()
+    {
+        return [
+            'companyID.required_if' => 'فیلد :attribute الزامی است.'
+        ];
+    }
 
     /**
      * Filtering variables
@@ -144,56 +152,6 @@ class WalletPage extends Component
         }
     }
 
-    /**
-     * @param Request $request
-     * @param WalletTransaction $transaction
-     * @param Payment $payment
-     * @param PaymentService $paymentService
-     * @return RedirectResponse|void
-     */
-    public function paymentCallback(Request $request, WalletTransaction $transaction, Payment $payment, PaymentService $paymentService)
-    {
-        try {
-            $payment->update(['bank_first_response' => json_encode($request->all())]);
-
-            $verifyResponse = $paymentService->paymentVerify((int)$transaction->amount, $payment);
-            if (strtoupper($request->Status) === 'OK') {
-
-                $payment->update([
-                    'status' => 'success',
-                    'bank_second_response' => json_encode($verifyResponse)
-                ]);
-
-                $transaction->update(['status' => 'success']);
-
-                $wallet = $transaction->wallet;
-                $wallet->increment('balance', (int)$transaction->amount);
-
-                return to_route('profile.wallet')->with('success-alert', $this->successMessage($transaction->amount, $verifyResponse, $wallet->balance));
-
-            } else {
-                if ($verifyResponse) {
-                    $payment->update([
-                        'status' => 'failed',
-                        'bank_second_response' => is_string($verifyResponse) ? $verifyResponse : json_encode($verifyResponse)
-                    ]);
-
-                    $transaction->update(['status' => 'failed']);
-
-                    return to_route('profile.wallet')->with('error-alert', $this->failedMessage($transaction->amount, $verifyResponse));
-                }
-            }
-        } catch (Exception $e) {
-            Log::error('payment failed', [
-                'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
-            ]);
-
-            return to_route('profile.wallet')->with('error-alert',
-                "❌ مشکلی در پردازش پرداخت به وجود آمد.\nدر صورت کسر مبلغ، وجه تا ۷۲ ساعت آینده به حساب شما بازگردانده خواهد شد.\nلطفاً در صورت نیاز با پشتیبانی تماس بگیرید."
-            );
-        }
-    }
 
     /**
      * @param array|null $properties
@@ -261,7 +219,7 @@ class WalletPage extends Component
             ->whereIn('source_id', $companyIds)
             ->withOnly('wallet')
             ->when(!empty($this->search), fn($q) => $q->whereLike('amount', "{$this->search}")
-                ->orWhereHas('source', fn ($query) => $query->whereLike('name', "%{$this->search}%")))
+                ->orWhereHas('source', fn($query) => $query->whereLike('name', "%{$this->search}%")))
             ->when($this->type, fn($q) => $q->where('type', $this->type))
             ->when($this->status, fn($q) => $q->where('status', $this->status))
             ->when(isset($date), fn($q) => $q->whereDate('created_at', $date))
@@ -297,55 +255,6 @@ class WalletPage extends Component
         return $this->chargeTarget
             ? Company::findOrFail($this->companyID)->wallet
             : Auth::user()->wallet;
-    }
-
-    /**
-     * @param int $amount
-     * @param array $verifyResponse
-     * @param $balance
-     * @return string
-     */
-    private function successMessage(int $amount, array $verifyResponse, $balance): string
-    {
-        return sprintf(
-            "💳 عملیات شارژ کیف پول با موفقیت تکمیل شد.\n\n" .
-            "✳️ جزئیات تراکنش:\n" .
-            "▫️ مبلغ: %s تومان\n" .
-            "▫️ کد رهگیری: %s\n" .
-            "▫️ زمان: %s \n\n" .
-            "💰 موجودی فعلی: %s تومان\n\n" .
-            "در صورت هرگونه مشکل با پشتیبانی تماس بگیرید.",
-            priceFormat($amount),
-            $verifyResponse['referenceId'],
-            jalaliDate($verifyResponse['date'], format: '%d %B %Y, H:i') ?? jalaliDate(now(), format: '%d %B %Y, H:i'),
-            priceFormat($balance)
-        );
-    }
-
-    /**
-     * @param int $amount
-     * @param array|string|null $verifyResponse
-     * @return string
-     */
-    private function failedMessage(int $amount, array|string|null $verifyResponse = null): string
-    {
-        $referenceId = is_array($verifyResponse) ? $verifyResponse['referenceId'] ?? '---' : '---';
-        $date = is_array($verifyResponse) ? jalaliDate($verifyResponse['date'], format: '%d %B %Y, H:i') ?? jalaliDate(now(), format: '%d %B %Y, H:i') : jalaliDate(now(), format: '%d %B %Y, H:i');
-        $errorMessage = is_string($verifyResponse) ? $verifyResponse : null;
-
-        return sprintf(
-            "❌ عملیات پرداخت ناموفق بود.\n\n" .
-            "✳️ جزئیات تراکنش:\n" .
-            "▫️ مبلغ: %s تومان\n" .
-            "▫️ کد رهگیری: %s\n" .
-            "▫️ زمان: %s\n\n" .
-            "%s\n" .
-            "💡 در صورت کسر وجه، مبلغ طی ۷۲ ساعت آینده به کارت بانکی شما بازگردانده خواهد شد.",
-            priceFormat($amount),
-            $referenceId,
-            $date,
-            $errorMessage ? "🛑 توضیح خطا: " . $errorMessage : ""
-        );
     }
 
 

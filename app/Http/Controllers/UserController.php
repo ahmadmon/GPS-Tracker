@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Facades\Acl;
 use App\Http\Requests\UserRequest;
 use App\Http\Services\Notify\SMS\SmsService;
+use App\Jobs\SendSms;
 use App\Models\Company;
 use App\Models\Permission;
 use App\Models\Role;
@@ -122,9 +123,8 @@ class UserController extends BaseController
         }
 
         // Send Sms To User
-//        $smsService->setTo($user->phone);
-//        $smsService->setText("{$user->name} عزیز به سمفا خوش آمدید\nنام کاربری شما: {$user->phone}\nرمز عبور موقت شما: {$validated['password']}\nبرای ورود و تغییر رمز، به سایت مراجعه کنید.");
-//        $smsService->fire();
+        $message = "{$user->name} عزیز به سمفا خوش آمدید\nنام کاربری شما: {$user->phone}\nرمز عبور موقت شما: {$validated['password']}\nبرای ورود و تغییر رمز، به سایت مراجعه کنید.";
+        SendSms::dispatch($user->phone, $message);
 
         //removing The session
 //        session()->forget('generatedPass');

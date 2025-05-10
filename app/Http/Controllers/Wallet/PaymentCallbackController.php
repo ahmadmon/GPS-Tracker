@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Wallet;
 use App\Facades\Acl;
 use App\Http\Controllers\Controller;
 use App\Http\Services\Payment\PaymentService;
+use App\Jobs\SendSms;
 use App\Models\Payment;
+use App\Models\User;
 use App\Models\WalletTransaction;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,6 +45,12 @@ class PaymentCallbackController extends Controller
                 $transaction->update(['status' => 'success']);
                 $wallet->increment('balance', (int)$transaction->amount);
 
+                // Sending a success message via SMS
+                $isUser = $wallet->walletable instanceof User;
+                $phoneNumber = $isUser ? $wallet->walletable->phone : $wallet->walletable->manager->phone;
+                $message = $this->smsSuccessMessage($transaction->amount, $verifyResponse, $isUser, $wallet->walletable->name);
+                SendSms::dispatch($phoneNumber, $message);
+
                 return $this->getRedirectResponse('success', $wallet->id, $transaction->amount, $verifyResponse, $wallet->balance);
 
             } else {
@@ -63,7 +71,7 @@ class PaymentCallbackController extends Controller
                 'trace' => $e->getTraceAsString(),
             ]);
 
-            return $this->getRedirectResponse('error', $wallet->id);
+            return $this->getRedirectResponse('error', $transaction->wallet->id);
         }
     }
 
@@ -145,6 +153,39 @@ class PaymentCallbackController extends Controller
 
         return $commonMessage . "\nدر صورت هرگونه مشکل با پشتیبانی تماس بگیرید.";
 
+    }
+
+    /**
+     * @param int $amount
+     * @param array $verifyResponse
+     * @param $isUser
+     * @param $companyName
+     * @return string
+     *
+     * Success Message for sms to sending user's phone
+     */
+    private function smsSuccessMessage(int $amount, array $verifyResponse, $isUser = false, $companyName = null): string
+    {
+        if (!$isUser && $companyName) {
+            return sprintf(
+                "سمفا - سامانه هوشمند ردیابی GPS\n" .
+                "💳 شارژ کیف پول سازمان '%s' با موفقیت انجام شد.\n" .
+                "💰 مبلغ: %s تومان\n" .
+                "▫️ کد رهگیری: %s",
+                $companyName,
+                priceFormat($amount),
+                $verifyResponse['referenceId']
+            );
+        } else {
+            return sprintf(
+                "سمفا - سامانه هوشمند ردیابی GPS\n" .
+                "💳 شارژ کیف پول شما با موفقیت انجام شد.\n" .
+                "💰 مبلغ: %s تومان\n" .
+                "▫️ کد رهگیری: %s",
+                priceFormat($amount),
+                $verifyResponse['referenceId']
+            );
+        }
     }
 
     /**

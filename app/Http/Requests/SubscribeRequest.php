@@ -24,7 +24,7 @@ class SubscribeRequest extends FormRequest
     {
         return [
             'plan' => 'required|numeric|exists:subscription_plans,id',
-            'is_activated_automatically' => 'boolean'
+            'auto_renew' => 'boolean'
         ];
     }
 
@@ -34,7 +34,7 @@ class SubscribeRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'is_activated_automatically' => (bool)$this->is_activated_automatically
+            'auto_renew' => (bool)$this->auto_renew
         ]);
     }
 
@@ -42,7 +42,7 @@ class SubscribeRequest extends FormRequest
     {
         return [
             'plan' => 'طرح اشتراک',
-            'is_activated_automatically' => 'تمدید خودکار'
+            'auto_renew' => 'تمدید خودکار'
         ];
     }
 }

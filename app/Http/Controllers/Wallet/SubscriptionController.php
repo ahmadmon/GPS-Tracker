@@ -6,6 +6,7 @@ use App\Enums\Subscription\Plan\PlanType;
 use App\Facades\Subscription;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SubscribeRequest;
+use App\Jobs\SendSms;
 use App\Models\Subscription as SubscriptionModel;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
@@ -51,14 +52,17 @@ class SubscriptionController extends Controller
                     'amount' => $price,
                     'description' => "برداشت برای خرید اشتراک {$plan->name}"
                 ], $wallet);
+                $isUser = $wallet->walletable instanceof User;
 
-
-                if ($wallet->walletable instanceof User) {
-                    Subscription::subscribe($wallet, $plan, $inputs->auto_renew);// activation subscribes for User
-                } else {
-                    Subscription::subscribe($wallet, $plan, $inputs->auto_renew); // activation subscribes for Company
+                $subscription = Subscription::subscribe($wallet, $plan, $inputs->auto_renew);
+                if (!$isUser) {
                     Subscription::subscribeSubsets($wallet, $plan); // activation subscribes for manger and subsets
                 }
+
+                // Sending a success message via SMS
+                $phoneNumber = $isUser ? $wallet->walletable->phone : $wallet->walletable->manager->phone;
+                $message = $this->smsSubscriptionSuccessMessage($plan, $subscription->end_at, $isUser, $wallet->walletable->name);
+                SendSms::dispatch($phoneNumber, $message);
             });
 
             return to_route('profile.wallet')->with('success-alert', "✅ خرید اشتراک با موفقیت انجام شد!\n شما اکنون دسترسی کامل به بخش های سامانه را دارید.\n\n برای مشاهده جزئیات بیشتر اشتراک, به جزئیات اشتراک مراجعه کنید.");
@@ -109,4 +113,30 @@ class SubscriptionController extends Controller
             'description' => $info['description'] ?? null,
         ]);
     }
+
+
+    private function smsSubscriptionSuccessMessage($plan, $expirationDate, $isUser, $companyName): string
+    {
+        if (!$isUser && $companyName) {
+            return sprintf(
+                "سمفا - سامانه هوشمند ردیابی GPS\n\n" .
+                "🎉 اشتراک '%s' برای سازمان '%s' با موفقیت فعال شد.\n" .
+                "📅 تاریخ انقضا: %s\n\n" .
+                "برای مشاهده اشتراک، به جزئیات اشتراک مراجعه کنید.",
+                $plan->name,
+                $companyName,
+                jalaliDate($expirationDate)
+            );
+        }
+
+        return sprintf(
+            "سمفا - سامانه هوشمند ردیابی GPS\n\n" .
+            "🎉 اشتراک '%s' برای شما با موفقیت فعال شد.\n" .
+            "📅 تاریخ انقضا: %s\n\n" .
+            "برای مشاهده اشتراک، به جزئیات اشتراک مراجعه کنید.",
+            $plan->name,
+            jalaliDate($expirationDate)
+        );
+    }
+
 }

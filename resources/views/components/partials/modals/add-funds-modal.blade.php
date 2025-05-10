@@ -50,6 +50,7 @@
                                         <select class="form-control form-select" :disabled="parseInt(type) === 0"
                                                 wire:model="companyID"
                                                 id="company">
+                                            <option value="">انتخاب کنید</option>
                                             @foreach($user->companies as $company)
                                                 <option value="{{ $company->id }}">{{ $company?->name }}</option>
                                             @endforeach
