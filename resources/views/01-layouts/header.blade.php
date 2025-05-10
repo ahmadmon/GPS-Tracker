@@ -119,32 +119,7 @@
                 {{--                        </div>--}}
                 {{--                    </div>--}}
                 {{--                </li>--}}
-                <li class="onhover-dropdown">
-                    <div class="notification-box">
-                        <svg>
-                            <use href="{{ asset('assets/svg/icon-sprite.svg#notification') }}"></use>
-                        </svg>
-                        <span class="badge rounded-pill badge-secondary">4 </span>
-                    </div>
-                    <div class="onhover-show-div notification-dropdown">
-                        <h6 class="f-18 mb-0 dropdown-title">اعلان‌ها </h6>
-                        <ul>
-                            <li class="b-l-primary border-4">
-                                <p>پردازش تحویل <span class="font-danger">10 دقیقه.</span></p>
-                            </li>
-                            <li class="b-l-success border-4">
-                                <p>سفارش کامل شد<span class="font-success">1 ساعت</span></p>
-                            </li>
-                            <li class="b-l-secondary border-4">
-                                <p>بلیت‌های تولید شده<span class="font-secondary">3 ساعت</span></p>
-                            </li>
-                            <li class="b-l-warning border-4">
-                                <p>تحویل کامل<span class="font-warning">6 ساعت</span></p>
-                            </li>
-                            <li><a class="f-w-700" href="#">بررسی همه</a></li>
-                        </ul>
-                    </div>
-                </li>
+                <livewire:notifications-dropdown/>
                 <li>
                     <div class="mode">
                         <svg>

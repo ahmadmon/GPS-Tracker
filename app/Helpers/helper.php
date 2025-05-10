@@ -36,9 +36,7 @@ function randomColor()
 {
     $stateNum = rand(0, 6);
     $states = ['success', 'danger', 'warning', 'info', 'dark', 'primary', 'secondary'];
-    $color = $states[$stateNum];
-
-    return $color;
+    return $states[$stateNum];
 }
 
 function dayCount($endDate, $startDate = null)

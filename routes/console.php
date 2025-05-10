@@ -1,7 +1,8 @@
 <?php
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+
 use App\Helpers\Hadis;
+use Illuminate\Support\Facades\Schedule;
 
 Schedule::call(new Hadis())->daily();
+Schedule::command('send:expiry-notifications')->daily();
