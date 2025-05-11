@@ -28,7 +28,7 @@ class SendSubscriptionExpiryNotifications extends Command
     /**
      * Execute the console command.
      */
-    public function handle()
+    public function handle(): void
     {
         $subscriptions = Subscription::with(['wallet', 'wallet.walletable'])
             ->where('status', 'active')

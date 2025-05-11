@@ -2,8 +2,8 @@
 
 namespace App\Livewire;
 
-use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\Features\SupportRedirects\Redirector;
 
 class NotificationsDropdown extends Component
 {
@@ -11,8 +11,8 @@ class NotificationsDropdown extends Component
     public $notifications;
     public $user;
 
-    #[On('notificationUpdated')]
-    public function mount()
+//    #[On('notificationUpdated')]
+    public function booted(): void
     {
         $this->user = auth()->user();
         $this->notifications = $this->user->unreadNotifications;
@@ -25,14 +25,30 @@ class NotificationsDropdown extends Component
     }
 
 
-    public function markAsRead(string $notifId)
+    /**
+     * @param string $notifId
+     * @return Redirector|null
+     */
+    public function markAsRead(string $notifId): Redirector|null
     {
         $notification = $this->user->notifications()->find($notifId);
-        dd($notification);
         $notification->markAsRead();
 
-        $this->notificationsCount -= 1;
+        if ($this->notificationsCount < 0)
+            $this->notificationsCount -= 1;
 
-        $this->dispatch('notificationUpdated')->self();
+        $this->dispatch('notificationUpdated');
+
+        $route = $this->getRedirectRoute($notification->data['type']);
+        return $route ? redirect($route) : null;
+    }
+
+
+    private function getRedirectRoute(string $name): ?string
+    {
+        return match ($name) {
+            'subscription_expiry' => route('profile.subscription.show'),
+            default => null
+        };
     }
 }

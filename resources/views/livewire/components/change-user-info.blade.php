@@ -39,10 +39,14 @@
     </div>
     @if($companiesName)
         <div class="col-12 mb-3" )>
-            <p>شما عضو سازمان های زیر هستید.</p>
-            <ul>
+            @role(['manager'])
+            <p>شما مدیر سازمان های زیر هستید.</p>
+            @else
+                <p>شما عضو سازمان های زیر هستید.</p
+            @endrole
+            <ul class="fw-bold list-group">
                 @foreach($companiesName as $name)
-                    <li>{{ $name }}</li>
+                    <li class="list-group-item border-left-{{ randomColor() }}">{{ $name }}</li>
                 @endforeach
             </ul>
         </div>

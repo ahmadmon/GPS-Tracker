@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Enums\Subscription\Plan\PlanType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Support\Facades\Cache;
 
 class SubscriptionPlan extends Model
 {
@@ -13,7 +12,8 @@ class SubscriptionPlan extends Model
 
 
     protected $casts = [
-        'type' => PlanType::class
+        'type' => PlanType::class,
+        'is_lifetime' => 'boolean'
     ];
 
 

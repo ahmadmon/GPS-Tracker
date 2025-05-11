@@ -23,7 +23,7 @@ class SubscriptionService
             'start_at' => Carbon::now(),
             'end_at' => Carbon::now()->addDays($plan->duration)->endOfDay(),
             'status' => 'active',
-            'is_activated_automatically' => $AutoRenew ? 1 : 0
+            'auto_renew' => $AutoRenew ? 1 : 0
         ]);
     }
 

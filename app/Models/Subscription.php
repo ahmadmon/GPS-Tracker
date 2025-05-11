@@ -11,7 +11,8 @@ class Subscription extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'status' => SubscriptionStatus::class
+        'status' => SubscriptionStatus::class,
+        'auto_renew' => 'boolean'
     ];
 
 

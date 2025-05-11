@@ -88,10 +88,10 @@ class SubscriptionController extends Controller
 
     public function toggleAutoActivation(SubscriptionModel $subscription)
     {
-        $subscription->is_activated_automatically = $subscription->is_activated_automatically == 0 ? 1 : 0;
+        $subscription->auto_renew = $subscription->auto_renew == 0 ? 1 : 0;
         $subscription->save();
 
-        return response()->json(['status' => true, 'data' => (bool)$subscription->is_activated_automatically]);
+        return response()->json(['status' => true, 'data' => (bool)$subscription->auto_renew]);
     }
 
     /*

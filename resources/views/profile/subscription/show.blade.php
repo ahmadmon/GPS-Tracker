@@ -68,7 +68,7 @@
                                 </td>
                                 <td>
                                     <x-partials.alpine.change-status
-                                        :status="(bool)$subscription->is_activated_automatically"
+                                        :status="(bool)$subscription->auto_renew"
                                         :url="route('profile.subscription.toggle-auto-activation', $subscription->id)"/>
                                 </td>
                                 @isset($subscription->canceled_at)

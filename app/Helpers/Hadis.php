@@ -4,7 +4,6 @@ namespace App\Helpers;
 
 use App\Models\Config;
 use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Session;
 
 class Hadis
 {

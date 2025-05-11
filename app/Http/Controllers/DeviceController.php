@@ -7,6 +7,7 @@ use App\Http\Requests\DeviceRequest;
 use App\Http\Requests\StoreSmsRequest;
 use App\Http\Services\DeviceManager;
 use App\Http\Services\Notify\SMS\SmsService;
+use App\Jobs\SendSms;
 use App\Models\Device;
 use App\Models\Trip;
 use App\Models\User;
