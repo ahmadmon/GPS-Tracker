@@ -59,8 +59,7 @@ class ChangeUserInfo extends Component
 
         $this->show = true;
 
-        $smsService = new SmsService();
-        $otpModel = $this->generateOtp($this->phone, $smsService, auth()->user());
+        $otpModel = $this->generateOtp($this->phone, auth()->user());
         $seconds = isset($otpModel) ? Carbon::parse($otpModel->expired_at)->diffInSeconds(Carbon::now()) : -180;
         $this->duration = (int)number_format($seconds) * -1;
     }

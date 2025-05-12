@@ -86,6 +86,38 @@ class SubscriptionController extends Controller
         return view('profile.subscription.show', compact('subscription', 'isUser'));
     }
 
+    public function renew(string $id)
+    {
+        $subscription = SubscriptionModel::with('wallet.walletable', 'plan:price,id,name,duration')
+            ->findOrFail($id);
+        $wallet = $subscription->wallet;
+        $walletable = $wallet->walletable;
+        $isUser = $walletable instanceof User;
+        $user = $isUser ? $walletable : $walletable->manager;
+        $plan = $subscription->plan;
+
+
+        if ($wallet->balance >= $plan->price) {
+            Subscription::renew($subscription);
+
+            $wallet->decrement('balance', $plan->price);
+
+            $this->createTransaction([
+                'amount' => $plan->price,
+                'description' => "برداشت برای تمدید اشتراک {$plan->name}"
+            ], $wallet);
+
+            $message = $this->smsSubscriptionSuccessMessage($plan, $subscription->end_at, $isUser, $walletable->name, isRenew: true);
+            SendSms::dispatch($user->phone, $message);
+
+            return to_route('profile.wallet')->with('success-alert', "✅ تمدید اشتراک با موفقیت انجام شد!\n شما اکنون دسترسی کامل به بخش های سامانه را دارید.\n\n برای مشاهده جزئیات بیشتر اشتراک, به جزئیات اشتراک مراجعه کنید.");
+        } else {
+            $walletPageUrl = route('profile.wallet');
+            return back()->with('error-alert', "❌ تمدید اشتراک ناموفق بود!<br> 💳به نظر می‌رسد موجودی کیف پول شما کافی نیست. برای افزایش موجودی کیف پول، لطفاً به لینک زیر مراجعه کنید: <br><a href='{$walletPageUrl}' >افزایش موجودی</a>");
+        }
+
+    }
+
     public function toggleAutoActivation(SubscriptionModel $subscription)
     {
         $subscription->auto_renew = $subscription->auto_renew == 0 ? 1 : 0;
@@ -115,12 +147,13 @@ class SubscriptionController extends Controller
     }
 
 
-    private function smsSubscriptionSuccessMessage($plan, $expirationDate, $isUser, $companyName): string
+    private function smsSubscriptionSuccessMessage($plan, $expirationDate, $isUser, $companyName, $isRenew = false): string
     {
+        $type = $isRenew ? 'تمدید' : 'فعال';
         if (!$isUser && $companyName) {
             return sprintf(
                 "سمفا - سامانه هوشمند ردیابی GPS\n\n" .
-                "🎉 اشتراک '%s' برای سازمان '%s' با موفقیت فعال شد.\n" .
+                "🎉 اشتراک '%s' برای سازمان '%s' با موفقیت {$type} شد.\n" .
                 "📅 تاریخ انقضا: %s\n\n" .
                 "برای مشاهده اشتراک، به جزئیات اشتراک مراجعه کنید.",
                 $plan->name,
@@ -131,7 +164,7 @@ class SubscriptionController extends Controller
 
         return sprintf(
             "سمفا - سامانه هوشمند ردیابی GPS\n\n" .
-            "🎉 اشتراک '%s' برای شما با موفقیت فعال شد.\n" .
+            "🎉 اشتراک '%s' برای شما با موفقیت {$type} شد.\n" .
             "📅 تاریخ انقضا: %s\n\n" .
             "برای مشاهده اشتراک، به جزئیات اشتراک مراجعه کنید.",
             $plan->name,

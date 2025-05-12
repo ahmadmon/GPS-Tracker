@@ -47,7 +47,11 @@ class NotificationsDropdown extends Component
     private function getRedirectRoute(string $name): ?string
     {
         return match ($name) {
-            'subscription_expiry' => route('profile.subscription.show'),
+            'subscription_expiry',
+            'subscription_renewed',
+            'subscription-expired', => route('profile.subscription.show'),
+
+            'subscription_renewed_failed' => route('profile.wallet'),
             default => null
         };
     }

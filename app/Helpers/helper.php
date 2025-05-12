@@ -45,7 +45,7 @@ function dayCount($endDate, $startDate = null)
     $endDate = Carbon::parse($endDate);
 
 
-    return $startDate->diffInDays($endDate);
+    return max(0, $startDate->diffInDays($endDate));
 }
 
 function priceFormat($price): string

@@ -12,6 +12,26 @@ enum SubscriptionStatus: string
     case CANCELED = 'canceled';
 
 
+    public function isActive(): bool
+    {
+        return $this === self::ACTIVE;
+    }
+
+    public function iExpired(): bool
+    {
+        return $this === self::EXPIRED;
+    }
+
+    public function isCanceled(): bool
+    {
+        return $this === self::CANCELED;
+    }
+
+    public function isInActive(): bool
+    {
+        return $this === self::INACTIVE;
+    }
+
     /**
      * @return string
      */

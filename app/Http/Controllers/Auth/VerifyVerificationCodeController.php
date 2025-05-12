@@ -13,14 +13,14 @@ class VerifyVerificationCodeController extends Controller
 {
     use VerificationCode;
 
-    public function verification(string $phone, SmsService $smsService)
+    public function verification(string $phone)
     {
         $user = User::where('phone', $phone)->first();
         if (!$user) {
             return to_route('login')->with('error-alert', 'همچین کاربری پیدا نشد.');
         }
 
-        $otpModel = $this->generateOtp($user->phone, $smsService);
+        $otpModel = $this->generateOtp($user->phone);
         $seconds = isset($otpModel) ? Carbon::parse($otpModel->expired_at)->diffInSeconds(Carbon::now()) : -120;
         $duration = (int)number_format($seconds) * -1;
 

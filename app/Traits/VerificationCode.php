@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 trait VerificationCode
 {
-    public function generateOtp(string $mobile, $smsService, $existsUser = null)
+    public function generateOtp(string $mobile, $existsUser = null)
     {
         $user = User::where('phone', $mobile)->first() ?? $existsUser;
 

@@ -54,7 +54,7 @@ class SubscriptionService
      */
     public function renew(Subscription $subscription): bool
     {
-        $subscription->load('plan:duration');
+        $subscription->load('plan:duration,id');
 
         return $subscription->update([
             'end_at' => Carbon::now()->addDays($subscription->plan->duration)->endOfDay(),

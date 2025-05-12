@@ -30,13 +30,17 @@
     </div>
 
     <div class="container-fluid">
+        <x-partials.alert.success-alert/>
+        <x-partials.alert.error-alert/>
+
         <div class="card">
             <div class="card-header">
                 @if($isUser)
                     <h5>جزئیات اشتراک شما</h5>
                 @else
                     @php $company = $subscription->wallet?->walletable @endphp
-                    <h5>جزئیات اشتراک  <a href="{{ route('company.show', $company->id) }}" class="h5 fw-bold txt-primary">{{ $company?->name }}</a></h5>
+                    <h5>جزئیات اشتراک <a href="{{ route('company.show', $company->id) }}"
+                                         class="h5 fw-bold txt-primary">{{ $company?->name }}</a></h5>
                 @endif
             </div>
             <div class="card-block row">
@@ -50,7 +54,7 @@
                                 <th scope="col">تاریخ انقضا</th>
                                 <th scope="col">وضعیت</th>
                                 <th scope="col">تمدید خودکار</th>
-                                <th scope="col">لغو اشتراک</th>
+                                <th scope="col">عملیات اشتراک</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -58,7 +62,8 @@
                                 <th scope="row">{{ $subscription?->plan?->name }}</th>
                                 <td>{{ jalaliDate($subscription->start_at, format: "%d %B %Y H:i") }}</td>
                                 <td>
-                                    <span data-bs-toggle="tooltip" data-bs-placement="top" title="{{ number_format(dayCount($subscription->end_at)) }} روز باقی مانده است"
+                                    <span data-bs-toggle="tooltip" data-bs-placement="top"
+                                          title="{{ number_format(dayCount($subscription->end_at)) }} روز باقی مانده است"
                                     >{{ jalaliDate($subscription->end_at, format: "%d %B %Y H:i") }}</span>
                                 </td>
                                 <td>
@@ -77,12 +82,31 @@
                                         {{ $subscription?->cancellation_reason }}
                                     </td>
                                 @else
-                                    <td>
-                                        <button class="btn btn-sm btn-outline-danger fw-bold" type="button"
+                                    <td class="btn-group" x-data="subscriptionActions">
+                                        @php
+                                            $canRenew = !$subscription->status->isActive() && ($subscription->end_at <= now()->addDay());
+                                        @endphp
+                                        @if($canRenew)
+                                            <form action="{{ route('profile.subscription.renew', $subscription->id) }}"
+                                                  method="post" id="renew-form">
+                                                @csrf
+                                                @method('PUT')
+                                                <button
+                                                    class="btn btn-sm btn-outline-warning fw-bold d-flex align-items-center"
+                                                    type="button"
+                                                    @click="showConfirmation"
+                                                >
+                                                    <i data-feather="refresh-cw" class="me-1" style="width: 18px"></i>
+                                                    <span>تمــدیــد</span>
+                                                </button>
+                                            </form>
+                                        @endif
+                                        <button class="btn btn-sm btn-outline-danger fw-bold d-flex align-items-center"
+                                                type="button"
 
                                         >
-                                            <i data-feather="cancel" class="me-1"></i>
-                                            لــغو اشتـــراک
+                                            <i data-feather="slash" class="me-1" style="width: 18px"></i>
+                                            <span>لـــغو</span>
                                         </button>
                                     </td>
                                 @endisset
@@ -99,7 +123,25 @@
 @push('scripts')
     <script>
         window.addEventListener('alpine:init', () => {
-
+            Alpine.data('subscriptionActions', () => ({
+                showConfirmation() {
+                    Swal.fire({
+                        title: "تایید برداشت از کیف پول",
+                        text: "شما در حال برداشت از کیف پول خود جهت تمدید اشتراک هستید. آیا مطمئنید که می‌خواهید این تراکنش را انجام دهید؟",
+                        icon: "warning",
+                        showCancelButton: true,
+                        reverseButtons: true,
+                        cancelButtonText: "لغو",
+                        confirmButtonColor: "#3085d6",
+                        cancelButtonColor: "#d33",
+                        confirmButtonText: "تایید و ادامه"
+                    }).then((result) => {
+                        if (result.value) {
+                            document.getElementById("renew-form").submit();
+                        }
+                    });
+                }
+            }))
         })
     </script>
 @endpush

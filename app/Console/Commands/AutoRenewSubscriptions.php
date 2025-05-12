@@ -7,6 +7,7 @@ use App\Facades\Subscription as SubscriptionFacade;
 use App\Jobs\SendSms;
 use App\Models\Subscription;
 use App\Models\User;
+use App\Models\Wallet;
 use App\Notifications\GenericNotification;
 use Illuminate\Console\Command;
 
@@ -51,10 +52,15 @@ class AutoRenewSubscriptions extends Command
 
                 $wallet->decrement('balance', $plan->price);
 
+                $this->createTransaction([
+                    'amount' => $plan->price,
+                    'description' => "برداشت برای تمدید اشتراک {$plan->name}"
+                ], $wallet);
+
                 $message = $this->smsSubscriptionSuccessMessage($plan,
                     $subscription->end_at,
                     $isUser,
-                    $walletable->company_name ?? null
+                    $walletable->name ?? null
                 );
 
                 $user->notify(new GenericNotification("اشتراک '{$plan->name}' شما با موفقیت تمدید شد.", 'subscription_renewed'));
@@ -63,14 +69,35 @@ class AutoRenewSubscriptions extends Command
 
                 $message = $this->smsSubscriptionFailedMessage($plan,
                     $isUser,
-                    $walletable->company_name ?? null
+                    $walletable->name ?? null
                 );
 
+                $user->notify(new GenericNotification("متاسفانه موجودی کیف پول شما برای تمدید اشتراک '{$plan->name}' کافی نیست.", 'subscription_renewed_failed'));
             }
             SendSms::dispatch($user->phone, $message);
 
-            $user->notify(new GenericNotification("متاسفانه موجودی کیف پول شما برای تمدید اشتراک '{$plan->name}' کافی نیست.", 'subscription_renewed_failed'));
         }
+    }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Private Helper Function
+    |--------------------------------------------------------------------------
+    |
+    |
+    */
+
+
+    private function createTransaction(array $info, Wallet $wallet)
+    {
+        $wallet->transactions()->create([
+            'source_id' => $wallet->walletable_id,
+            'source_type' => $wallet->walletable_type,
+            'type' => 'debit',
+            'status' => 'success',
+            'amount' => $info['amount'],
+            'description' => $info['description'] ?? null,
+        ]);
     }
 
     private function

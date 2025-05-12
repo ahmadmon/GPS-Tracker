@@ -236,7 +236,6 @@
                                                                                 <span x-text="label"></span>
                                                                             </button>
                                                                         @endif
-
                                                                     </td>
                                                                     <td class="task-date">
                                                                         {{ jalaliDate($transaction->created_at, format: "%d %B %Y , H:i") }}
@@ -331,8 +330,21 @@
                                                                             </h5>
                                                                         </td>
                                                                         <td>
-                                                                            <span
-                                                                                class="badge badge-{{ $transaction->statusDisplay['color'] }} stroke-{{ $transaction->statusDisplay['color'] }} dana">{{ $transaction->statusDisplay['label'] }}</span>
+                                                                            @php $isPending = (bool)$transaction->status->isPending(); @endphp
+                                                                            @if(!$isPending)
+                                                                                <span @class(["dana badge badge-{$transaction->statusDisplay['color']} stroke-{$transaction->statusDisplay['color']}"])>
+                                                                                {{ $transaction->statusDisplay['label'] }}
+                                                                            </span>
+                                                                            @else
+                                                                                <button
+                                                                                    wire:click="retryPayment({{ $transaction->id }})"
+                                                                                    x-data="{ label: @js($transaction->statusDisplay['label']) }"
+                                                                                    @mouseenter="label = 'پرداخت مجدد'"
+                                                                                    @mouseleave="label = @js($transaction->statusDisplay['label'])"
+                                                                                    type="button" @class(["cursor-pointer btn btn-sm btn-outline-warning p-1"])>
+                                                                                    <span x-text="label"></span>
+                                                                                </button>
+                                                                            @endif
                                                                         </td>
                                                                         <td class="task-date">
                                                                             {{ jalaliDate($transaction->created_at, format: "%d %B %Y , H:i") }}

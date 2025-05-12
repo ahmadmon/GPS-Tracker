@@ -248,8 +248,8 @@
                                         </div>
                                         <div class="ms-3">
                                             @foreach($permission as $item)
-                                                <div class="">
-                                                    <input class="form-check-input cursor-pointer"
+                                                <div class="d-flex">
+                                                    <input class="form-check-input cursor-pointer me-1"
                                                            value="{{ $item['id'] }}"
                                                            name="permissions[]"
                                                            :checked="selectedPermissions.includes({{ (int)$item['id'] }})"

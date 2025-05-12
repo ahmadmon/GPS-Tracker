@@ -16,3 +16,8 @@ Schedule::command('send:expiry-notifications')
 Schedule::command('subscriptions:auto-renew')
     ->everySixHours()
     ->runInBackground();
+
+// Subscription Check Expiry
+Schedule::command('subscriptions:check-expiry')
+    ->daily()
+    ->runInBackground();

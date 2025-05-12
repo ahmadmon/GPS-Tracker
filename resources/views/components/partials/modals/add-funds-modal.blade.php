@@ -44,7 +44,6 @@
                                     <x-input-error :messages="$errors->get('chargeTarget')" class="mt-2"/>
 
                                 </div>
-                                @if($user->companies->count() !== 1)
                                     <div class="mb-3 col-md-6 my-0">
                                         <label for="company">سازمان</label>
                                         <select class="form-control form-select" :disabled="parseInt(type) === 0"
@@ -57,14 +56,6 @@
                                         </select>
                                         <x-input-error :messages="$errors->get('companyID')" class="mt-2"/>
                                     </div>
-                                @else
-                                    <div class="mb-3 col-md-6 my-0">
-                                        <label for="company">سازمان</label>
-                                        <input class="form-control" :disabled="parseInt(type) === 0" type="text"
-                                               readonly
-                                               value="{{ $user->companies()->first()->name }}" id="company">
-                                    </div>
-                                @endif
                             </div>
                         @endif
                         <div class="mb-3 col-md-12 my-0">

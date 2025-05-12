@@ -3,7 +3,9 @@
 namespace App\Providers;
 
 
+use App\Enums\Subscription\SubscriptionStatus;
 use App\Http\Services\Subscription\SubscriptionService;
+use App\Models\Subscription;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,6 +24,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        Auth::loginUsingId(155);
+        Auth::loginUsingId(3);
     }
 }
