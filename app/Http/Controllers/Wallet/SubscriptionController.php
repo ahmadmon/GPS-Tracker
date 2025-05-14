@@ -11,6 +11,7 @@ use App\Models\Subscription as SubscriptionModel;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
 use App\Models\Wallet;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -42,9 +43,10 @@ class SubscriptionController extends Controller
         $inputs = (object)$request->validated();
         $plan = SubscriptionPlan::findOrFail((int)$inputs->plan);
         $price = $plan->price;
+        $walletable = $wallet->walletable;
 
         if ($wallet->balance >= $price) {
-            DB::transaction(function () use ($wallet, $price, $plan, $inputs) {
+            DB::transaction(function () use ($wallet, $price, $plan, $inputs, $walletable) {
 
                 $wallet->decrement('balance', $price);
 
@@ -52,15 +54,19 @@ class SubscriptionController extends Controller
                     'amount' => $price,
                     'description' => "برداشت برای خرید اشتراک {$plan->name}"
                 ], $wallet);
-                $isUser = $wallet->walletable instanceof User;
+                $isUser = $walletable instanceof User;
 
                 $subscription = Subscription::subscribe($wallet, $plan, $inputs->auto_renew);
                 if (!$isUser) {
                     Subscription::subscribeSubsets($wallet, $plan); // activation subscribes for manger and subsets
+
+                    foreach ($walletable->users as $subset) {
+                        SendSms::dispatch($subset->phone, $this->smsSubsetsMessage($subscription->end_at, $walletable->name));
+                    }
                 }
 
                 // Sending a success message via SMS
-                $phoneNumber = $isUser ? $wallet->walletable->phone : $wallet->walletable->manager->phone;
+                $phoneNumber = $isUser ? $walletable->phone : $walletable->manager->phone;
                 $message = $this->smsSubscriptionSuccessMessage($plan, $subscription->end_at, $isUser, $wallet->walletable->name);
                 SendSms::dispatch($phoneNumber, $message);
             });
@@ -90,6 +96,7 @@ class SubscriptionController extends Controller
     {
         $subscription = SubscriptionModel::with('wallet.walletable', 'plan:price,id,name,duration')
             ->findOrFail($id);
+
         $wallet = $subscription->wallet;
         $walletable = $wallet->walletable;
         $isUser = $walletable instanceof User;
@@ -98,16 +105,28 @@ class SubscriptionController extends Controller
 
 
         if ($wallet->balance >= $plan->price) {
-            Subscription::renew($subscription);
 
-            $wallet->decrement('balance', $plan->price);
+            DB::transaction(function () use ($subscription, $isUser, $walletable, $wallet, $plan) {
+                Subscription::renew($subscription);
+                if (!$isUser) {
+                    Subscription::renewSubsets($walletable);
+                }
 
-            $this->createTransaction([
-                'amount' => $plan->price,
-                'description' => "برداشت برای تمدید اشتراک {$plan->name}"
-            ], $wallet);
+                $wallet->decrement('balance', $plan->price);
+
+                $this->createTransaction([
+                    'amount' => $plan->price,
+                    'description' => "برداشت برای تمدید اشتراک {$plan->name}"
+                ], $wallet);
+            });
+
 
             $message = $this->smsSubscriptionSuccessMessage($plan, $subscription->end_at, $isUser, $walletable->name, isRenew: true);
+            if (!$isUser) {
+                foreach ($walletable->users as $subset) {
+                    SendSms::dispatch($subset->phone, $this->smsSubsetsMessage($subscription->end_at, $walletable->name, isRenew: true));
+                }
+            }
             SendSms::dispatch($user->phone, $message);
 
             return to_route('profile.wallet')->with('success-alert', "✅ تمدید اشتراک با موفقیت انجام شد!\n شما اکنون دسترسی کامل به بخش های سامانه را دارید.\n\n برای مشاهده جزئیات بیشتر اشتراک, به جزئیات اشتراک مراجعه کنید.");
@@ -149,26 +168,43 @@ class SubscriptionController extends Controller
 
     private function smsSubscriptionSuccessMessage($plan, $expirationDate, $isUser, $companyName, $isRenew = false): string
     {
-        $type = $isRenew ? 'تمدید' : 'فعال';
+        $type = $isRenew ? 'تمدید' : 'فعال‌سازی';
         if (!$isUser && $companyName) {
             return sprintf(
                 "سمفا - سامانه هوشمند ردیابی GPS\n\n" .
-                "🎉 اشتراک '%s' برای سازمان '%s' با موفقیت {$type} شد.\n" .
+                "🎉 اشتراک '%s' برای سازمان '%s' با موفقیت %s شد.\n" .
                 "📅 تاریخ انقضا: %s\n\n" .
                 "برای مشاهده اشتراک، به جزئیات اشتراک مراجعه کنید.",
                 $plan->name,
                 $companyName,
+                $type,
                 jalaliDate($expirationDate)
             );
         }
 
         return sprintf(
             "سمفا - سامانه هوشمند ردیابی GPS\n\n" .
-            "🎉 اشتراک '%s' برای شما با موفقیت {$type} شد.\n" .
+            "🎉 اشتراک '%s' برای شما با موفقیت %s شد.\n" .
             "📅 تاریخ انقضا: %s\n\n" .
             "برای مشاهده اشتراک، به جزئیات اشتراک مراجعه کنید.",
             $plan->name,
+            $type,
             jalaliDate($expirationDate)
+        );
+    }
+
+    private function smsSubsetsMessage($expirationDate, $companyName, $isRenew = false)
+    {
+        $type = $isRenew ? 'تمدید' : 'فعال‌سازی';
+        return sprintf(
+            "سمفا - سامانه هوشمند ردیابی GPS\n\n" .
+            "با توجه به %s اشتراک سازمان «%s»، اشتراک شما نیز به‌صورت خودکار %s شد.\n" .
+            "📅 تاریخ انقضای جدید: %s\n" .
+            "شما همچنان به تمامی امکانات سامانه دسترسی دارید. برای مشاهده جزئیات بیشتر، به بخش جزئیات اشتراک‌ مراجعه فرمایید.",
+            $type,
+            $companyName,
+            $type,
+            $expirationDate
         );
     }
 

@@ -1,3 +1,7 @@
+@php
+    $loadAlpineJs = false;
+@endphp
+
 @extends('01-layouts.master')
 
 @section('title', 'پروفایل کاربری')

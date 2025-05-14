@@ -1,3 +1,6 @@
+@php
+    $loadAlpineJs = false;
+@endphp
 @extends('01-layouts.master')
 
 @section('title', 'جزئیات اشتراک')
@@ -84,7 +87,7 @@
                                 @else
                                     <td class="btn-group" x-data="subscriptionActions">
                                         @php
-                                            $canRenew = !$subscription->status->isActive() && ($subscription->end_at <= now()->addDay());
+                                            $canRenew = !$subscription->status->isActive() || ($subscription->end_at <= now()->addDay());
                                         @endphp
                                         @if($canRenew)
                                             <form action="{{ route('profile.subscription.renew', $subscription->id) }}"
@@ -103,7 +106,8 @@
                                         @endif
                                         <button class="btn btn-sm btn-outline-danger fw-bold d-flex align-items-center"
                                                 type="button"
-
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#subscriptionCancellation"
                                         >
                                             <i data-feather="slash" class="me-1" style="width: 18px"></i>
                                             <span>لـــغو</span>
@@ -117,6 +121,8 @@
                 </div>
             </div>
         </div>
+
+        <livewire:components.cancellation-modal :$subscription/>
     </div>
 @endsection
 

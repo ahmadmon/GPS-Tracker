@@ -14,9 +14,11 @@ class SubscriptionService
     /**
      * @param Wallet $wallet
      * @param SubscriptionPlan $plan
+     * @param bool $AutoRenew
      * @return Subscription
      */
-    public function subscribe(Wallet $wallet, SubscriptionPlan $plan, bool $AutoRenew = false): Subscription
+    public function
+    subscribe(Wallet $wallet, SubscriptionPlan $plan, bool $AutoRenew = false): Subscription
     {
         return $wallet->subscription()->create([
             'subscription_plan_id' => $plan->id,
@@ -50,23 +52,43 @@ class SubscriptionService
 
     /**
      * @param Subscription $subscription
-     * @return bool
+     * @return void
      */
-    public function renew(Subscription $subscription): bool
+    public function
+    renew(Subscription $subscription): void
     {
         $subscription->load('plan:duration,id');
 
-        return $subscription->update([
-            'end_at' => Carbon::now()->addDays($subscription->plan->duration)->endOfDay(),
+        $subscription->update([
+            'end_at' => Carbon::create($subscription->start_at)->addDays($subscription->plan->duration)->endOfDay(),
             'status' => 'active'
         ]);
+    }
+
+    /**
+     * @param Company $company
+     * @return void
+     */
+    public function
+    renewSubsets(Company $company): void
+    {
+        $company->load(['users', 'manager']);
+
+        $company->users->push($company->manager)->map(function (User $user) {
+            $userSubscription = $user->wallet->subscription;
+
+            if ($userSubscription) {
+                $this->renew($userSubscription);
+            }
+        });
     }
 
     /**
      * @param Subscription $subscription
      * @return bool
      */
-    public function cancel(Subscription $subscription): bool
+    public function
+    cancel(Subscription $subscription): bool
     {
         return $subscription->update([
             'status' => 'canceled',
@@ -78,7 +100,8 @@ class SubscriptionService
      * @param Wallet $wallet
      * @return bool
      */
-    public function activeSubscription(Wallet $wallet): bool
+    public function
+    activeSubscription(Wallet $wallet): bool
     {
         return $wallet->subscription()->where('status', 'active')->exists();
     }

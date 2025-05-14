@@ -50,6 +50,10 @@ class AutoRenewSubscriptions extends Command
             if ($wallet->balance >= $plan->price) {
                 SubscriptionFacade::renew($subscription);
 
+                if (!$isUser) {
+                    SubscriptionFacade::renewSubsets($walletable);
+                }
+
                 $wallet->decrement('balance', $plan->price);
 
                 $this->createTransaction([

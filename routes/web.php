@@ -83,7 +83,7 @@ Route::middleware(['auth'])->group(function () {
             Route::any('/toggle-auto-activation/{subscription}', [SubscriptionController::class, 'toggleAutoActivation'])->name('toggle-auto-activation');
             Route::get('/{wallet?}', [SubscriptionController::class, 'index'])->name('index');
             Route::post('/{wallet}/subscribe', [SubscriptionController::class, 'subscribe'])->name('subscribe');
-            Route::put('/{wallet}/renew', [SubscriptionController::class, 'renew'])->name('renew');
+            Route::put('/{subscription}/renew', [SubscriptionController::class, 'renew'])->name('renew');
         });
     });
 
