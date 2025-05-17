@@ -23,7 +23,11 @@
                             </a>
                         </li>
                         <li class="breadcrumb-item dana">
-                            <a href="{{ route('profile.wallet') }}">کیف پول من</a>
+                            @if($isUser)
+                                <a href="{{ route('profile.wallet') }}">کیف پول من</a>
+                            @else
+                                <a href="{{ route('company.index') }}">لیست سازمان های من</a>
+                            @endif
                         </li>
                         <li class="breadcrumb-item dana">جزئیات اشتراک</li>
                     </ol>
@@ -37,19 +41,28 @@
         <x-partials.alert.error-alert/>
 
         <div class="card">
-            <div class="card-header">
+            <div class="card-header d-flex justify-content-between align-items-center">
                 @if($isUser)
                     <h5>جزئیات اشتراک شما</h5>
+                    <a href="{{ route('profile.subscription.history') }}">#تاریخچه اشتراک ها</a>
                 @else
                     @php $company = $subscription->wallet?->walletable @endphp
                     <h5>جزئیات اشتراک <a href="{{ route('company.show', $company->id) }}"
                                          class="h5 fw-bold txt-primary">{{ $company?->name }}</a></h5>
+                    <a href="{{ route('profile.subscription.history', $subscription->wallet_id) }}">#تاریخچه اشتراک
+                        ها</a>
                 @endif
             </div>
             <div class="card-block row">
                 <div class="col-sm-12 col-lg-12 col-xl-12">
                     <div class="table-responsive custom-scrollbar">
                         <table class="table text-nowrap">
+                            @php
+                                $canRenew = !$subscription->status->isActive() || ($subscription->end_at <= now()->addDays(2));
+                                $canCancel = !$subscription->cancellation()->exists();
+                                $showActions = $canCancel || $canRenew;
+                                $isCanceled = $subscription->status->isCanceled();
+                            @endphp
                             <thead class="table-inverse">
                             <tr>
                                 <th scope="col">طرح</th>
@@ -57,7 +70,9 @@
                                 <th scope="col">تاریخ انقضا</th>
                                 <th scope="col">وضعیت</th>
                                 <th scope="col">تمدید خودکار</th>
-                                <th scope="col">عملیات اشتراک</th>
+                                @if($showActions)
+                                    <th scope="col">{{ $isCanceled ? 'تاریخ لغو' : 'عملیات اشتراک' }}</th>
+                                @endif
                             </tr>
                             </thead>
                             <tbody>
@@ -79,41 +94,42 @@
                                         :status="(bool)$subscription->auto_renew"
                                         :url="route('profile.subscription.toggle-auto-activation', $subscription->id)"/>
                                 </td>
-                                @isset($subscription->canceled_at)
+                                @if($isCanceled)
                                     <td>{{ jalaliDate($subscription->canceled_at, format: "%d %B %Y H:i") }}</td>
-                                    <td>
-                                        {{ $subscription?->cancellation_reason }}
-                                    </td>
                                 @else
-                                    <td class="btn-group" x-data="subscriptionActions">
-                                        @php
-                                            $canRenew = !$subscription->status->isActive() || ($subscription->end_at <= now()->addDay());
-                                        @endphp
-                                        @if($canRenew)
-                                            <form action="{{ route('profile.subscription.renew', $subscription->id) }}"
-                                                  method="post" id="renew-form">
-                                                @csrf
-                                                @method('PUT')
+                                    @if($showActions)
+                                        <td class="btn-group" x-data="subscriptionActions">
+                                            @if($canRenew)
+                                                <form
+                                                    action="{{ route('profile.subscription.renew', $subscription->id) }}"
+                                                    method="post" id="renew-form">
+                                                    @csrf
+                                                    @method('PUT')
+                                                    <button
+                                                        class="btn btn-sm btn-outline-warning fw-bold d-flex align-items-center"
+                                                        type="button"
+                                                        @click="showConfirmation"
+                                                    >
+                                                        <i data-feather="refresh-cw" class="me-1"
+                                                           style="width: 18px"></i>
+                                                        <span>تمــدیــد</span>
+                                                    </button>
+                                                </form>
+                                            @endif
+                                            @if($canCancel)
                                                 <button
-                                                    class="btn btn-sm btn-outline-warning fw-bold d-flex align-items-center"
+                                                    class="btn btn-sm btn-outline-danger fw-bold d-flex align-items-center"
                                                     type="button"
-                                                    @click="showConfirmation"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#subscriptionCancellation"
                                                 >
-                                                    <i data-feather="refresh-cw" class="me-1" style="width: 18px"></i>
-                                                    <span>تمــدیــد</span>
+                                                    <i data-feather="slash" class="me-1" style="width: 18px"></i>
+                                                    <span>لـــغو</span>
                                                 </button>
-                                            </form>
-                                        @endif
-                                        <button class="btn btn-sm btn-outline-danger fw-bold d-flex align-items-center"
-                                                type="button"
-                                                data-bs-toggle="modal"
-                                                data-bs-target="#subscriptionCancellation"
-                                        >
-                                            <i data-feather="slash" class="me-1" style="width: 18px"></i>
-                                            <span>لـــغو</span>
-                                        </button>
-                                    </td>
-                                @endisset
+                                            @endif
+                                        </td>
+                                    @endif
+                                @endif
                             </tr>
                             </tbody>
                         </table>

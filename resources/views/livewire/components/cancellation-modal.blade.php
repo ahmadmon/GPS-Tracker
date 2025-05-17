@@ -36,7 +36,7 @@
                             <div class="mb-3 mt-0 col-md-12">
 
                                 <div x-data="{
-                                    refundType: $wire.refundType,
+                                    walletRefund: $wire.walletRefund,
                                     iban: 'IR'
                                 }" x-init="$wire">
                                     <div class="mb-3">
@@ -44,8 +44,8 @@
                                             <div class="text-end icon-state">
                                                 <label class="switch mb-0">
                                                     <input type="checkbox"
-                                                           x-model="refundType"
-                                                           wire:model="refundType"
+                                                           x-model="walletRefund"
+                                                           wire:model="walletRefund"
 
                                                     ><span
                                                         class="switch-state bg-black"></span>
@@ -53,9 +53,9 @@
                                             </div>
                                             <label class="col-form-label m-l-10">واریز به کیف‌پول</label>
                                         </div>
-                                        <x-input-error :messages="$errors->get('refundType')" class="mt-2"/>
+                                        <x-input-error :messages="$errors->get('walletRefund')" class="mt-2"/>
                                     </div>
-                                    <template x-if="refundType === false">
+                                    <template x-if="walletRefund === false">
                                         <div class="mb-3">
                                             <label for="iban">شماره شبا را وارد کنید
                                                 <sup class="text-danger fw-bold">*</sup>

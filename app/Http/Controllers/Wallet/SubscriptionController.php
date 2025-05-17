@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Wallet;
 
 use App\Enums\Subscription\Plan\PlanType;
+use App\Enums\Subscription\SubscriptionStatus;
 use App\Facades\Subscription;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SubscribeRequest;
@@ -35,6 +36,26 @@ class SubscriptionController extends Controller
             'wallet' => $wallet,
             'isUser' => $isUser
         ]);
+    }
+
+    public function history(?Wallet $wallet = null)
+    {
+        $wallet = is_null($wallet) ? Auth::user()->wallet : $wallet;
+
+        $isUser = $wallet->walletable instanceof User;
+
+        $subscriptions = $wallet->subscription()
+            ->with(['wallet', 'plan'])
+            ->whereIn('status', [SubscriptionStatus::EXPIRED, SubscriptionStatus::CANCELED])
+            ->latest()
+            ->get();
+
+        $canceledSubscription = $subscriptions->where('status', 'canceled')->last();
+        $isPending = $canceledSubscription->cancellation()->exists() && $canceledSubscription->cancellation->status->isPending();
+        if($isPending) session()->put('info-alert', "درخواست بازگشت وجه شما در حال بررسی است.\nپس از تایید توسط پشتیبانی، مبلغ به شماره شبا اعلام شده واریز خواهد شد.");
+
+        return view('profile.subscription.history', compact('subscriptions', 'isUser', 'wallet'));
+
     }
 
 
@@ -84,7 +105,10 @@ class SubscriptionController extends Controller
     {
         $subscription = SubscriptionModel::with(['plan', 'wallet.walletable:id,name'])
             ->where('wallet_id', is_null($id) ? Auth::user()->wallet->id : $id)
-            ->firstOrFail();
+            ->where('status', SubscriptionStatus::ACTIVE)
+            ->first();
+        if (!$subscription) return to_route('profile.wallet')->with('error-alert', "درحال حاضر اشتراک فعالی ندارید.\nبرای خرید اشتراک ابتدا موجودی کیف پول خود را افزایش دهید سپس طرح اشتراک مناسب خود را انتخاب و خریداری کنید.");
+
 
         $isUser = $subscription->wallet->walletable instanceof User;
 

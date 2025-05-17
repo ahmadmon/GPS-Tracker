@@ -156,6 +156,8 @@
                             <li><a href="{{ route('profile.subscription.show') }}"><i data-feather="star"></i><span>جزئیات اشتراک</span></a>
                             </li>
                         @endunless
+                        <li><a href="{{ route('profile.subscription.history') }}" class="d-flex justify-content-between align-items-center"><i data-feather="clock"></i><span>تاریخچه اشتراک</span></a>
+
                         <li>
                             <form action="{{ route('logout') }}" method="post" class="d-inline">
                                 @csrf
