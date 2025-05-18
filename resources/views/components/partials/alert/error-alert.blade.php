@@ -1,5 +1,5 @@
 @if(session('error-alert'))
-    <div class="alert alert-light-danger light alert-dismissible fade show text-dark border-right-wrapper" role="alert" x-init="$el.scrollIntoView({behavior: 'smooth'})">
+    <div class="alert alert-light-danger light alert-dismissible fade show text-dark border-right-wrapper" role="alert" x-init="$el.scrollIntoView({behavior: 'smooth', block: 'nearest'})">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
              class="feather feather-alert-octagon text-danger">

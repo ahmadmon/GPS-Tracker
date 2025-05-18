@@ -50,8 +50,8 @@ class SubscriptionController extends Controller
             ->latest()
             ->get();
 
-        $canceledSubscription = $subscriptions->where('status', 'canceled')->last();
-        $isPending = $canceledSubscription->cancellation()->exists() && $canceledSubscription->cancellation->status->isPending();
+        $canceledSubscription = $subscriptions->where('status', 'canceled')->first();
+        $isPending = $canceledSubscription?->cancellation()->exists() && $canceledSubscription?->cancellation?->status->isPending();
         if($isPending) session()->put('info-alert', "درخواست بازگشت وجه شما در حال بررسی است.\nپس از تایید توسط پشتیبانی، مبلغ به شماره شبا اعلام شده واریز خواهد شد.");
 
         return view('profile.subscription.history', compact('subscriptions', 'isUser', 'wallet'));

@@ -3,9 +3,11 @@
         <div class="logo-wrapper">
             <a href="{{ route('home') }}">
                 <img class="img-fluid for-light"
-                     src="{{ asset('assets/images/logo/samfa-logo.png') }}" width="40" alt="سمفا - سامانه هوشمند ردیابی GPS">
+                     src="{{ asset('assets/images/logo/samfa-logo.png') }}" width="40"
+                     alt="سمفا - سامانه هوشمند ردیابی GPS">
                 <img class="img-fluid for-dark"
-                     src="{{ asset('assets/images/logo/samfa-logo.png') }}" width="40" alt="سمفا - سامانه هوشمند ردیابی GPS">
+                     src="{{ asset('assets/images/logo/samfa-logo.png') }}" width="40"
+                     alt="سمفا - سامانه هوشمند ردیابی GPS">
             </a>
             <div class="back-btn">
                 <i class="fa fa-angle-left"></i>
@@ -44,15 +46,15 @@
                     </li>
                     @endnotRole
                     @if(can('show-map'))
-                    <li class="sidebar-list">
-                        <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('map')]) href="{{ route('map') }}">
-                            <i data-feather="map"></i>
-                            <span>نقشه</span>
-                            <div class="according-menu">
-                                <i class="fa-solid fa-angle-right"></i>
-                            </div>
-                        </a>
-                    </li>
+                        <li class="sidebar-list">
+                            <a @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('map')]) href="{{ route('map') }}">
+                                <i data-feather="map"></i>
+                                <span>نقشه</span>
+                                <div class="according-menu">
+                                    <i class="fa-solid fa-angle-right"></i>
+                                </div>
+                            </a>
+                        </li>
                     @endif
                     @if(can('devices-list'))
                         <li class="sidebar-list">
@@ -128,7 +130,12 @@
                     @endif
 
                     <li class="sidebar-list">
-                        <a @class(['sidebar-link sidebar-title', 'active' => Route::is('subscription-plan.*') || Route::is('subscription-management.*')]) href="javascript:void(0)">
+                        @php
+                            $subscriptionsRoute = Route::is('subscription-plan.*') ||
+                             Route::is('subscription-management.*') ||
+                              Route::is('subscription-cancellation.*');
+                        @endphp
+                        <a @class(['sidebar-link sidebar-title', 'active' => $subscriptionsRoute]) href="javascript:void(0)">
                             <i data-feather="star"></i>
                             <span>مدیریت اشتراک</span></a>
                         <ul class="sidebar-submenu">
@@ -138,8 +145,12 @@
                             <li>
                                 <a href="{{ route('subscription-management.index', ['type' => 'company']) }}"><span>لیست اشتراک سازمان ها</span></a>
                             </li>
+                            <li>
+                                <a href="{{ route('subscription-cancellation.index') }}"><span>درخواست‌های لغو اشتراک</span></a>
+                            </li>
                             @if(true)
-                                <li><a href="{{ route('subscription-plan.index') }}"><span>مدیریت طرح اشتراک</span></a></li>
+                                <li><a href="{{ route('subscription-plan.index') }}"><span>مدیریت طرح اشتراک</span></a>
+                                </li>
                             @endif
                         </ul>
                     </li>

@@ -13,7 +13,7 @@
                 <button class="btn-close" type="button" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body row">
-                <div class="col-xl-6">
+                <div class="col-xl-6 mb-3 mb-md-0">
                     <div class="border rounded-5 p-25 shadow-sm">
                         <h5 class="fw-bold">⚠️ شرایط لغو اشتراک</h5>
                         <ul class="mt-2 ms-2" style="list-style: initial">

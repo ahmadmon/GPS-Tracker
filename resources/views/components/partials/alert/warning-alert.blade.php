@@ -1,6 +1,6 @@
 @if(session('warning-alert'))
     <div class="alert alert-light-warning light alert-dismissible fade show text-dark border-right-wrapper"
-         role="alert" x-init="$el.scrollIntoView({behavior: 'smooth'})">
+         role="alert" x-init="$el.scrollIntoView({behavior: 'smooth', block: 'nearest'})">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 16 16">
             <path fill="black"
                   d="M8 9a.75.75 0 0 1-.75-.75v-3.5a.75.75 0 0 1 1.5 0v3.5A.75.75 0 0 1 8 9m-1 3a1 1 0 1 1 2 0a1 1 0 0 1-2 0"/>

@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Subscription;
 
-use App\Enums\Subscription\Plan\PlanType;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\SubscriptionPlanRequest;
 use App\Models\SubscriptionPlan;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 
 class SubscriptionPlanController extends Controller

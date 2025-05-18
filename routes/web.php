@@ -5,8 +5,9 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\DeviceController;
 use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\SubscriptionManagementController;
-use App\Http\Controllers\SubscriptionPlanController;
+use App\Http\Controllers\Subscription\CancellationController;
+use App\Http\Controllers\Subscription\SubscriptionManagementController;
+use App\Http\Controllers\Subscription\SubscriptionPlanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\Wallet\PaymentCallbackController;
@@ -53,10 +54,6 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/geofence/change-status/{geofence}', [GeofenceController::class, 'changeStatus'])->name('geofence.change-status');
     });
 
-    // <!-- Subscription Plan -->
-    Route::resource('subscription-plan', SubscriptionPlanController::class)->parameters(['subscription-plan' => 'slug']);
-    Route::get('/subscription-plan/change-status/{subscriptionPlan}', [SubscriptionPlanController::class, 'changeStatus'])->name('subscription-plan.change-status');
-
     // <!-- Wallet Management -->
     Route::prefix('wallet-management/show/{wallet}')->name('wallet-management.')->group(function () {
         Route::get('/', [WalletManagementController::class, 'show'])->name('show');
@@ -70,6 +67,13 @@ Route::middleware(['auth'])->group(function () {
 
     // <!-- Subscription Management -->
     Route::resource('subscription-management', SubscriptionManagementController::class);
+
+    // <!-- Subscription cancellation -->
+    Route::resource('subscription-cancellation', CancellationController::class);
+
+    // <!-- Subscription Plan -->
+    Route::resource('subscription-plan', SubscriptionPlanController::class)->parameters(['subscription-plan' => 'slug']);
+    Route::get('/subscription-plan/change-status/{subscriptionPlan}', [SubscriptionPlanController::class, 'changeStatus'])->name('subscription-plan.change-status');
 
     // <!-- Profile -->
     Route::prefix('profile')->name('profile.')->group(function () {

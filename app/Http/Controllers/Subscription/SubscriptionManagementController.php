@@ -1,14 +1,14 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Subscription;
 
 use App\Facades\Subscription as SubscriptionService;
+use App\Http\Controllers\Controller;
 use App\Http\Requests\GrantSubscriptionRequest;
 use App\Models\Company;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 

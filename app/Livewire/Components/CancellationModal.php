@@ -46,7 +46,6 @@ class CancellationModal extends Component
         $diffInHours = $startDate->diffInHours($now);
         $diffInDays = $startDate->diffInDays($now);
         $plan = $subscription->plan;
-
         if ($diffInHours <= 24) {
             $refundAmount = $plan->price;
             $type = 'full-refund';
@@ -88,10 +87,10 @@ class CancellationModal extends Component
                 }
             ], $wallet);
 
-            return to_route('profile.subscription.show')->with('success-alert', sprintf('مبلغ %s تومان با موفقیت به کیف پول شما واریز شد.', priceFormat($refundAmount)));
+            return to_route('profile.subscription.history')->with('success-alert', sprintf('مبلغ %s تومان با موفقیت به کیف پول شما واریز شد.', priceFormat($refundAmount)));
         }
 
-        return to_route('profile.subscription.show')->with('success-alert', "درخواست لغو اشتراک شما با موفقیت ثبت شد.\nهمکاران ما در اسرع وقت آن را بررسی خواهند کرد.");
+        return to_route('profile.subscription.history')->with('success-alert', "درخواست لغو اشتراک شما با موفقیت ثبت شد.\nهمکاران ما در اسرع وقت آن را بررسی خواهند کرد.");
     }
 
 
