@@ -34,8 +34,9 @@ class NotificationsDropdown extends Component
         $notification = $this->user->notifications()->find($notifId);
         $notification->markAsRead();
 
-        if ($this->notificationsCount < 0)
-            $this->notificationsCount -= 1;
+        if ($this->notificationsCount < 0) {
+            --$this->notificationsCount;
+        }
 
         $this->dispatch('notificationUpdated');
 
@@ -52,6 +53,7 @@ class NotificationsDropdown extends Component
             'subscription-expired', => route('profile.subscription.show'),
 
             'subscription_renewed_failed' => route('profile.wallet'),
+            'subscription-cancellation' => route('profile.subscription.history'),
             default => null
         };
     }

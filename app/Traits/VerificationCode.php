@@ -28,7 +28,7 @@ trait VerificationCode
             'expired_at' => $now->addMinutes(value: 2)
         ]);
 
-        $message = "سمفا - سامانه هوشمند ردیابی GPS\nرمز ورود: {$verificationCode->otp}\n";
+        $message = "سمفا - سامانه هوشمند رهیابی GPS\nرمز ورود: {$verificationCode->otp}\n";
         SendSms::dispatch($mobile, $message);
 
 

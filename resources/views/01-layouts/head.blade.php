@@ -58,6 +58,10 @@
     <!-- Custom css-->
     <link rel="stylesheet" type="text/css" href="{{ asset('assets/css/custom-style.css')}}">
     @if(!isset($loadAlpineJs) || $loadAlpineJs !== false)
+        <script
+            defer
+            src="https://unpkg.com/alpinejs-form-validation@latest/dist/validation.min.js"
+        ></script>
         <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     @endif
     @stack('styles')

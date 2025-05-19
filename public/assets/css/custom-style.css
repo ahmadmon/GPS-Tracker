@@ -26,8 +26,16 @@
     font-family: 'dana', Serif !important;
 }
 
-[x-clock] {
+[x-cloak] {
     display: none !important;
+}
+
+[data-validation-valid='false'] {
+    border-color: red;
+}
+
+[data-validation-valid='true'] {
+    border-color: green;
 }
 
 .cursor-pointer {
@@ -429,4 +437,11 @@ section.leaflet-control-layers-list div.leaflet-control-layers-base label span s
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+}
+
+
+@media only screen and (max-width: 575.98px) {
+    .alert-dismissible p {
+        max-width: 100%;
+    }
 }

@@ -69,7 +69,11 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('subscription-management', SubscriptionManagementController::class);
 
     // <!-- Subscription cancellation -->
-    Route::resource('subscription-cancellation', CancellationController::class);
+    Route::resource('subscription-cancellation', CancellationController::class)->except(['show', 'edit', 'update', 'destroy']);
+    Route::prefix('subscription-cancellation')->name('subscription-cancellation.')->group(function () {
+        Route::post('/reject-request/{id}', [CancellationController::class, 'rejectRequest'])->name('reject-request');
+        Route::post('/approve-request/{id}', [CancellationController::class, 'approveRequest'])->name('approve-request');
+    });
 
     // <!-- Subscription Plan -->
     Route::resource('subscription-plan', SubscriptionPlanController::class)->parameters(['subscription-plan' => 'slug']);

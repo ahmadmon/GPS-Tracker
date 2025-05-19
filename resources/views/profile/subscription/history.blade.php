@@ -45,7 +45,7 @@
     <div class="container-fluid">
         <x-partials.alert.success-alert/>
         <x-partials.alert.error-alert/>
-        <x-partials.alert.info-alert />
+        <x-partials.alert.info-alert/>
 
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -70,6 +70,7 @@
                                 <th>تاریخ انقضا</th>
                                 <th>وضعیت</th>
                                 <th>تمدید خودکار</th>
+                                <th>تاریخ بازگشت وجه</th>
                                 <th>تاریخ لغو</th>
                             </tr>
                             </thead>
@@ -95,6 +96,36 @@
                                                  'bg-danger' => !$subscription->auto_renew])>
                                        {{ $subscription->auto_renew ? 'فعال' : 'غیرفعال' }}
                                    </span>
+                                    </td>
+                                    <td>
+                                        @php
+                                            $isRefunded = $subscription?->cancellation?->refunded_at;
+                                            $isRejected = !$isRefunded && $subscription?->cancellation?->status->isRejected();
+                                        @endphp
+                                        @if($isRefunded)
+                                            <div class="d-flex flex-column">
+                                                <small
+                                                    class="text-muted">{{ !$subscription?->cancellation?->iban ? 'واریز به کیف پول' : 'واریز به شماره شبا' }}</small>
+                                                <span>{{ jalaliDate($subscription->cancellation->refunded_at, format: '%d %B %Y, H:i') }}</span>
+                                            </div>
+                                        @elseif($isRejected)
+                                            <div x-data="{show: false , showReason: false}">
+                                                <div x-show="!showReason">
+                                                <span class="badge bg-dark dana cursor-pointer"
+                                                      @mouseenter="show = true"
+                                                      @mouseleave="show = false"
+                                                      @click="showReason = true"
+                                                      x-text="show ? 'مشاهده دلیل' : 'درخواست لغو, رد شده'">درخواست لغو رد شده</span>
+                                                </div>
+
+                                                <div x-cloak x-show="showReason" @click="showReason = false"
+                                                     class="cursor-pointer">
+                                                    <small>{!! nl2br(e($subscription?->cancellation->rejection_reason)) !!}</small>
+                                                </div>
+                                            </div>
+                                        @else
+                                            -
+                                        @endif
                                     </td>
                                     @if($isCanceled)
                                         <td>{{ jalaliDate($subscription->canceled_at, format: "%d %B %Y H:i") }}</td>

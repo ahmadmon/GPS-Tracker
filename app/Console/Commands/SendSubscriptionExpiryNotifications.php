@@ -60,7 +60,7 @@ class SendSubscriptionExpiryNotifications extends Command
     {
         if ($isUser) {
             return sprintf(
-                "سمفا - سامانه هوشمند ردیابی GPS\n\n" .
+                "سمفا - سامانه هوشمند رهیابی GPS\n\n" .
                 "%s عزیز اشتراک شما به زودی منقضی خواهد شد.\n" .
                 "لطفا آن را تمدید کنید.",
                 $name
@@ -68,7 +68,7 @@ class SendSubscriptionExpiryNotifications extends Command
         }
 
         return sprintf(
-            "سمفا - سامانه هوشمند ردیابی GPS\n\n" .
+            "سمفا - سامانه هوشمند رهیابی GPS\n\n" .
             "%s عزیز اشتراک سازمان '%s' به زودی منقضی خواهد شد.\n" .
             "لطفا آن را تمدید کنید.",
             $name,

@@ -15,13 +15,16 @@ use App\Models\Wallet;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Session;
 
 class SubscriptionController extends Controller
 {
     public function index(?Wallet $wallet = null)
     {
         $wallet = is_null($wallet) ? Auth::user()->wallet : $wallet;
-        if ($wallet->hasSubscription()) return to_route('profile.subscription.show'); // Checking if the wallet owner is a subscriber?
+        if ($wallet->hasSubscription()) {
+            return to_route('profile.subscription.show');
+        } // Checking if the wallet owner is a subscriber?
 
         $isUser = $wallet->walletable instanceof User;
 
@@ -45,14 +48,18 @@ class SubscriptionController extends Controller
         $isUser = $wallet->walletable instanceof User;
 
         $subscriptions = $wallet->subscription()
-            ->with(['wallet', 'plan'])
+            ->with(['wallet', 'plan', 'cancellation'])
             ->whereIn('status', [SubscriptionStatus::EXPIRED, SubscriptionStatus::CANCELED])
             ->latest()
             ->get();
 
         $canceledSubscription = $subscriptions->where('status', 'canceled')->first();
         $isPending = $canceledSubscription?->cancellation()->exists() && $canceledSubscription?->cancellation?->status->isPending();
-        if($isPending) session()->put('info-alert', "درخواست بازگشت وجه شما در حال بررسی است.\nپس از تایید توسط پشتیبانی، مبلغ به شماره شبا اعلام شده واریز خواهد شد.");
+        if ($isPending) {
+            Session::put('info-alert', "درخواست بازگشت وجه شما در حال بررسی است.\nپس از تایید توسط پشتیبانی، مبلغ به شماره شبا اعلام شده واریز خواهد شد.");
+        } elseif (Session::exists('info-alert')) {
+            Session::forget('info-alert');
+        }
 
         return view('profile.subscription.history', compact('subscriptions', 'isUser', 'wallet'));
 
@@ -93,10 +100,10 @@ class SubscriptionController extends Controller
             });
 
             return to_route('profile.wallet')->with('success-alert', "✅ خرید اشتراک با موفقیت انجام شد!\n شما اکنون دسترسی کامل به بخش های سامانه را دارید.\n\n برای مشاهده جزئیات بیشتر اشتراک, به جزئیات اشتراک مراجعه کنید.");
-        } else {
-            $walletPageUrl = route('profile.wallet');
-            return back()->with('error-alert', "❌ خرید اشتراک ناموفق بود!<br> 💳به نظر می‌رسد موجودی کیف پول شما کافی نیست. برای افزایش موجودی کیف پول، لطفاً به لینک زیر مراجعه کنید: <br><a href='{$walletPageUrl}' >افزایش موجودی</a>");
         }
+
+        $walletPageUrl = route('profile.wallet');
+        return back()->with('error-alert', "❌ خرید اشتراک ناموفق بود!<br> 💳به نظر می‌رسد موجودی کیف پول شما کافی نیست. برای افزایش موجودی کیف پول، لطفاً به لینک زیر مراجعه کنید: <br><a href='{$walletPageUrl}' >افزایش موجودی</a>");
 
     }
 
@@ -107,7 +114,9 @@ class SubscriptionController extends Controller
             ->where('wallet_id', is_null($id) ? Auth::user()->wallet->id : $id)
             ->where('status', SubscriptionStatus::ACTIVE)
             ->first();
-        if (!$subscription) return to_route('profile.wallet')->with('error-alert', "درحال حاضر اشتراک فعالی ندارید.\nبرای خرید اشتراک ابتدا موجودی کیف پول خود را افزایش دهید سپس طرح اشتراک مناسب خود را انتخاب و خریداری کنید.");
+        if (!$subscription) {
+            return to_route('profile.wallet')->with('error-alert', "درحال حاضر اشتراک فعالی ندارید.\nبرای خرید اشتراک ابتدا موجودی کیف پول خود را افزایش دهید سپس طرح اشتراک مناسب خود را انتخاب و خریداری کنید.");
+        }
 
 
         $isUser = $subscription->wallet->walletable instanceof User;
@@ -154,10 +163,10 @@ class SubscriptionController extends Controller
             SendSms::dispatch($user->phone, $message);
 
             return to_route('profile.wallet')->with('success-alert', "✅ تمدید اشتراک با موفقیت انجام شد!\n شما اکنون دسترسی کامل به بخش های سامانه را دارید.\n\n برای مشاهده جزئیات بیشتر اشتراک, به جزئیات اشتراک مراجعه کنید.");
-        } else {
-            $walletPageUrl = route('profile.wallet');
-            return back()->with('error-alert', "❌ تمدید اشتراک ناموفق بود!<br> 💳به نظر می‌رسد موجودی کیف پول شما کافی نیست. برای افزایش موجودی کیف پول، لطفاً به لینک زیر مراجعه کنید: <br><a href='{$walletPageUrl}' >افزایش موجودی</a>");
         }
+
+        $walletPageUrl = route('profile.wallet');
+        return back()->with('error-alert', "❌ تمدید اشتراک ناموفق بود!<br> 💳به نظر می‌رسد موجودی کیف پول شما کافی نیست. برای افزایش موجودی کیف پول، لطفاً به لینک زیر مراجعه کنید: <br><a href='{$walletPageUrl}' >افزایش موجودی</a>");
 
     }
 
@@ -195,7 +204,7 @@ class SubscriptionController extends Controller
         $type = $isRenew ? 'تمدید' : 'فعال‌سازی';
         if (!$isUser && $companyName) {
             return sprintf(
-                "سمفا - سامانه هوشمند ردیابی GPS\n\n" .
+                "سمفا - سامانه هوشمند رهیابی GPS\n\n" .
                 "🎉 اشتراک '%s' برای سازمان '%s' با موفقیت %s شد.\n" .
                 "📅 تاریخ انقضا: %s\n\n" .
                 "برای مشاهده اشتراک، به جزئیات اشتراک مراجعه کنید.",
@@ -207,7 +216,7 @@ class SubscriptionController extends Controller
         }
 
         return sprintf(
-            "سمفا - سامانه هوشمند ردیابی GPS\n\n" .
+            "سمفا - سامانه هوشمند رهیابی GPS\n\n" .
             "🎉 اشتراک '%s' برای شما با موفقیت %s شد.\n" .
             "📅 تاریخ انقضا: %s\n\n" .
             "برای مشاهده اشتراک، به جزئیات اشتراک مراجعه کنید.",
@@ -221,7 +230,7 @@ class SubscriptionController extends Controller
     {
         $type = $isRenew ? 'تمدید' : 'فعال‌سازی';
         return sprintf(
-            "سمفا - سامانه هوشمند ردیابی GPS\n\n" .
+            "سمفا - سامانه هوشمند رهیابی GPS\n\n" .
             "با توجه به %s اشتراک سازمان «%s»، اشتراک شما نیز به‌صورت خودکار %s شد.\n" .
             "📅 تاریخ انقضای جدید: %s\n" .
             "شما همچنان به تمامی امکانات سامانه دسترسی دارید. برای مشاهده جزئیات بیشتر، به بخش جزئیات اشتراک‌ مراجعه فرمایید.",

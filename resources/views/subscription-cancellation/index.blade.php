@@ -100,6 +100,7 @@
 
                                                 <div data-bs-toggle="tooltip" data-bs-placement="top" title="رد کردن">
                                                     <button class="btn btn-sm btn-dark ms-1"
+                                                            x-data
                                                             @click="$dispatch('cancellation-request-id', {id: '{{ $cancellation->id }}'})"
                                                             data-bs-target="#rejection-reason-modal"
                                                             data-bs-toggle="modal">
@@ -140,12 +141,17 @@
         window.addEventListener('alpine:init', () => {
             Alpine.data('rejectionReason', () => ({
                 reason: '',
-                id: '',
-                error: '',
+                id: null,
+                required: false,
 
-                init(){
-                    console.log(this.id)
+                submitForm() {
+                    if (!this.reason.trim()) {
+                        this.required = true;
+                        return false;
+                    }
+                    this.$refs.rejectionReasonForm.submit();
                 }
+
             }))
         })
     </script>

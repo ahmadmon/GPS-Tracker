@@ -168,7 +168,7 @@ class PaymentCallbackController extends Controller
     {
         if (!$isUser && $companyName) {
             return sprintf(
-                "سمفا - سامانه هوشمند ردیابی GPS\n" .
+                "سمفا - سامانه هوشمند رهیابی GPS\n" .
                 "💳 شارژ کیف پول سازمان '%s' با موفقیت انجام شد.\n" .
                 "💰 مبلغ: %s تومان\n" .
                 "▫️ کد رهگیری: %s",
@@ -176,16 +176,16 @@ class PaymentCallbackController extends Controller
                 priceFormat($amount),
                 $verifyResponse['referenceId']
             );
-        } else {
-            return sprintf(
-                "سمفا - سامانه هوشمند ردیابی GPS\n" .
-                "💳 شارژ کیف پول شما با موفقیت انجام شد.\n" .
-                "💰 مبلغ: %s تومان\n" .
-                "▫️ کد رهگیری: %s",
-                priceFormat($amount),
-                $verifyResponse['referenceId']
-            );
         }
+
+        return sprintf(
+            "سمفا - سامانه هوشمند رهیابی GPS\n" .
+            "💳 شارژ کیف پول شما با موفقیت انجام شد.\n" .
+            "💰 مبلغ: %s تومان\n" .
+            "▫️ کد رهگیری: %s",
+            priceFormat($amount),
+            $verifyResponse['referenceId']
+        );
     }
 
     /**
@@ -200,7 +200,7 @@ class PaymentCallbackController extends Controller
         $date = is_array($verifyResponse) ? jalaliDate($verifyResponse['date'], format: '%d %B %Y, H:i') ?? jalaliDate(now(), format: '%d %B %Y, H:i') : jalaliDate(now(), format: '%d %B %Y, H:i');
         $errorMessage = is_string($verifyResponse) ? $verifyResponse : null;
 
-        // Create common transaction details message
+        // Create a common transaction details message
         $transactionDetails = sprintf(
             "❌ عملیات پرداخت ناموفق بود.\n\n" .
             "✳️ جزئیات تراکنش:\n" .
@@ -212,7 +212,7 @@ class PaymentCallbackController extends Controller
             $date
         );
 
-        // Create error explanation message
+        // Create an error explanation message
         $errorExplanation = $errorMessage ? "🛑 توضیح خطا: " . $errorMessage : '';
 
 
