@@ -39,6 +39,7 @@
     <div class="container-fluid">
         <x-partials.alert.success-alert/>
         <x-partials.alert.error-alert/>
+        <x-partials.alert.info-alert/>
 
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -138,7 +139,9 @@
             </div>
         </div>
 
-        <livewire:components.cancellation-modal :$subscription/>
+        @if($canCancel)
+            <livewire:components.cancellation-modal :$subscription/>
+        @endif
     </div>
 @endsection
 

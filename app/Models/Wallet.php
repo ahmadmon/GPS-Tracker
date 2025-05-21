@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\Subscription\SubscriptionStatus;
 use App\Facades\Subscription as SubscriptionFacade;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -29,7 +30,12 @@ class Wallet extends Model
 
     public function subscription(): HasOne
     {
-        return $this->hasOne(Subscription::class);
+        return $this->hasOne(Subscription::class)->where('status', SubscriptionStatus::ACTIVE);
+    }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
     }
 
     public function hasSubscription(): bool

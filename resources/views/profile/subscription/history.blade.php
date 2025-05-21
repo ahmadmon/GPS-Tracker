@@ -45,7 +45,6 @@
     <div class="container-fluid">
         <x-partials.alert.success-alert/>
         <x-partials.alert.error-alert/>
-        <x-partials.alert.info-alert/>
 
         <div class="card">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -69,7 +68,6 @@
                                 <th>تاریخ شروع</th>
                                 <th>تاریخ انقضا</th>
                                 <th>وضعیت</th>
-                                <th>تمدید خودکار</th>
                                 <th>تاریخ بازگشت وجه</th>
                                 <th>تاریخ لغو</th>
                             </tr>
@@ -89,13 +87,6 @@
                                     <span @class(['badge dana fw-bold', "bg-{$subscription->status->badge()->color}"])>
                                         {{ $subscription->status->label() }}
                                     </span>
-                                    </td>
-                                    <td>
-                                   <span @class(['badge dana fw-bold',
-                                                 'bg-success' => $subscription->auto_renew ,
-                                                 'bg-danger' => !$subscription->auto_renew])>
-                                       {{ $subscription->auto_renew ? 'فعال' : 'غیرفعال' }}
-                                   </span>
                                     </td>
                                     <td>
                                         @php
@@ -192,7 +183,7 @@
 
     <script>
         $('#basic-1').DataTable({
-            order: [[4, 'desc']],
+            order: [[2, 'desc']],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
             }

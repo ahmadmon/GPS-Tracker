@@ -5,7 +5,7 @@
             <div class="modal-content">
                 <form :action="`/subscription-cancellation/reject-request/${id}`" method="post" x-ref="rejectionReasonForm"
                       @submit.prevent="submitForm">
-                    @csrf
+                    @csrf @method('PUT')
                     <div class="modal-header">
                         <h4>رد کردن درخواست</h4>
                         <button class="btn-close py-0" type="button" data-bs-dismiss="modal"

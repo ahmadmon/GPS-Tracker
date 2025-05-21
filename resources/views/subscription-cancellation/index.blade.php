@@ -35,10 +35,6 @@
         <div class="row">
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
-                @if(can('create-vehicle'))
-                    <a href="{{ route('subscription-cancellation.create') }}" class="btn btn-primary mb-4">+ لغو
-                        اشتراک</a>
-                @endif
                 <div class="card">
                     <div class="card-header pb-0 card-no-border">
                         <h4>لیست درخواست های لغو اشتراک</h4>
@@ -78,7 +74,7 @@
                                             </div>
                                         </td>
                                         <td>{{ $plan->name }}</td>
-                                        <td>{{ $cancellation->iban }}</td>
+                                        <td>{{ formatIban($cancellation->iban) }}</td>
                                         <td>{{ priceFormat($cancellation->refund_amount) }} تومان</td>
                                         <td>
                                             <span
@@ -88,7 +84,7 @@
                                         <td>
                                             <div class="d-flex align-items-center">
                                                 <form
-                                                    action="{{ route('subscription-cancellation.update', $cancellation) }}"
+                                                    action="{{ route('subscription-cancellation.approve-request', $cancellation) }}"
                                                     method="post">
                                                     @csrf @method('PUT')
                                                     <button class="btn btn-sm btn-success"

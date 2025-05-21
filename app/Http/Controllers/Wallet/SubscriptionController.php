@@ -47,19 +47,11 @@ class SubscriptionController extends Controller
 
         $isUser = $wallet->walletable instanceof User;
 
-        $subscriptions = $wallet->subscription()
+        $subscriptions = $wallet->subscriptions()
             ->with(['wallet', 'plan', 'cancellation'])
             ->whereIn('status', [SubscriptionStatus::EXPIRED, SubscriptionStatus::CANCELED])
             ->latest()
             ->get();
-
-        $canceledSubscription = $subscriptions->where('status', 'canceled')->first();
-        $isPending = $canceledSubscription?->cancellation()->exists() && $canceledSubscription?->cancellation?->status->isPending();
-        if ($isPending) {
-            Session::put('info-alert', "درخواست بازگشت وجه شما در حال بررسی است.\nپس از تایید توسط پشتیبانی، مبلغ به شماره شبا اعلام شده واریز خواهد شد.");
-        } elseif (Session::exists('info-alert')) {
-            Session::forget('info-alert');
-        }
 
         return view('profile.subscription.history', compact('subscriptions', 'isUser', 'wallet'));
 
@@ -118,8 +110,9 @@ class SubscriptionController extends Controller
             return to_route('profile.wallet')->with('error-alert', "درحال حاضر اشتراک فعالی ندارید.\nبرای خرید اشتراک ابتدا موجودی کیف پول خود را افزایش دهید سپس طرح اشتراک مناسب خود را انتخاب و خریداری کنید.");
         }
 
-
         $isUser = $subscription->wallet->walletable instanceof User;
+
+        $this->showPendingCancellationAlert($subscription);
 
 
         return view('profile.subscription.show', compact('subscription', 'isUser'));
@@ -127,7 +120,7 @@ class SubscriptionController extends Controller
 
     public function renew(string $id)
     {
-        $subscription = SubscriptionModel::with('wallet.walletable', 'plan:price,id,name,duration')
+        $subscription = SubscriptionModel::with(['wallet.walletable', 'plan:price,id,name,duration'])
             ->findOrFail($id);
 
         $wallet = $subscription->wallet;
@@ -239,6 +232,27 @@ class SubscriptionController extends Controller
             $type,
             $expirationDate
         );
+    }
+
+    /**
+     * @param SubscriptionModel $subscription
+     * @return void
+     */
+    private function showPendingCancellationAlert(SubscriptionModel $subscription): void
+    {
+        $cancellation = $subscription->cancellation;
+        $isPending = $subscription->cancellation()->exists() && $cancellation?->status->isPending();
+        if ($isPending) {
+            $alertMessage = sprintf(
+                "درخواست بازگشت وجه شما در حال بررسی است.\n" .
+                "پس از تایید توسط پشتیبانی، مبلغ به شماره شبا اعلام شده واریز خواهد شد.\n" .
+                "تاریخ درخواست: %s",
+                jalaliDate($cancellation->created_at, format: "%d %B %Y H:i")
+            );
+            Session::put('info-alert', $alertMessage);
+        } elseif (Session::exists('info-alert')) {
+            Session::forget('info-alert');
+        }
     }
 
 }

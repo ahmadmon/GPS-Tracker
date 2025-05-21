@@ -37,7 +37,7 @@
 
                                 <div x-data="{
                                     walletRefund: $wire.walletRefund,
-                                    iban: 'IR'
+                                    iban: $wire.iban ? $wire.iban : 'IR'
                                 }" x-init="$wire">
                                     <div class="mb-3">
                                         <div class="d-flex mt-2">
@@ -56,17 +56,66 @@
                                         <x-input-error :messages="$errors->get('walletRefund')" class="mt-2"/>
                                     </div>
                                     <template x-if="walletRefund === false">
-                                        <div class="mb-3">
-                                            <label for="iban">شماره شبا را وارد کنید
-                                                <sup class="text-danger fw-bold">*</sup>
-                                            </label>
-                                            <input type="text" class="form-control" dir="ltr"
-                                                   wire:model="iban"
-                                                   x-model="iban"
-                                                   id="iban"
-                                            >
-                                            <x-input-error :messages="$errors->get('iban')" class="mt-2"/>
-                                        </div>
+                                        @if($userSavedIbans->count() > 1)
+                                            <div class="mb-3"
+                                                 x-data="{ newIban: false, selected: '', show: false,
+
+                                                 resetOptions(){
+                                                  this.show = false
+                                                  if(this.show){
+                                                    this.selected = @js((string)$userSavedIbans->first(), JSON_THROW_ON_ERROR);
+                                                  }else{
+                                                    this.selected = '';
+                                                    $wire.iban = '';
+                                                  }
+                                                  } }"
+                                                 x-init="$watch('selected', value => { show = value === 'new-iban'; console.log(value)})">
+
+                                                <label for="selectIbans" class="form-label"
+                                                       x-text="show ? 'شماره شبا جدید را وارد کنید' : 'شماره شبا را انتخاب کنید'">
+                                                    <sup class="text-danger fw-bold">*</sup>
+                                                </label>
+                                                <template x-if="show === false">
+                                                    <select wire:model="iban" id="selectIbans" class="form-select"
+                                                            x-model="selected">
+                                                        <option value="" dir="rtl">انتخاب کنید</option>
+                                                        @foreach($userSavedIbans as $userIban)
+                                                            <option
+                                                                value="{{ $userIban }}">{{ formatIban($userIban) }}</option>
+                                                        @endforeach
+                                                        <option value="new-iban" dir="rtl">+ شماره شبا جدید</option>
+                                                    </select>
+                                                </template>
+                                                <template x-if="show === true">
+                                                    <div>
+                                                        <input type="text" class="form-control" dir="ltr"
+                                                               wire:model="iban"
+                                                               x-model="iban"
+                                                               id="iban"
+                                                        >
+                                                        <div>
+                                                            <button type="button"
+                                                                    class="btn p-0 txt-primary text-decoration-underline"
+                                                                    @click="resetOptions">انتخاب شماره شبا
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <x-input-error :messages="$errors->get('iban')" class="mt-2"/>
+                                            </div>
+                                        @else
+                                            <div class="mb-3">
+                                                <label for="iban">شماره شبا را وارد کنید
+                                                    <sup class="text-danger fw-bold">*</sup>
+                                                </label>
+                                                <input type="text" class="form-control" dir="ltr"
+                                                       wire:model="iban"
+                                                       x-model="iban"
+                                                       id="iban"
+                                                >
+                                                <x-input-error :messages="$errors->get('iban')" class="mt-2"/>
+                                            </div>
+                                        @endif
                                     </template>
                                 </div>
                                 <div class="mb-3">

@@ -7,6 +7,8 @@ use App\Enums\Subscription\SubscriptionStatus;
 use App\Models\Subscription;
 use App\Models\Wallet;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -28,7 +30,23 @@ class CancellationModal extends Component
 
     public function render()
     {
-        return view('livewire.components.cancellation-modal');
+        $userSavedIbans = Cache::remember('user-ibans', 60 * 5, static function () {
+            return DB::table('subscription_cancellations')
+                ->join('subscriptions', 'subscriptions.id', '=', 'subscription_cancellations.subscription_id')
+                ->where('subscriptions.wallet_id', auth()->user()->wallet->id)
+                ->whereNotNull('subscription_cancellations.iban')
+                ->distinct()
+                ->pluck('subscription_cancellations.iban');
+        });
+
+        if ($userSavedIbans->count() === 1) {
+            $this->iban = $userSavedIbans->first();
+        }
+
+
+        return view('livewire.components.cancellation-modal', [
+            'userSavedIbans' => $userSavedIbans
+        ]);
     }
 
 
@@ -36,7 +54,9 @@ class CancellationModal extends Component
     {
         $inputs = (object)$this->validate();
 
-        $subscription = $this->subscription->load('plan', 'wallet');
+        dd($inputs);
+
+        $subscription = $this->subscription->load('plan', 'wallet', 'cancellation');
         if ($subscription->cancellation()->exists() && $subscription->cancellation->status->isPending()) {
             return to_route('profile.subscription.show')->with('error-alert', 'شما یک درخواست لغو در حال بررسی دارید. لطفاً تا مشخص شدن وضعیت آن صبر کنید.');
         }
@@ -46,6 +66,8 @@ class CancellationModal extends Component
         $diffInHours = $startDate->diffInHours($now);
         $diffInDays = $startDate->diffInDays($now);
         $plan = $subscription->plan;
+
+
         if ($diffInHours <= 24) {
             $refundAmount = $plan->price;
             $type = 'full-refund';
@@ -66,31 +88,33 @@ class CancellationModal extends Component
             'canceled_at' => now()
         ]);
 
-        $subscription->update([
-            'status' => SubscriptionStatus::CANCELED,
-            'auto_renew' => false,
-            'canceled_at' => now()
-        ]);
 
         if ($refundAmount > 0 && $inputs->walletRefund) {
 
+            DB::transaction(function () use ($subscription, $refundAmount, $type) {
+                $subscription->update([
+                    'status' => SubscriptionStatus::CANCELED,
+                    'auto_renew' => false,
+                    'canceled_at' => now()
+                ]);
 
-            $wallet = $subscription->wallet;
-            $wallet->increment('balance', $refundAmount);
+                $wallet = $subscription->wallet;
+                $wallet->increment('balance', $refundAmount);
 
-            $this->createTransaction([
-                'amount' => $refundAmount,
-                'description' => match ($type) {
-                    '70%-refund' => 'بازگشت 70% مبلغ اشتراک به کیف پول به دلیل لغو اشتراک در کمتر از نصف مدت آن',
-                    'full-refund' => 'بازگشت کل مبلغ اشتراک به کیف پول به دلیل لغو اشتراک در کمتر از 24 ساعت',
-                    default => 'بازگشت مبلغ اشتراک به کیف پول'
-                }
-            ], $wallet);
+                $this->createTransaction([
+                    'amount' => $refundAmount,
+                    'description' => match ($type) {
+                        '70%-refund' => 'بازگشت 70% مبلغ اشتراک به کیف پول به دلیل لغو اشتراک در کمتر از نصف مدت آن',
+                        'full-refund' => 'بازگشت کل مبلغ اشتراک به کیف پول به دلیل لغو اشتراک در کمتر از 24 ساعت',
+                        default => 'بازگشت مبلغ اشتراک به کیف پول'
+                    }
+                ], $wallet);
+            });
 
-            return to_route('profile.subscription.history')->with('success-alert', sprintf('مبلغ %s تومان با موفقیت به کیف پول شما واریز شد.', priceFormat($refundAmount)));
+            return to_route('profile.wallet')->with('success-alert', sprintf("اشتراک شما با موفقیت لغو شد.\nمبلغ %s تومان به کیف پول شما واریز شد.", priceFormat($refundAmount)));
         }
 
-        return to_route('profile.subscription.history')->with('success-alert', "درخواست لغو اشتراک شما با موفقیت ثبت شد.\nهمکاران ما در اسرع وقت آن را بررسی خواهند کرد.");
+        return to_route('profile.subscription.show')->with('success-alert', "درخواست لغو اشتراک شما با موفقیت ثبت شد.\nهمکاران ما در اسرع وقت آن را بررسی خواهند کرد.");
     }
 
 

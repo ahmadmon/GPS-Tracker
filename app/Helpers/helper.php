@@ -202,3 +202,10 @@ function cannot(string $permission): bool
     return !Acl::hasPermission($permission);
 }
 
+
+function formatIban(string $iban): string
+{
+    $iban = trim($iban);
+
+    return implode(' ', str_split($iban, 4));
+}

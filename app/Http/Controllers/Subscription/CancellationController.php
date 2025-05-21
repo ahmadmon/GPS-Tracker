@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Subscription;
 
 use App\Enums\Subscription\CancellationStatus;
+use App\Enums\Subscription\SubscriptionStatus;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendSms;
 use App\Models\SubscriptionCancellation;
@@ -25,23 +26,10 @@ class CancellationController extends Controller
         return view('subscription-cancellation.index', compact('cancellationRequests'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
-     * Store a newly created resource in storage.
+     * @param string $id
      */
-    public function store(Request $request)
-    {
-        //
-    }
-
-
     public function approveRequest(string $id)
     {
         $cancellation = SubscriptionCancellation::with('subscription.wallet.walletable')->findOrFail($id);
@@ -52,6 +40,16 @@ class CancellationController extends Controller
             'refunded_at' => now()
         ]);
 
+        $cancellation->subscription()->update([
+            'status' => SubscriptionStatus::CANCELED,
+            'auto_renew' => false,
+            'canceled_at' => now()
+        ]);
+
+        $user->notify(new GenericNotification($this->approvedMessage(isSms: false), 'subscription-cancellation'));
+        SendSms::dispatch($user->phone, $this->approvedMessage(name: $user->name));
+
+        return back()->with('success-alert', 'درخواست با موفقیت تایید شد.');
     }
 
     /**
@@ -69,11 +67,19 @@ class CancellationController extends Controller
         ]);
 
         $user->notify(new GenericNotification($this->rejectedMessage(isSms: false), 'subscription-cancellation'));
-        SendSms::dispatch($user->phone, $this->rejectedMessage($user->name));
+        SendSms::dispatch($user->phone, $this->rejectedMessage(name: $user->name));
 
 
         return back()->with('success-alert', 'درخواست با موفقیت رد شد.');
     }
+
+    /*
+    |--------------------------------------------------------------------------
+    | Private Helper Functions
+    |--------------------------------------------------------------------------
+    |
+    |
+    */
 
 
     /**
@@ -94,6 +100,26 @@ class CancellationController extends Controller
         }
 
         return "متأسفانه درخواست لغو اشتراک شما رد شد. لطفاً برای مشاهده جزئیات و دلیل این تصمیم به بخش «تاریخچه اشتراک» در پنل کاربری مراجعه فرمایید.";
+    }
+
+    /**
+     * @param string|null $name
+     * @param bool $isSms
+     * @return string
+     */
+    protected function approvedMessage(?string $name = null, bool $isSms = true): string
+    {
+        if ($isSms) {
+            return sprintf(
+                "سلام %s عزیز،\n" .
+                "درخواست لغو اشتراک شما با موفقیت تایید شد و مبلغ قابل عودت به شماره شبا اعلام‌شده واریز گردید.\n" .
+                "از همراهی شما سپاسگزاریم. در صورت نیاز به اطلاعات بیشتر، با پشتیبانی در تماس باشید.\n" .
+                "سامانه سمفا - رهیابی GPS",
+                $name
+            );
+        }
+
+        return "درخواست لغو اشتراک شما تایید شد و مبلغ به حساب بانکی شما واریز گردید.\nبرای مشاهده جزئیات بیشتر، به بخش تاریخچه اشتراک‌ها مراجعه فرمایید.";
     }
 
 
