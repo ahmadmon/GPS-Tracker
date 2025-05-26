@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Subscription;
 
+use App\Facades\Acl;
 use App\Facades\Subscription as SubscriptionService;
+use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GrantSubscriptionRequest;
 use App\Models\Company;
@@ -12,7 +14,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
-class SubscriptionManagementController extends Controller
+class SubscriptionManagementController extends BaseController
 {
     /**
      * Display a listing of the resource.
@@ -20,6 +22,12 @@ class SubscriptionManagementController extends Controller
     public function index(Request $request)
     {
         [$model, $isUser] = $this->getWalletTypeAndUser($request);
+
+        if ($isUser) {
+            Acl::authorize('user-subscriptions-list');
+        } else {
+            Acl::authorize('company-subscriptions-list');
+        }
 
         $subscriptions = Subscription::with(['plan', 'wallet.walletable'])
             ->whereHas('wallet', fn($q) => $q->where('walletable_type', $model))
@@ -37,9 +45,15 @@ class SubscriptionManagementController extends Controller
     {
         [$model, $isUser] = $this->getWalletTypeAndUser($request);
 
+        if ($isUser) {
+            Acl::authorize('create-user-subscription');
+        } else {
+            Acl::authorize('create-company-subscription');
+        }
+
         $plans = SubscriptionPlan::where('status', 1)->whereIn('type', ['both', $isUser ? 'personal' : 'company'])->get(['id', 'name']);
 
-        $noneSubscribedModels = $model::whereDoesntHave('wallet.subscription', fn($q) => $q->where('status', 'active'))
+        $noneSubscribedModels = $model::whereDoesntHave('wallet.subscription', static fn($q) => $q->where('status', 'active'))
             ->where('status', 1)
             ->when($isUser, fn($q) => $q->whereIn('user_type', [0, 3]))
             ->get(['id as value', 'name'])
@@ -60,9 +74,16 @@ class SubscriptionManagementController extends Controller
         $plan = SubscriptionPlan::find($inputs->plan, ['id', 'duration', 'name', 'price']);
         $isUser = $inputs->type === 'user';
 
+        if ($isUser) {
+            Acl::authorize('create-user-subscription');
+        } else {
+            Acl::authorize('create-company-subscription');
+        }
+
+
         $failedEntities = [];
 
-        DB::transaction(function () use ($inputs, $model, $plan, $isUser, &$failedEntities) {
+        DB::transaction(static function () use ($inputs, $model, $plan, $isUser, &$failedEntities) {
             foreach ($inputs->entity_ids as $id) {
                 $entity = $model::find($id);
                 $wallet = $entity->wallet;
@@ -78,8 +99,9 @@ class SubscriptionManagementController extends Controller
 
                 if (!$wallet->hasSubscription()) {
                     SubscriptionService::subscribe($wallet, $plan, $inputs->auto_renew);
-                    if (!$isUser)
+                    if (!$isUser) {
                         SubscriptionService::subscribeSubsets($wallet, $plan);
+                    }
                 }
 
             }
@@ -98,29 +120,6 @@ class SubscriptionManagementController extends Controller
         abort(404);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
-    }
 
     /*
     |--------------------------------------------------------------------------

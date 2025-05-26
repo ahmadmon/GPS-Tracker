@@ -29,12 +29,12 @@
                 <ul class="sidebar-links" id="simple-bar">
                     <li class="back-btn">
                         <div class="mobile-back text-end"><span>بازگشت</span><i
-                                    class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
+                                class="fa fa-angle-right ps-2" aria-hidden="true"></i></div>
                     </li>
                     @notRole(['manager', 'user'])
                     <li class="sidebar-list">
                         <a
-                                @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('home')]) href="{{ route('home') }}">
+                            @class(['sidebar-link sidebar-title link-nav', 'active' => Route::is('home')]) href="{{ route('home') }}">
                             <svg class="stroke-icon">
                                 <use href="{{ asset('assets/svg/icon-sprite.svg#stroke-home') }}"></use>
                             </svg>
@@ -129,6 +129,7 @@
                         </li>
                     @endif
 
+                    @role(['super-admin', 'admin', 'developer'])
                     <li class="sidebar-list">
                         @php
                             $subscriptionsRoute = Route::is('subscription-plan.*') ||
@@ -139,21 +140,28 @@
                             <i data-feather="star"></i>
                             <span>مدیریت اشتراک</span></a>
                         <ul class="sidebar-submenu">
-                            <li>
-                                <a href="{{ route('subscription-management.index', ['type' => 'user']) }}"><span>لیست اشتراک کاربران</span></a>
-                            </li>
-                            <li>
-                                <a href="{{ route('subscription-management.index', ['type' => 'company']) }}"><span>لیست اشتراک سازمان ها</span></a>
-                            </li>
-                            <li>
-                                <a href="{{ route('subscription-cancellation.index') }}"><span>درخواست‌های لغو اشتراک</span></a>
-                            </li>
-                            @if(true)
+                            @if(can('user-subscriptions-list'))
+                                <li>
+                                    <a href="{{ route('subscription-management.index', ['type' => 'user']) }}"><span>لیست اشتراک کاربران</span></a>
+                                </li>
+                            @endif
+                            @if(can('company-subscriptions-list'))
+                                <li>
+                                    <a href="{{ route('subscription-management.index', ['type' => 'company']) }}"><span>لیست اشتراک سازمان ها</span></a>
+                                </li>
+                            @endif
+                            @if(can('revoke-user-subscription'))
+                                <li>
+                                    <a href="{{ route('subscription-cancellation.index') }}"><span>درخواست‌های لغو اشتراک</span></a>
+                                </li>
+                            @endif
+                            @if(can('plan-list'))
                                 <li><a href="{{ route('subscription-plan.index') }}"><span>مدیریت طرح اشتراک</span></a>
                                 </li>
                             @endif
                         </ul>
                     </li>
+                    @endrole
 
                 </ul>
             </div>

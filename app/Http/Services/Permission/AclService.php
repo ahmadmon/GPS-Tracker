@@ -14,13 +14,21 @@ class AclService
         $this->user = auth()->user();
     }
 
-    public function authorize(string $permission, $entity = null)
+    /**
+     * @param string|array $permissions
+     * @param $entity
+     * @param bool $requireAll
+     * @return true|void
+     */
+    public function authorize(string|array $permissions, $entity = null, bool $requireAll = false)
     {
-        if ($this->user->hasAccessTo($permission, $entity)) {
+        $result = $this->checkPermissions($permissions, $entity, $requireAll);
+
+        if ($result) {
             return true;
-        } else {
-            abort(403, 'شما مجوز دسترسی به این بخش از سامانه را ندارید. لطفا با مدیر سامانه تماس بگیرید.');
         }
+
+        abort(403, 'شما مجوز دسترسی به این بخش از سامانه را ندارید!');
     }
 
     public function hasPermission(string $permission): bool
@@ -38,5 +46,19 @@ class AclService
     public static function getRole()
     {
         return auth()->user()->roles()?->first()?->title;
+    }
+
+
+    protected function checkPermissions(string|array $permissions, $entity = null, bool $requireAll = false): bool
+    {
+        $permissions = (array)$permissions;
+
+        $results = collect($permissions)->map(function ($permission) use ($entity) {
+            return $this->user->hasAccessTo($permission, $entity);
+        });
+
+        return $requireAll
+            ? $results->every(fn($result) => $result)
+            : $results->contains(true);
     }
 }

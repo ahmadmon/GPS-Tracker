@@ -39,7 +39,10 @@
         <div class="row">
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
-                @if(can('create-vehicle'))
+                @if($isUser && can('create-user-subscription'))
+                    <a href="{{ route('subscription-management.create', ['type' => request('type')]) }}"
+                       class="btn btn-primary mb-4">+ اعطای اشتراک</a>
+                @elseif(!$isUser && can('create-company-subscription'))
                     <a href="{{ route('subscription-management.create', ['type' => request('type')]) }}"
                        class="btn btn-primary mb-4">+ اعطای اشتراک</a>
                 @endif
@@ -80,12 +83,12 @@
                                         </td>
                                         <td>
                                             <span
-                                                    class="badge badge-{{ $subscription->status->badge()->color }} dana rounded-pill">{{ $subscription->status->label() }}</span>
+                                                class="badge badge-{{ $subscription->status->badge()->color }} dana rounded-pill">{{ $subscription->status->label() }}</span>
                                         </td>
                                         <td>
                                             <x-partials.alpine.change-status
-                                                    :status="(bool)$subscription->auto_renew"
-                                                    :url="route('profile.subscription.toggle-auto-activation', $subscription->id)"/>
+                                                :status="(bool)$subscription->auto_renew"
+                                                :url="route('profile.subscription.toggle-auto-activation', $subscription->id)"/>
                                         </td>
                                         <td x-data="{ show: false }">
                                             <div class="btn-group" x-cloak x-show="!show">

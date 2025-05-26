@@ -50,7 +50,9 @@
                                     <th>شماره تماس</th>
                                     <th>وضعیت</th>
                                     @role(['super-admin','admin'])
-                                    <th>موجودی کیف پول</th>
+                                    @if(can('wallet-list'))
+                                        <th>موجودی کیف پول</th>
+                                    @endif
                                     @endrole
                                     <th>تاریخ عضویت</th>
                                     <th>عملیات</th>
@@ -76,12 +78,14 @@
                                                                              :url="route('user.change-status',$user->id)"/>
                                         </td>
                                         @role(['super-admin', 'admin'])
-                                        <td data-sort="{{ $user?->wallet?->balance }}">
-                                            <a href="{{ route('wallet-management.show', $user->wallet) }}"
-                                               target="_blank">
-                                                <strong>{{ priceFormat($user?->wallet?->balance) }} تومان</strong>
-                                            </a>
-                                        </td>
+                                        @if(can('wallet-list'))
+                                            <td data-sort="{{ $user?->wallet?->balance }}">
+                                                <a href="{{ route('wallet-management.show', $user->wallet) }}"
+                                                   target="_blank">
+                                                    <strong>{{ priceFormat($user?->wallet?->balance) }} تومان</strong>
+                                                </a>
+                                            </td>
+                                        @endif
                                         @endrole
                                         <td data-sort="{{ $user->created_at->toDateTimeString() }}">
                                             <span class="text-muted">{{ jalaliDate($user->created_at) }}</span>

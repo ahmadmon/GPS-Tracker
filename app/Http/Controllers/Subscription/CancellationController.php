@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Subscription;
 
 use App\Enums\Subscription\CancellationStatus;
 use App\Enums\Subscription\SubscriptionStatus;
+use App\Facades\Acl;
+use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
 use App\Jobs\SendSms;
 use App\Models\SubscriptionCancellation;
@@ -11,13 +13,15 @@ use App\Models\User;
 use App\Notifications\GenericNotification;
 use Illuminate\Http\Request;
 
-class CancellationController extends Controller
+class CancellationController extends BaseController
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+        Acl::authorize('revoke-user-subscription');
+
         $cancellationRequests = SubscriptionCancellation::with(['subscription.plan:id,name', 'subscription.wallet.walletable:id,name'])
             ->where('status', CancellationStatus::PENDING)
             ->latest()
@@ -32,6 +36,9 @@ class CancellationController extends Controller
      */
     public function approveRequest(string $id)
     {
+        Acl::authorize('revoke-user-subscription');
+
+
         $cancellation = SubscriptionCancellation::with('subscription.wallet.walletable')->findOrFail($id);
         $user = $this->getUser($cancellation);
 
@@ -58,6 +65,9 @@ class CancellationController extends Controller
      */
     public function rejectRequest(Request $request, string $id)
     {
+        Acl::authorize('revoke-user-subscription');
+
+
         $cancellation = SubscriptionCancellation::with('subscription.wallet.walletable')->findOrFail($id);
         $user = $this->getUser($cancellation);
 

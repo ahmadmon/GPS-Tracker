@@ -68,7 +68,8 @@
                                                     </div>
                                                     <div class="media-body">
                                                         <h6 class="f-w-600">{{ $entity->name }}</h6>
-                                                        <p>{{ $entity->contact_number }} | {{ $entity->manager->name }}</p>
+                                                        <p>{{ $entity->contact_number }}
+                                                            | {{ $entity->manager->name }}</p>
                                                     </div>
                                                 @endif
                                             </div>
@@ -94,11 +95,13 @@
                                                     </li>
 
                                                     <li class="nav-item">
-                                                        <a href="{{ route('wallet-management.create', $wallet) }}"
-                                                           class="btn btn-primary-gradien d-flex justify-content-center btn-block w-100 mt-0">
-                                                            <i class="me-2" data-feather="plus-circle"></i>
-                                                            شارژ کیف‌ پول
-                                                        </a>
+                                                        @if(can('credit-wallet'))
+                                                            <a href="{{ route('wallet-management.create', $wallet) }}"
+                                                               class="btn btn-primary-gradien d-flex justify-content-center btn-block w-100 mt-0">
+                                                                <i class="me-2" data-feather="plus-circle"></i>
+                                                                شارژ کیف‌ پول
+                                                            </a>
+                                                        @endif
                                                         <hr>
                                                     </li>
 
@@ -171,7 +174,8 @@
 
                                                     @if($hasFilters ?? false)
                                                         <li class="nav-item mt-2">
-                                                            <a href="{{ route('wallet-management.show', $wallet) }}" class="btn btn-outline-danger btn-block justify-content-center w-100">
+                                                            <a href="{{ route('wallet-management.show', $wallet) }}"
+                                                               class="btn btn-outline-danger btn-block justify-content-center w-100">
                                                         <span>
                                                             <i data-feather="filter" class="me-1"></i>
                                                             حذف فیلتــرها
@@ -263,14 +267,17 @@
                                                                             @click="$dispatch('open-retry-payment-modal', { id: @js($transaction->id), walletId: @js($wallet->id) })"
                                                                             @mouseenter="label = 'پرداخت مجدد'"
                                                                             @mouseleave="label = @js($transaction->statusDisplay['label'])"
-                                                                            data-bs-toggle="modal" data-bs-target="#exampleModalToggle" data-bs-dismiss="modal"
+                                                                            data-bs-toggle="modal"
+                                                                            data-bs-target="#exampleModalToggle"
+                                                                            data-bs-dismiss="modal"
                                                                             type="button" @class(["cursor-pointer btn btn-sm btn-warning p-1"])>
                                                                             <span x-text="label"></span>
                                                                         </button>
                                                                     @endif
 
                                                                 </td>
-                                                                <td class="task-date" data-sort="{{ $transaction->created_at->toDateTimeString() }}">
+                                                                <td class="task-date"
+                                                                    data-sort="{{ $transaction->created_at->toDateTimeString() }}">
                                                                     {{ jalaliDate($transaction->created_at, format: "%d %B %Y , H:i") }}
                                                                 </td>
                                                             </tr>
@@ -296,7 +303,7 @@
         </div>
     </div>
 
-    <x-partials.modals.retry-payment-modal />
+    <x-partials.modals.retry-payment-modal/>
 
 @endsection
 

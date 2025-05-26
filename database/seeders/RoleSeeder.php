@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -14,8 +15,6 @@ class RoleSeeder extends Seeder
      */
     public function run(): void
     {
-        DB::table('roles')->delete();
-
         $roles = [
             ['title' => 'user', 'persian_name' => 'کاربر عادی', 'description' => 'کاربری است که به صورت محدود به برخی از امکانات پایه سامانه دسترسی دارد.', 'created_at' => now()],
             ['title' => 'admin', 'persian_name' => 'ادمین', 'description' => 'کاربری است که مسئولیت مدیریت کاربران، دستگاه ها و برخی از تنظیمات سامانه را بر عهده دارد.', 'created_at' => now()],
@@ -24,10 +23,28 @@ class RoleSeeder extends Seeder
             ['title' => 'developer', 'persian_name' => 'توسعه دهنده', 'description' => 'کاربری است که مسئولیت توسعه و نگهداری سامانه را بر عهده دارد.', 'created_at' => now()],
         ];
 
-        DB::table('roles')->insert($roles);
+        foreach ($roles as $role) {
+            Role::updateOrCreate(['title' => $role['title']],
+                array_merge($role, ['updated_at' => now(), 'created_at' => now()])
+            );
+        }
 
-        $superAdminRole = Role::where('title', 'super-admin')->first()?->id;
-        $superAdminUser = User::where('user_type', 2)->first();
-        $superAdminUser->roles()->sync([$superAdminRole]);
+        // Super admin Role's permissions
+        $superAdminRole = Role::where('title', 'super-admin')->first();
+
+        if ($superAdminRole) {
+            $superAdminRole->permissions()->sync(Permission::pluck('id'));
+
+        }
+
+        // admin Role's permissions
+        $adminRole = Role::where('title', 'admin')->first();
+        if ($adminRole) {
+            $adminPermissionGroups = ['wallet', 'subscriptions', 'subscription-plans'];
+            $permissions = Permission::whereIn('group', $adminPermissionGroups)->pluck('id');
+
+            $adminRole->permissions()->syncWithoutDetaching($permissions);
+        }
+
     }
 }

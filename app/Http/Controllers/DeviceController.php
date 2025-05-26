@@ -113,13 +113,13 @@ class DeviceController extends BaseController
                     'speed' => $lastLocation->device_stats['data']['speed'],
                 ]
             ]);
-        } else {
-            return response()->json([
-                'status' => 'error',
-                'data' => [],
-                'message' => 'An error occurred!'
-            ]);
         }
+
+        return response()->json([
+            'status' => 'error',
+            'data' => [],
+            'message' => 'An error occurred!'
+        ]);
     }
 
     /**
@@ -212,7 +212,7 @@ class DeviceController extends BaseController
         $sms->setText($command);
         $res = $sms->api();
 
-        if ($res->getStatusCode() == 200) {
+        if ($res->getStatusCode() === 200) {
             if ((isset($request->passStatus) && (bool)$request->passStatus === true) || isset($request->password)) {
                 $pass = is_null($device->password) ? '000000' : $request->password;
                 $device->update(['password' => $pass]);
@@ -222,10 +222,10 @@ class DeviceController extends BaseController
 
 
             return back()->with('success-alert', 'دستور با موفقیت برای دستگاه ارسال شد.');
-        } else {
-            Log::error("Error Sending Msg by device {$device->serial}: ", [$res->original['error']]);
-            return back()->with('error-alert', "خطایی به وجود آمده است!\nلطفا بعد از چند لحظه دوباره امتحان کنید.\nدر صورت مشاهده دوباره این پیغام لطفا با پشتیبانی تماس بگیرید.");
         }
+
+        Log::error("Error Sending Msg by device {$device->serial}: ", [$res->original['error']]);
+        return back()->with('error-alert', "خطایی به وجود آمده است!\nلطفا بعد از چند لحظه دوباره امتحان کنید.\nدر صورت مشاهده دوباره این پیغام لطفا با پشتیبانی تماس بگیرید.");
     }
 
     private function checkPhone($phones, $device)

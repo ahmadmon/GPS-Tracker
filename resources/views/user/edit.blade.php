@@ -150,9 +150,10 @@
                                     $roles = $roles->reject(fn($role) => in_array($role->title,['developer', 'super-admin']));
                                 }
                                     $defaultRoleId = $roles->first()->id;
+                                    $userRole = $user->roles->first();
                             @endphp
                             <div class="d-flex align-items-center justify-content-between flex-wrap"
-                                 x-data="{ role: @json( (int)old('role', $user->roles->first()->id ?? $defaultRoleId ) ) }">
+                                 x-data="{ role: @json( (int)old('role', $userRole->id ?? $defaultRoleId ) ) }">
                                 @foreach($roles as $role)
                                     <div class="form-check">
                                         <input class="form-check-input" id="role-{{ $role->id }}"
@@ -236,31 +237,35 @@
 
 
                                 @foreach($permissions as $group => $permission)
-                                    <div class="col-md-6 mb-2">
-                                        <div class="form-check checkbox checkbox-solid-dark mb-0 learning-header">
-                                            <input class="form-check-input cursor-pointer"
-                                                   value="{{ $group }}"
-                                                   :checked="permissions.length > 0 && permissions.every(permission => selectedPermissions.includes(permission.id))"
-                                                   @change="toggleGroup('{{ $group }}')"
-                                                   id="{{ $group }}" type="checkbox">
-                                            <label class="form-check-label"
-                                                   for="{{ $group }}"> {{ $group }}</label>
+                                    <template x-if="isVisibleGroup('{{ $group }}')">
+                                        <div class="col-md-6 mb-2">
+                                            <div class="form-check checkbox checkbox-solid-dark mb-0 learning-header">
+                                                <input class="form-check-input cursor-pointer"
+                                                       value="{{ $group }}"
+                                                       :checked="permissions.length > 0 && permissions.every(permission => selectedPermissions.includes(permission.id))"
+                                                       @change="toggleGroup('{{ $group }}')"
+                                                       id="{{ $group }}" type="checkbox">
+                                                <label class="form-check-label"
+                                                       for="{{ $group }}"> {{ $group }}</label>
+                                            </div>
+                                            <div class="ms-3">
+                                                @foreach($permission as $item)
+                                                    <template x-if="isVisiblePermission('{{ $item['id'] }}')">
+                                                        <div class="d-flex">
+                                                            <input class="form-check-input cursor-pointer me-1"
+                                                                   value="{{ $item['id'] }}"
+                                                                   name="permissions[]"
+                                                                   :checked="selectedPermissions.includes({{ (int)$item['id'] }})"
+                                                                   @change="togglePermission({{ (int)$item['id'] }})"
+                                                                   id="{{ $item['id'] }}" type="checkbox">
+                                                            <label class="form-check-label text-muted cursor-pointer"
+                                                                   for="{{ $item['id'] }}"> {{ $item['persian_name'] }}</label>
+                                                        </div>
+                                                    </template>
+                                                @endforeach
+                                            </div>
                                         </div>
-                                        <div class="ms-3">
-                                            @foreach($permission as $item)
-                                                <div class="d-flex">
-                                                    <input class="form-check-input cursor-pointer me-1"
-                                                           value="{{ $item['id'] }}"
-                                                           name="permissions[]"
-                                                           :checked="selectedPermissions.includes({{ (int)$item['id'] }})"
-                                                           @change="togglePermission({{ (int)$item['id'] }})"
-                                                           id="{{ $item['id'] }}" type="checkbox">
-                                                    <label class="form-check-label text-muted cursor-pointer"
-                                                           for="{{ $item['id'] }}"> {{ $item['persian_name'] }}</label>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
+                                    </template>
                                 @endforeach
                             </div>
                         </div>
@@ -272,73 +277,113 @@
 
 @endsection
 
-@push('scripts')
-    @if(can('user-permissions'))
-        <script>
-            window.addEventListener('alpine:init', () => {
-                Alpine.data('permissionsList', () => ({
-                    permissions: @json($permissions),
-                    selectedPermissions: @json(old('permissions', $userPermissions)),
-
-                    init() {
-                        if (this.selectedPermissions.length === 0) {
-                            this.handleDispatch('{{ $roles->firstWhere('id', old('role', $defaultRoleId))->title ?? null }}')
-                        }
-
-                        if (this.selectedPermissions.length > 0) {
-                            this.selectedPermissions = this.selectedPermissions.flat().map(item => parseInt(item));
-                        }
+@pushif(can('user-permissions'), 'scripts')
+    <script>
+        window.addEventListener('alpine:init', () => {
+            Alpine.data('permissionsList', () => ({
+                permissions: @json($permissions, JSON_THROW_ON_ERROR),
+                selectedPermissions: @json(old('permissions', $userPermissions), JSON_THROW_ON_ERROR),
+                currentRole: '{{ $userRole?->title }}',
+                restrictedPermissions: {
+                    manager: {
+                        ids: [],
+                        groups: ['بخش کیف پول', 'بخش طرح های اشتراک', 'بخش اشتراک ها']
                     },
-
-                    selectAll() {
-                        this.selectedPermissions = Object.values(this.permissions).flat().map(permission => permission.id)
+                    user: {
+                        ids: [],
+                        groups: ['بخش کیف پول', 'بخش طرح های اشتراک', 'بخش اشتراک ها']
                     },
+                },
+                firstPermission: parseInt('{{ $firstPermissionId }}'),
+                lastPermission: parseInt('{{ $lastPermissionId }}'),
 
-                    deselectAll() {
-                        this.selectedPermissions = [];
-                    },
+                init() {
+                    this.restrictedPermissions.manager.ids = this.createRangedArray(64, 79, [], [56])
+                    this.restrictedPermissions.user.ids = this.createRangedArray(64, 79)
 
-                    toggleGroup(group) {
-                        const groupIds = this.permissions[group].map(permission => permission.id)
-                        if (groupIds.every(id => this.selectedPermissions.includes(id))) {
-                            this.selectedPermissions = this.selectedPermissions.filter(id => !groupIds.includes(id));
-                        } else {
-                            this.selectedPermissions = [...new Set([...this.selectedPermissions, ...groupIds])];
-                        }
-                    },
-
-                    togglePermission(id) {
-                        if (this.selectedPermissions.includes(id)) {
-                            this.selectedPermissions = this.selectedPermissions.filter(permissionId => permissionId !== id);
-                        } else {
-                            this.selectedPermissions.push(id);
-                        }
-                    },
-
-                    handleDispatch($roleName) {
-                        switch ($roleName) {
-                            case 'super-admin':
-                                this.selectAll();
-                                break;
-                            case 'manager':
-                                this.selectAll();
-                                break;
-                            case 'developer':
-                                this.selectAll();
-                                break;
-                            case 'user':
-                                this.selectedPermissions = [32, 33, 37, 38, 39, 40, 41, 42, 44, 57, 58, 59, 60, 61, 62];
-                                break
-                            case 'admin':
-                                this.selectedPermissions = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 57, 58, 59, 60, 61, 62, 63];
-                                break;
-                            default:
-                                this.deselectAll();
-                        }
+                    if (this.selectedPermissions.length === 0) {
+                        this.handleDispatch('{{ $roles->firstWhere('id', old('role', $defaultRoleId))->title ?? null }}')
                     }
 
-                }))
-            })
-        </script>
-    @endif
-@endpush
+                    if (this.selectedPermissions.length > 0) {
+                        this.selectedPermissions = this.selectedPermissions.flat().map(item => parseInt(item));
+                    }
+                },
+
+                selectAll() {
+                    this.selectedPermissions = Object.values(this.permissions).flat().map(permission => permission.id)
+                },
+
+                deselectAll() {
+                    this.selectedPermissions = [];
+                },
+
+                toggleGroup(group) {
+                    const groupIds = this.permissions[group].map(permission => permission.id)
+                    if (groupIds.every(id => this.selectedPermissions.includes(id))) {
+                        this.selectedPermissions = this.selectedPermissions.filter(id => !groupIds.includes(id));
+                    } else {
+                        this.selectedPermissions = [...new Set([...this.selectedPermissions, ...groupIds])];
+                    }
+                },
+
+                togglePermission(id) {
+                    if (this.selectedPermissions.includes(id)) {
+                        this.selectedPermissions = this.selectedPermissions.filter(permissionId => permissionId !== id);
+                    } else {
+                        this.selectedPermissions.push(id);
+                    }
+                },
+
+                handleDispatch($roleName) {
+                    this.currentRole = $roleName;
+                    switch ($roleName) {
+                        case 'super-admin':
+                            this.selectAll();
+                            break;
+                        case 'manager':
+                            this.selectedPermissions = this.createRangedArray(this.firstPermission, 63, [56]);
+                            break;
+                        case 'developer':
+                            this.selectAll();
+                            break;
+                        case 'user':
+                            this.selectedPermissions = this.createRangedArray(this.firstPermission, 62, this.createRangedArray(45, 56));
+                            break
+                        case 'admin':
+                            this.selectAll();
+                            break;
+                        default:
+                            this.deselectAll();
+                    }
+                },
+
+                isVisiblePermission(id) {
+                    const restricted = this.restrictedPermissions[this.currentRole]?.ids || [];
+                    return !restricted.includes(parseInt(id));
+                },
+
+                isVisibleGroup(groupName) {
+                    const restricted = this.restrictedPermissions[this.currentRole]?.groups || [];
+                    return !restricted.includes(groupName);
+                },
+
+                createRangedArray(start = this.firstPermission, end, except = [], additionalNumbers = []) {
+                    const rangedArray = Array.from({length: end - start + 1}, (_, index) => start + index)
+                        .filter(num => !except.includes(num))
+
+                    const finalArray = [...rangedArray]
+
+                    additionalNumbers.forEach(num => {
+                        if (!finalArray.includes(num) && !except.includes(num)) {
+                            finalArray.push(num)
+                        }
+                    })
+
+                    return finalArray.sort((a, b) => a - b);
+                }
+
+            }))
+        })
+    </script>
+@endpushif

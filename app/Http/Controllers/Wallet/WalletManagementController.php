@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Wallet;
 
 use App\Enums\Wallet\TransactionStatus;
 use App\Enums\Wallet\TransactionType;
+use App\Facades\Acl;
+use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\WalletChargeRequest;
 use App\Http\Services\Payment\PaymentService;
@@ -17,10 +19,12 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use Morilog\Jalali\Jalalian;
 
-class WalletManagementController extends Controller
+class WalletManagementController extends BaseController
 {
     public function show(Request $request, Wallet $wallet)
     {
+        Acl::authorize('show-wallet');
+
         // Get filter parameters from URL
         $type = $request->input('type');
         $status = $request->input('status');
@@ -53,6 +57,8 @@ class WalletManagementController extends Controller
      */
     public function filter(Request $request, Wallet $wallet)
     {
+        Acl::authorize('show-wallet');
+
         $type = $request->input('type');
         $status = $request->input('status');
         $date = !is_null($request->input('date')) ? Jalalian::fromFormat('Y-m-d', $request->input('date'))->toCarbon() : null;
@@ -80,6 +86,8 @@ class WalletManagementController extends Controller
 
     public function create(Wallet $wallet)
     {
+        Acl::authorize('credit-wallet');
+
         $walletable = $wallet->walletable;
 
         return view('wallet.create', [
@@ -91,6 +99,8 @@ class WalletManagementController extends Controller
 
     public function store(Wallet $wallet, WalletChargeRequest $request)
     {
+        Acl::authorize('credit-wallet');
+
         $inputs = $request->validated();
 
         $this->createTransaction($inputs, $wallet, false);
@@ -101,6 +111,8 @@ class WalletManagementController extends Controller
 
     public function sendToGateway(Wallet $wallet, WalletChargeRequest $request, PaymentService $paymentService)
     {
+        Acl::authorize('wallet-pay-gateway');
+
         $inputs = $request->validated();
 
         // Creating transaction and payment record
@@ -121,6 +133,8 @@ class WalletManagementController extends Controller
 
     public function retryPayment(string $walletId, string $transactionNumber, PaymentService $paymentService)
     {
+        Acl::authorize('credit-wallet');
+
         $transaction = WalletTransaction::with('payment')->where('transaction_number', $transactionNumber)->first();
 
         // Check status

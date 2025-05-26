@@ -34,7 +34,7 @@
 
         <!-- User Info -->
         <div @class(['col-xl-4' => can('user-permissions'),
-                      'col-12' => !can('user-permission')
+                      'col-12' => !can('user-permissions')
                        ])>
             <div class="card">
                 <h5 class="card-header">اطلاعات کاربر</h5>
@@ -85,18 +85,18 @@
                     <div x-data="{ selected: @js(old('user_type', 0)) }">
 
                         <div class="col-12 mb-3">
-                        <label class="form-label" for="user_type">نوع کاربر
-                            <sup class="text-danger">*</sup>
-                        </label>
+                            <label class="form-label" for="user_type">نوع کاربر
+                                <sup class="text-danger">*</sup>
+                            </label>
                             <select class="form-select" name="user_type" id="user_type" x-model="selected">
-                            <option value="0" selected @selected(old('user_type') == 0)>کاربر</option>
-                            <option value="1" @selected(old('user_type') == 1)>ادمین</option>
+                                <option value="0" selected @selected(old('user_type') === 0)>کاربر</option>
+                                <option value="1" @selected(old('user_type') === 1)>ادمین</option>
                                 @notRole(['manager'])
-                            <option value="2" @selected(old('user_type') == 2)>سوپر ادمین</option>
+                                <option value="2" @selected(old('user_type') === 2)>سوپر ادمین</option>
                                 @endnotRole
-                            <option value="3" @selected(old('user_type') == 3)>مدیر سازمان</option>
-                        </select>
-                        <x-input-error :messages="$errors->get('user_type')" class="mt-2"/>
+                                <option value="3" @selected(old('user_type') === 3)>مدیر سازمان</option>
+                            </select>
+                            <x-input-error :messages="$errors->get('user_type')" class="mt-2"/>
                             @if(can('user-permissions'))
                                 <div class="d-block">
                                     <small class="text-muted">لطفا نام کاربری و نقش را مشابه هم انتخاب کنید.</small>
@@ -105,16 +105,16 @@
                         </div>
 
                         <div class="col-12 mb-3" x-cloak x-show="[0,1].includes(parseInt(selected))">
-                        <label class="form-label" for="user_id">عضو سازمان
-                            <sup class="text-danger">*</sup>
-                        </label>
+                            <label class="form-label" for="user_id">عضو سازمان
+                                <sup class="text-danger">*</sup>
+                            </label>
                             @php
                                 $options = $companies->mapWithKeys(fn($item) => [$item->id => implode(' - ', [$item->name , $item?->manager?->name])])->toArray();
                             @endphp
                             <x-partials.alpine.input.select-option :$options
-                                                               name="company_id"/>
-                        <x-input-error :messages="$errors->get('company_id')" class="mt-2"/>
-                    </div>
+                                                                   name="company_id"/>
+                            <x-input-error :messages="$errors->get('company_id')" class="mt-2"/>
+                        </div>
 
                     </div>
 
@@ -160,10 +160,10 @@
                                 if(Acl::hasRole(['manager'])){
                                        $roles = $roles->reject(fn($role) => in_array($role->title,['developer', 'super-admin']));
                                 }
-                                    $defaultRoleId = $roles->first()->id;
+                                    $defaultRoleId = $roles->first()?->id;
                             @endphp
                             <div class="d-flex align-items-center justify-content-between flex-wrap"
-                                 x-data="{ role: @json( (int)old('role', $defaultRoleId) ) }">
+                                 x-data="{ role: @json((int)old('role', $defaultRoleId), JSON_THROW_ON_ERROR) }">
                                 @foreach($roles as $role)
                                     <div class="form-check">
                                         <input class="form-check-input" id="role-{{ $role->id }}"
@@ -247,31 +247,35 @@
 
 
                                 @foreach($permissions as $group => $permission)
-                                    <div class="col-md-6 mb-2">
-                                        <div class="form-check checkbox checkbox-solid-dark mb-0 learning-header">
-                                            <input class="form-check-input cursor-pointer"
-                                                   value="{{ $group }}"
-                                                   :checked="permissions.length > 0 && permissions.every(permission => selectedPermissions.includes(permission.id))"
-                                                   @change="toggleGroup('{{ $group }}')"
-                                                   id="{{ $group }}" type="checkbox">
-                                            <label class="form-check-label"
-                                                   for="{{ $group }}"> {{ $group }}</label>
+                                    <template x-if="isVisibleGroup('{{ $group }}')">
+                                        <div class="col-md-6 mb-2">
+                                            <div class="form-check checkbox checkbox-solid-dark mb-0 learning-header">
+                                                <input class="form-check-input cursor-pointer"
+                                                       value="{{ $group }}"
+                                                       :checked="permissions.length > 0 && permissions.every(permission => selectedPermissions.includes(permission.id))"
+                                                       @change="toggleGroup('{{ $group }}')"
+                                                       id="{{ $group }}" type="checkbox">
+                                                <label class="form-check-label"
+                                                       for="{{ $group }}"> {{ $group }}</label>
+                                            </div>
+                                            <div class="ms-3">
+                                                @foreach($permission as $item)
+                                                    <template x-if="isVisiblePermission('{{ $item['id'] }}')">
+                                                        <div class="d-flex">
+                                                            <input class="form-check-input cursor-pointer me-1"
+                                                                   value="{{ $item['id'] }}"
+                                                                   name="permissions[]"
+                                                                   :checked="selectedPermissions.includes({{ (int)$item['id'] }})"
+                                                                   @change="togglePermission({{ (int)$item['id'] }})"
+                                                                   id="{{ $item['id'] }}" type="checkbox">
+                                                            <label class="form-check-label text-muted cursor-pointer"
+                                                                   for="{{ $item['id'] }}"> {{ $item['persian_name'] }}</label>
+                                                        </div>
+                                                    </template>
+                                                @endforeach
+                                            </div>
                                         </div>
-                                        <div class="ms-3">
-                                            @foreach($permission as $item)
-                                                <div class="d-flex">
-                                                    <input class="form-check-input cursor-pointer me-1"
-                                                           value="{{ $item['id'] }}"
-                                                           name="permissions[]"
-                                                           :checked="selectedPermissions.includes({{ (int)$item['id'] }})"
-                                                           @change="togglePermission({{ (int)$item['id'] }})"
-                                                           id="{{ $item['id'] }}" type="checkbox">
-                                                    <label class="form-check-label text-muted cursor-pointer"
-                                                           for="{{ $item['id'] }}"> {{ $item['persian_name'] }}</label>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </div>
+                                    </template>
                                 @endforeach
                             </div>
                         </div>
@@ -284,14 +288,30 @@
 
 @endsection
 
-@push('scripts')
+@pushif(can('user-permissions'), 'scripts')
     <script>
         window.addEventListener('alpine:init', () => {
             Alpine.data('permissionsList', () => ({
                 permissions: @json($permissions),
                 selectedPermissions: @json(old('permissions', [])),
+                currentRole: '',
+                restrictedPermissions: {
+                    manager: {
+                        ids: [],
+                        groups: ['بخش کیف پول', 'بخش طرح های اشتراک', 'بخش اشتراک ها']
+                    },
+                    user: {
+                        ids: [],
+                        groups: ['بخش کیف پول', 'بخش طرح های اشتراک', 'بخش اشتراک ها']
+                    },
+                },
+                firstPermission: Number('{{ $firstPermissionId }}'),
+                lastPermission: Number('{{ $lastPermissionId }}'),
 
                 init() {
+                    this.restrictedPermissions.manager.ids = this.createRangedArray(64, 79, [], [56])
+                    this.restrictedPermissions.user.ids = this.createRangedArray(64, 79)
+
                     if (this.selectedPermissions.length === 0) {
                         this.handleDispatch('{{ $roles->firstWhere('id', old('role', $defaultRoleId))->title ?? null }}')
                     }
@@ -327,28 +347,54 @@
                 },
 
                 handleDispatch($roleName) {
+                    this.currentRole = $roleName;
                     switch ($roleName) {
                         case 'super-admin':
                             this.selectAll();
                             break;
                         case 'manager':
-                            this.selectAll();
+                            this.selectedPermissions = this.createRangedArray(this.firstPermission, 63, [56]);
                             break;
                         case 'developer':
                             this.selectAll();
                             break;
                         case 'user':
-                            this.selectedPermissions = [32, 33, 37, 38, 39, 40, 41, 42, 44, 57, 58, 59, 60, 61, 62];
+                            this.selectedPermissions = this.createRangedArray(this.firstPermission, 62, this.createRangedArray(45, 56));
                             break
                         case 'admin':
-                            this.selectedPermissions = [32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 57, 58, 59, 60, 61, 62, 63];
+                            this.selectAll();
                             break;
                         default:
                             this.deselectAll();
                     }
+                },
+
+                isVisiblePermission(id) {
+                    const restricted = this.restrictedPermissions[this.currentRole]?.ids || [];
+                    return !restricted.includes(parseInt(id));
+                },
+
+                isVisibleGroup(groupName) {
+                    const restricted = this.restrictedPermissions[this.currentRole]?.groups || [];
+                    return !restricted.includes(groupName);
+                },
+
+                createRangedArray(start = this.firstPermission, end, except = [], additionalNumbers = []) {
+                    const rangedArray = Array.from({length: end - start + 1}, (_, index) => start + index)
+                        .filter(num => !except.includes(num))
+
+                    const finalArray = [...rangedArray]
+
+                    additionalNumbers.forEach(num => {
+                        if (!finalArray.includes(num) && !except.includes(num)) {
+                            finalArray.push(num)
+                        }
+                    })
+
+                    return finalArray.sort((a, b) => a - b);
                 }
 
             }))
         })
     </script>
-@endpush
+@endpushif

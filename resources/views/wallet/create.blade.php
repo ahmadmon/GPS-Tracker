@@ -66,38 +66,39 @@
                                                     </div>
                                                     <div class="media-body">
                                                         <h6 class="f-w-600">{{ $entity->name }}</h6>
-                                                        <p>{{ $entity->contact_number }} | {{ $entity->manager->name }}</p>
+                                                        <p>{{ $entity->contact_number }}
+                                                            | {{ $entity->manager->name }}</p>
                                                     </div>
                                                 @endif
                                             </div>
-                                                <ul class="nav main-menu mt-2" role="tablist">
-                                                    <li class="nav-item effective-card">
-                                                        <div class="card common-hover">
-                                                            <div class="card-body p-2">
-                                                                <a class="effect-card d-block p-3"
-                                                                   style="cursor:default;"
-                                                                   href="javascript:void(0)">
-                                                                    <div class="common-box1 common-align">
-                                                                        <h5 class="d-block">موجودی:</h5>
-                                                                    </div>
-                                                                    <p class="mb-0 pt-2 fw-bolder h5">{{ persianPriceFormat($wallet->balance) }}</p>
-                                                                    <div class="go-corner">
-                                                                        <div class="go-arrow"></div>
-                                                                    </div>
-                                                                </a>
-                                                            </div>
+                                            <ul class="nav main-menu mt-2" role="tablist">
+                                                <li class="nav-item effective-card">
+                                                    <div class="card common-hover">
+                                                        <div class="card-body p-2">
+                                                            <a class="effect-card d-block p-3"
+                                                               style="cursor:default;"
+                                                               href="javascript:void(0)">
+                                                                <div class="common-box1 common-align">
+                                                                    <h5 class="d-block">موجودی:</h5>
+                                                                </div>
+                                                                <p class="mb-0 pt-2 fw-bolder h5">{{ persianPriceFormat($wallet->balance) }}</p>
+                                                                <div class="go-corner">
+                                                                    <div class="go-arrow"></div>
+                                                                </div>
+                                                            </a>
                                                         </div>
-                                                    </li>
+                                                    </div>
+                                                </li>
 
-                                                    <li class="nav-item">
-                                                        <a href="{{ route('wallet-management.show', $wallet) }}"
-                                                           class="btn btn-primary-gradien d-flex justify-content-center btn-block w-100 mt-0">
-                                                            <i class="me-2" data-feather="arrow-right"></i>
-                                                            بــازگشت
-                                                        </a>
-                                                        <hr>
-                                                    </li>
-                                                </ul>
+                                                <li class="nav-item">
+                                                    <a href="{{ route('wallet-management.show', $wallet) }}"
+                                                       class="btn btn-primary-gradien d-flex justify-content-center btn-block w-100 mt-0">
+                                                        <i class="me-2" data-feather="arrow-right"></i>
+                                                        بــازگشت
+                                                    </a>
+                                                    <hr>
+                                                </li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -126,13 +127,13 @@
                                             <label for="wallet-amount">مبلغ مورد نظر جهت شارژ کیف پول (تومان)
                                                 <sup class="text-danger fw-bold">*</sup>
                                             </label>
-                                            <input class="form-control" id="wallet-amount" x-ref="walletAmount" type="text" required
+                                            <input class="form-control" id="wallet-amount" x-ref="walletAmount"
+                                                   type="text" required
                                                    placeholder="مبلغ را وارد کنید..."
                                                    name="amount" value="{{ old('amount') }}"
                                                    autocomplete="off">
                                             <x-input-error :messages="$errors->get('amount')" class="mt-2"/>
                                         </div>
-
 
 
                                         <div class="col-12 mb-3 my-0">
@@ -148,23 +149,27 @@
                                 onlinePaymentUrl: @js(route('wallet-management.send-to-gateway', $wallet->id)),
                                 manualCredit: @js(route('wallet-management.store', $wallet->id))
                     }">
-                                        <button class="btn btn-secondary btn-sm me-2" id="Bookmark"
-                                                @click.prevent="$el.closest('form').action = onlinePaymentUrl; $el.closest('form').submit()"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-placement="top"
-                                                title="با کلیک بر روی این دکمه، به درگاه پرداخت آنلاین منتقل می‌شوید."
-                                                type="submit">
-                                            <span class="">انتقال به درگاه پرداخت</span>
-                                        </button>
+                                        @if(can('wallet-pay-gateway'))
+                                            <button class="btn btn-secondary btn-sm me-2" id="Bookmark"
+                                                    @click.prevent="$el.closest('form').action = onlinePaymentUrl; $el.closest('form').submit()"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="با کلیک بر روی این دکمه، به درگاه پرداخت آنلاین منتقل می‌شوید."
+                                                    type="submit">
+                                                <span class="">انتقال به درگاه پرداخت</span>
+                                            </button>
+                                        @endif
 
-                                        <button class="btn btn-primary btn-sm" id="increase-wallet"
-                                                @click.prevent="$el.closest('form').action = manualCredit; $el.closest('form').submit()"
-                                                data-bs-toggle="tooltip"
-                                                data-bs-placement="top"
-                                                title="با کلیک بر روی این دکمه، می‌توانید به صورت مستقیم و بدون نیاز به درگاه پرداخت، موجودی کیف پول موردنظر را افزایش دهید."
-                                                type="submit">
-                                            <span class="">افزایش اعتبار</span>
-                                        </button>
+                                        @if(can('wallet-manual-credit'))
+                                            <button class="btn btn-primary btn-sm" id="increase-wallet"
+                                                    @click.prevent="$el.closest('form').action = manualCredit; $el.closest('form').submit()"
+                                                    data-bs-toggle="tooltip"
+                                                    data-bs-placement="top"
+                                                    title="با کلیک بر روی این دکمه، می‌توانید به صورت مستقیم و بدون نیاز به درگاه پرداخت، موجودی کیف پول موردنظر را افزایش دهید."
+                                                    type="submit">
+                                                <span class="">افزایش اعتبار</span>
+                                            </button>
+                                        @endif
                                     </div>
                                 </form>
                             </div>

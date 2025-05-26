@@ -13,6 +13,7 @@ use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends BaseController
@@ -62,7 +63,7 @@ class UserController extends BaseController
         $roles = collect([]);
         if (can('user-permissions')) {
 
-            $permissions = Cache::remember('permissions-list', 60 * 60, fn() => Permission::all()
+            $permissions = Cache::remember('permissions-list', 60 * 60, static fn() => Permission::orderBy('order')->get()
                 ->groupBy('groupName')
                 ->mapWithKeys(function ($permissions, $key) {
                     return [
@@ -73,7 +74,7 @@ class UserController extends BaseController
                     ];
                 }));
 
-            $roles = Cache::remember('roles-list', 60 * 60, fn() => Role::all());
+            $roles = Cache::remember('roles-list', 60 * 60, static fn() => Role::all());
         }
 
 
@@ -91,7 +92,9 @@ class UserController extends BaseController
 //            'password' => $randomString,
             'roles' => $roles,
             'permissions' => $permissions,
-            'companies' => $companies
+            'companies' => $companies,
+            'firstPermissionId' => DB::table('permissions')->first()->id,
+            'lastPermissionId' => DB::table('permissions')->orderByDesc('id')->first()->id,
         ]);
     }
 
@@ -110,7 +113,7 @@ class UserController extends BaseController
         $user = User::create(Arr::except($validated, ['permissions', 'role']));
 
 
-        if (isset($validated['role']) && isset($validated['permissions'])) {
+        if (isset($validated['role'], $validated['permissions'])) {
             $user->roles()->syncWithoutDetaching([$validated['role']]);
             $user->permissions()->syncWithoutDetaching($validated['permissions']);
             $user->clearPermissionCache();
@@ -161,7 +164,7 @@ class UserController extends BaseController
         $userPermissions = [];
         if (can('user-permissions')) {
 
-            $permissions = Cache::remember('permissions-list', 60 * 60, fn() => Permission::all()
+            $permissions = Cache::remember('permissions-list', 60 * 60, static fn() => Permission::orderBy('order')->get()
                 ->groupBy('groupName')
                 ->mapWithKeys(function ($permissions, $key) {
                     return [
@@ -192,7 +195,9 @@ class UserController extends BaseController
             'roles' => $roles,
             'permissions' => $permissions,
             'userPermissions' => $userPermissions,
-            'companies' => $companies
+            'companies' => $companies,
+            'firstPermissionId' => DB::table('permissions')->first()->id,
+            'lastPermissionId' => DB::table('permissions')->orderByDesc('id')->first()->id,
         ]);
     }
 
