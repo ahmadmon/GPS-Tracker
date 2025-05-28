@@ -19,10 +19,10 @@ class SubscriptionPlan extends Model
 
     protected static function booted()
     {
-        $cacheKey = 'subscription-plan';
-        static::created(fn() => forgetCache($cacheKey));
-        static::deleted(fn() => forgetCache($cacheKey));
-        static::updated(fn() => forgetCache($cacheKey));
+        $cacheKey = ['subscription-plan', 'plan-list'];
+        static::created(static fn() => forgetCache($cacheKey));
+        static::deleted(static fn() => forgetCache($cacheKey));
+        static::updated(static fn() => forgetCache($cacheKey));
     }
 
     public function subscriptions(): HasMany

@@ -180,7 +180,7 @@
                                                name="plan" value="{{ $plan->id }}">
                                         <label class="form-check-label mb-0 w-100" for="radio-{{ $plan->slug }}"><span
                                                 class="media-body megaoption-space"><span class="mt-0 mega-title-badge">{{ $plan->name }}<span
-                                                        class="badge bg-secondary pull-right digits dana">{{ priceFormat($plan->price) }} تومان</span></span><span>{!! e(nl2br($plan?->description)) !!}</span></span></label>
+                                                        class="badge bg-secondary pull-right digits dana">{{ $plan->price > 0 ? priceFormat($plan->price) . ' تومان' : 'رایگان' }}</span></span><span>{!! e(nl2br($plan?->description)) !!}</span></span></label>
                                     </div>
                                 </div>
                             </div>

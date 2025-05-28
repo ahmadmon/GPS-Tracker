@@ -24,6 +24,7 @@ class UserController extends BaseController
      */
     public function index()
     {
+        abort(503);
         Acl::authorize('users-list');
 
         if ($this->role === 'manager') {

@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Wallet;
 
 use App\Enums\Subscription\Plan\PlanType;
 use App\Enums\Subscription\SubscriptionStatus;
+use App\Facades\Acl;
 use App\Facades\Subscription;
+use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SubscribeRequest;
 use App\Jobs\SendSms;
@@ -14,10 +16,11 @@ use App\Models\User;
 use App\Models\Wallet;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
 
-class SubscriptionController extends Controller
+class SubscriptionController extends BaseController
 {
     public function index(?Wallet $wallet = null)
     {
@@ -28,11 +31,13 @@ class SubscriptionController extends Controller
 
         $isUser = $wallet->walletable instanceof User;
 
-        $specificType = array_values(array_filter(PlanType::values(), fn($value) => $value !== ($isUser ? PlanType::COMPANY->value : PlanType::PERSONAL->value)));
-        $plans = SubscriptionPlan::where('status', 1)
-            ->whereIn('type', $specificType)
-            ->latest()
-            ->get();
+        $specificType = array_values(array_filter(PlanType::values(), static fn($value) => $value !== ($isUser ? PlanType::COMPANY->value : PlanType::PERSONAL->value)));
+        $plans = Cache::remember('plan-list', 60 * 2, static function () use ($specificType) {
+            return SubscriptionPlan::where('status', 1)
+                ->whereIn('type', $specificType)
+                ->latest()
+                ->get();
+        });
 
         return view('profile.subscription.index', [
             'plans' => $plans,
@@ -106,7 +111,7 @@ class SubscriptionController extends Controller
             ->where('wallet_id', is_null($id) ? Auth::user()->wallet->id : $id)
             ->where('status', SubscriptionStatus::ACTIVE)
             ->first();
-        if (!$subscription) {
+        if (!$subscription && Acl::hasRole(['user', 'manager'])) {
             return to_route('profile.wallet')->with('error-alert', "درحال حاضر اشتراک فعالی ندارید.\nبرای خرید اشتراک ابتدا موجودی کیف پول خود را افزایش دهید سپس طرح اشتراک مناسب خود را انتخاب و خریداری کنید.");
         }
 

@@ -39,20 +39,10 @@
                                                                                    src="{{ asset('assets/images/avtar/user.png') }}"
                                                                                    alt=""></div>
                                                 <div class="media-body">
-                                                    <h6 class="f-w-600">{{ $user->name }}</h6>
+                                                    <h6 class="f-w-600">{{ $user->name }} <x-subscription-badge :entity="$user" title="مشاهده جزئیات اشتراک" /></h6>
                                                     <p>{{ $user->phone }} | {{ $user->type['name'] }}</p>
                                                 </div>
 
-                                                @if($user->isSubscriber())
-                                                <a href="{{ route('profile.subscription.show') }}" wire:ignore>
-                                                    <span
-                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="مشاهده جزئیات اشتراک"
-                                                        class="badge bg-warning fw-bold dana d-flex align-items-center justify-content-around">
-                                                        <i data-feather="star" class="me-1 mb-2"></i>
-                                                        دارای اشتراک
-                                                    </span>
-                                                </a>
-                                                @endif
                                             </div>
                                             <ul class="nav main-menu mt-2" role="tablist">
                                                 <li class="nav-item effective-card">

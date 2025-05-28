@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Subscription;
 
+use App\Facades\Acl;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\SubscriptionPlanRequest;
 use App\Models\SubscriptionPlan;
@@ -14,7 +15,9 @@ class SubscriptionPlanController extends Controller
      */
     public function index()
     {
-        $plans = Cache::remember('subscription-plan', 60, fn() => SubscriptionPlan::latest()->get());
+        Acl::authorize('plan-list');
+
+        $plans = Cache::remember('subscription-plan', 60, static fn() => SubscriptionPlan::latest()->get());
 
         return view('subscription-plan.index', compact('plans'));
     }
@@ -24,6 +27,9 @@ class SubscriptionPlanController extends Controller
      */
     public function create()
     {
+        Acl::authorize('create-plan');
+
+
         return view('subscription-plan.create');
     }
 
@@ -32,6 +38,8 @@ class SubscriptionPlanController extends Controller
      */
     public function store(SubscriptionPlanRequest $request)
     {
+        Acl::authorize('create-plan');
+
         $inputs = $request->validated();
 
         SubscriptionPlan::create($inputs);
@@ -44,7 +52,7 @@ class SubscriptionPlanController extends Controller
      */
     public function show(string $id)
     {
-        dd('its plan controller');
+        abort(404);
     }
 
     /**
@@ -52,6 +60,7 @@ class SubscriptionPlanController extends Controller
      */
     public function edit(string $slug)
     {
+        Acl::authorize('edit-plan');
 
         $plan = $this->findPlan($slug);
 
@@ -63,6 +72,8 @@ class SubscriptionPlanController extends Controller
      */
     public function update(SubscriptionPlanRequest $request, string $slug)
     {
+        Acl::authorize('edit-plan');
+
         $inputs = $request->validated();
         $plan = $this->findPlan($slug);
 
@@ -77,6 +88,8 @@ class SubscriptionPlanController extends Controller
      */
     public function destroy(string $slug)
     {
+        Acl::authorize('delete-plan');
+
         $plan = $this->findPlan($slug);
         $plan->delete();
 
@@ -86,6 +99,8 @@ class SubscriptionPlanController extends Controller
 
     public function changeStatus(string $slug)
     {
+        Acl::authorize('edit-plan');
+
         $plan = $this->findPlan($slug);
 
         $plan->status = $plan->status == 0 ? 1 : 0;

@@ -54,25 +54,13 @@
                                 <img class="img-70 rounded me-2 object-fit-cover" alt=""
                                      src="{{ asset($company->logo ?? 'assets/images/custom/workplace-64px.png') }}">
                                 <div class="flex-grow-1">
-                                    <h5 class="mb-1">{{ $company->name }}</h5>
+                                    <h5 class="mb-1">{{ $company->name }} <x-subscription-badge :entity="$company" /></h5>
                                     @notRole(['manager'])
                                     <strong class="text-muted">مدیر:
                                         <a href="{{ route('user.show', $company->manager->id) }}"
                                            target="_blank">{{ $company->manager->name }}</a>
                                     </strong>
                                     @endnotRole
-                                    @if($company->isSubscriber())
-                                        <a href="{{ route('profile.subscription.show', $company->wallet->id) }}"
-                                           class="d-flex">
-                                                    <span
-                                                        data-bs-toggle="tooltip" data-bs-placement="top"
-                                                        title="مشاهده جزئیات اشتراک"
-                                                        class="badge bg-warning fw-bold dana d-flex align-items-center justify-content-around">
-                                                        <i data-feather="star" class="me-1 mb-2"></i>
-                                                        دارای اشتراک
-                                                    </span>
-                                        </a>
-                                    @endif
                                 </div>
                             </div>
                         </div>
@@ -147,14 +135,9 @@
                                 <tr>
                                     <td>
                                         <div class="d-flex align-items-center gap-1">
-                                            @if($user->isSubscriber())
-                                                <div class="d-inline">
-                                                    <span class="badge bg-warning"><i data-feather="star"></i></span>
-                                                </div>
-                                            @endif
                                             <div class="d-grid">
                                             <span class="fw-bold">
-                                                {{ $user->name }}
+                                                {{ $user->name }} <x-subscription-badge :entity="$user" />
                                             </span>
                                                 @notRole(['manager'])
                                                 <small

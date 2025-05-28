@@ -65,6 +65,7 @@
                                             <div class="d-flex flex-column">
                                                 <a href="{{ route('user.show', $user->id) }}">
                                                     <span class="fw-bold">{{ $user->name }}</span>
+                                                    <x-subscription-badge :entity="$user"/>
                                                 </a>
                                                 @notRole(['manager'])
                                                 <small

@@ -34,7 +34,7 @@
         <div class="row">
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
-                @if(can('create-vehicle'))
+                @if(can('create-plan'))
                     <a href="{{ route('subscription-plan.create') }}" class="btn btn-primary mb-4">+ تعریف طرح
                         اشتراک</a>
                 @endif
@@ -51,7 +51,9 @@
                                     <th>قیمت</th>
                                     <th>مدت زمان</th>
                                     <th>نوع</th>
-                                    <th>وضعیت</th>
+                                    @if(can('edit-plan'))
+                                        <th>وضعیت</th>
+                                    @endif
                                     <th>عملیات</th>
                                 </tr>
                                 </thead>
@@ -69,15 +71,18 @@
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>{{ priceFormat($plan->price) }} تومان</td>
+                                        <td>{{ $plan->price > 0 ? priceFormat($plan->price) . ' تومان' : 'رایگان'  }}</td>
                                         <td>{{ $plan->is_lifetime ? 'مادام‌العمر' : $plan?->duration }}</td>
                                         <td>
-                                            <span class="badge badge-{{ $plan->type->badge()->color }} dana rounded-pill">{{ $plan->type->badge()->name }}</span>
+                                            <span
+                                                class="badge badge-{{ $plan->type->badge()->color }} dana rounded-pill">{{ $plan->type->badge()->name }}</span>
                                         </td>
-                                        <td>
-                                            <x-partials.alpine.change-status :status="(bool)$plan->status"
-                                                                             :url="route('subscription-plan.change-status',$plan->slug)"/>
-                                        </td>
+                                        @if(can('edit-plan'))
+                                            <td>
+                                                <x-partials.alpine.change-status :status="(bool)$plan->status"
+                                                                                 :url="route('subscription-plan.change-status',$plan->slug)"/>
+                                            </td>
+                                        @endif
                                         <td x-data="{ show: false }">
                                             <div class="btn-group" x-cloak x-show="!show">
                                                 <button class="btn dropdown-toggle" type="button"
@@ -85,25 +90,25 @@
                                                     <i class="icofont icofont-listing-box txt-dark"></i>
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-block text-center" style="">
-                                                    {{--                                                    @if(can('edit-vehicle'))--}}
-                                                    <a class="dropdown-item "
-                                                       href="{{ route('subscription-plan.edit', $plan->slug) }}">ویرایش</a>
-                                                    {{--                                                    @endif--}}
+                                                    @if(can('edit-plan'))
+                                                        <a class="dropdown-item "
+                                                           href="{{ route('subscription-plan.edit', $plan->slug) }}">ویرایش</a>
+                                                    @endif
 
-                                                    {{--                                                    @if(can('delete-vehicle'))--}}
-                                                    <a href="javascript:void(0)" class="dropdown-item"
-                                                       @click.prevent="show = true">حذف</a>
-                                                    {{--                                                    @endif--}}
+                                                    @if(can('delete-plan'))
+                                                        <a href="javascript:void(0)" class="dropdown-item"
+                                                           @click.prevent="show = true">حذف</a>
+                                                    @endif
                                                 </ul>
                                             </div>
 
-                                            {{--                                            @if(can('delete-vehicle'))--}}
-                                            <x-partials.btns.confirm-rmv-btn
-                                                url="{{ route('subscription-plan.destroy', $plan->slug) }}"/>
-                                            {{--                                            @endif--}}
+                                            @if(can('delete-plan'))
+                                                <x-partials.btns.confirm-rmv-btn
+                                                    url="{{ route('subscription-plan.destroy', $plan->slug) }}"/>
+                                            @endif
                                         </td>
                                     </tr>
-                                    @endforeach
+                                @endforeach
                                 </tbody>
                             </table>
                         </div>

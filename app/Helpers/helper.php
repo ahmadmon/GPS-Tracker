@@ -183,13 +183,22 @@ function calculateHaversineDistance($lat1, $lon1, $lat2, $lon2): float|int
 }
 
 /**
- * @param string $cache
+ * @param string|array $caches
  * @return void
  */
-function forgetCache(string $cache): void
+function forgetCache(string|array $caches): void
 {
-    if (Cache::has($cache))
-        Cache::forget($cache);
+    if (is_array($caches)) {
+        foreach ($caches as $cache) {
+            if (Cache::has($caches)) {
+                Cache::forget($cache);
+            }
+        }
+    }
+
+    if (Cache::has($caches)) {
+        Cache::forget($caches);
+    }
 }
 
 function can(string $permission): bool

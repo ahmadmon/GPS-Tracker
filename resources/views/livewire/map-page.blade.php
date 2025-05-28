@@ -264,7 +264,9 @@
 <script src="{{ asset('assets/libs/leaflet/track-player/leaflet-trackplayer.umd.cjs') }}"></script>
 <script src="{{ asset('assets/libs/leaflet/track-player/rotatedMarker.js') }}"></script>
 <script src="{{ asset('assets/libs/leaflet/track-player/turf.min.js') }}"></script>
-
+<!-- // gesture handling assets  -->
+<link rel="stylesheet" type="text/css" href="{{ asset('assets/libs/leaflet/gesture-handling/leaflet-gesture-handling.min.css') }}">
+<script src="{{ asset('assets/libs/leaflet/gesture-handling/leaflet-gesture-handling.min.js') }}"></script>
 
 <!-- // Others assets  -->
 <script src="https://unpkg.com/leaflet-polylinedecorator@1.6.0/dist/leaflet.polylinedecorator.js"></script>
@@ -350,11 +352,20 @@
         map: null,
         defaultLayer: OSMBase,
         mapView: [35.715298, 51.404343],
+        enableGesture: true,
 
         initMap() {
             return this.map = L.map(document.getElementById('map'), {
                 pmIgnore: false,
                 fullscreenControl: true,
+                gestureHandling: this.enableGesture,
+                gestureHandlingOptions: {
+                    text: {
+                        touch: "جهت جابجایی نقشه از دو انگشت استفاده نمایید",
+                        scroll: "جهت بزرگنمایی نقشه از کلید Ctrl + Scroll استفاده نمایید.",
+                        scrollMac: "جهت بزرگنمایی نقشه از کلید ⌘ + Scroll استفاده نمایید."
+                    }
+                }
             })
                 .setView(this.mapView, 11)
                 .addLayer(this.defaultLayer);
@@ -590,6 +601,8 @@
                 }
             }
 
+            document.addEventListener('fullscreenchange', () => this.checkFullscreen());
+            this.checkFullscreen();
 
             // Livewire Events
             $wire.on('geo-fetched', (data) => {
@@ -617,6 +630,12 @@
                     $wire.on('locationUpdated', () => this.updateLocations($wire.deviceLocations));
                 }
             }, 4000)
+        },
+
+        // Handle The gesture in mobile map
+        //-----------------------------------
+        checkFullscreen() {
+            Alpine.store('map').enableGesture = !document.fullscreenElement;
         },
 
         // Handle The Devices live location
