@@ -139,9 +139,12 @@
                 </li>
 
                 <li class="profile-nav onhover-dropdown pe-0 py-0">
-                    <div class="media profile-media"><img class="b-r-10"
-                                                          src="{{ asset('assets/images/avtar/user.png') }}"
-                                                          alt="">
+                    <div class="media profile-media">
+                        @if(auth()->user()->isSubscriber())
+                            <img class="b-r-10" src="{{ asset('assets/images/avtar/star.png') }}" alt="">
+                        @else
+                            <img class="b-r-10" src="{{ asset('assets/images/avtar/user.png') }}" alt="">
+                        @endif
                         <div class="media-body"><span>{{ auth()->user()?->name }}</span>
                             <p class="mb-0">{{ auth()->user()->roles->first()?->persian_name }}<i
                                     class="middle fa fa-angle-down"></i></p>
