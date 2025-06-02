@@ -1,8 +1,9 @@
 <?php
 
-use Carbon\Carbon;
-use Morilog\Jalali\Jalalian;
 use App\Facades\Acl;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Morilog\Jalali\Jalalian;
 
 function jalaliDate($date, $time = false, $format = "%d %B %Y", $ago = false)
 {
@@ -35,20 +36,16 @@ function randomColor()
 {
     $stateNum = rand(0, 6);
     $states = ['success', 'danger', 'warning', 'info', 'dark', 'primary', 'secondary'];
-    $color = $states[$stateNum];
-
-    return $color;
+    return $states[$stateNum];
 }
 
-function dayCount($startDate, $endDate)
+function dayCount($endDate, $startDate = null)
 {
     $startDate = Carbon::parse($startDate) ?? Carbon::now();
     $endDate = Carbon::parse($endDate);
 
 
-    $diffinDays = $startDate->diffInDays($endDate);
-
-    return $diffinDays;
+    return max(0, $startDate->diffInDays($endDate));
 }
 
 function priceFormat($price): string
@@ -81,12 +78,33 @@ function formatNumber($number): string
 function persianPriceFormat($number): string
 {
     if ($number >= 1000000000) {
-        return priceFormat($number) . 'میلیارد ';
+        $value = $number / 1000000000;
+        return formatWithoutRounding($value) . ' میلیارد تومان';
     } elseif ($number >= 1000000) {
-        return priceFormat($number) . ' میلیون';
+        $value = $number / 1000000;
+        return formatWithoutRounding($value) . ' میلیون تومان';
     } else {
-        return priceFormat($number);
+        return number_format($number) . ' تومان';
     }
+}
+
+function formatWithoutRounding($value): string
+{
+    $strValue = (string)$value;
+
+    if (!str_contains($strValue, '.')) {
+        return number_format($value);
+    }
+
+    list($integerPart, $decimalPart) = explode('.', $strValue);
+
+    $decimalPart = rtrim($decimalPart, '0');
+
+    if (empty($decimalPart)) {
+        return number_format($integerPart);
+    }
+
+    return number_format($integerPart) . '.' . $decimalPart;
 }
 
 function is_image($file)
@@ -164,6 +182,25 @@ function calculateHaversineDistance($lat1, $lon1, $lat2, $lon2): float|int
     return $earthRadius * $c;
 }
 
+/**
+ * @param string|array $caches
+ * @return void
+ */
+function forgetCache(string|array $caches): void
+{
+    if (is_array($caches)) {
+        foreach ($caches as $cache) {
+            if (Cache::has($caches)) {
+                Cache::forget($cache);
+            }
+        }
+    }
+
+    if (Cache::has($caches)) {
+        Cache::forget($caches);
+    }
+}
+
 function can(string $permission): bool
 {
     return Acl::hasPermission($permission);
@@ -174,3 +211,10 @@ function cannot(string $permission): bool
     return !Acl::hasPermission($permission);
 }
 
+
+function formatIban(string $iban): string
+{
+    $iban = trim($iban);
+
+    return implode(' ', str_split($iban, 4));
+}

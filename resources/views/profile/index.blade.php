@@ -1,3 +1,7 @@
+@php
+    $loadAlpineJs = false;
+@endphp
+
 @extends('01-layouts.master')
 
 @section('title', 'پروفایل کاربری')
@@ -46,7 +50,7 @@
                     </div>
                     <div class="card-body">
 
-                        <x-partials.alert.success-alert />
+                        <x-partials.alert.success-alert/>
 
                         <div class="row">
                             <div class="form-group col-md-4 mb-3">
@@ -71,7 +75,8 @@
                                 <label for="password_confirmation" class="col-form-label">تکرار گذرواژه جدید</label>
                                 <div class="form-input position-relative">
                                     <input class="form-control" type="password" dir="ltr" id="password_confirmation"
-                                           name="password_confirmation" autocomplete="new-password" value="{{ old('password') }}"
+                                           name="password_confirmation" autocomplete="new-password"
+                                           value="{{ old('password') }}"
                                            placeholder="************">
                                 </div>
                                 <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2"/>

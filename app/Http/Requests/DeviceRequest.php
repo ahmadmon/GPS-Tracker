@@ -26,19 +26,7 @@ class DeviceRequest extends FormRequest
                 'name' => 'required|string|min:3|max:255',
                 'model' => 'required|string|min:3|max:255',
                 'serial' => 'required|numeric|min:10|unique:devices,serial',
-                'phone_number' => 'nullable|numeric|digits:11',
-                'user_id' => 'nullable|numeric|exists:users,id',
-                'password'=> 'nullable',
-                'brand'=> 'required|string|in:sinotrack,wanway,concox,qbit',
-                'vehicle_id' => 'required|numeric|exists:vehicles,id',
-                'status' => 'required|numeric|in:0,1'
-            ];
-        }else{
-            return [
-                'name' => 'required|string|min:3|max:255',
-                'model' => 'required|string|min:3|max:255',
-                'serial' => 'required|numeric|min:10|unique:devices,serial,' . $this->device->id,
-                'phone_number' => 'nullable|numeric|digits:11',
+                'phone_number' => 'required|numeric|digits:11',
                 'user_id' => 'nullable|numeric|exists:users,id',
                 'password'=> 'nullable',
                 'brand'=> 'required|string|in:sinotrack,wanway,concox,qbit',
@@ -46,6 +34,18 @@ class DeviceRequest extends FormRequest
                 'status' => 'required|numeric|in:0,1'
             ];
         }
+
+        return [
+            'name' => 'required|string|min:3|max:255',
+            'model' => 'required|string|min:3|max:255',
+            'serial' => 'required|numeric|min:10|unique:devices,serial,' . $this->device->id,
+            'phone_number' => 'required|numeric|digits:11',
+            'user_id' => 'nullable|numeric|exists:users,id',
+            'password'=> 'nullable',
+            'brand'=> 'required|string|in:sinotrack,wanway,concox,qbit',
+            'vehicle_id' => 'required|numeric|exists:vehicles,id',
+            'status' => 'required|numeric|in:0,1'
+        ];
 
     }
 
@@ -57,6 +57,7 @@ class DeviceRequest extends FormRequest
             'model' => 'مدل',
             'phone_number' => 'شماره سیم‌کارت',
             'user_id' => 'خریدار',
+            'vehicle_id' => 'وسیله نقلیه',
             'brand' => 'برند'
         ];
     }

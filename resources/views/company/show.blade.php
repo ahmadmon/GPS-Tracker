@@ -53,15 +53,15 @@
                             <div class="d-flex">
                                 <img class="img-70 rounded me-2 object-fit-cover" alt=""
                                      src="{{ asset($company->logo ?? 'assets/images/custom/workplace-64px.png') }}">
-                                @notRole(['manager'])
                                 <div class="flex-grow-1">
-                                    <h5 class="mb-1">{{ $company->name }}</h5>
+                                    <h5 class="mb-1">{{ $company->name }} <x-subscription-badge :entity="$company" /></h5>
+                                    @notRole(['manager'])
                                     <strong class="text-muted">مدیر:
                                         <a href="{{ route('user.show', $company->manager->id) }}"
                                            target="_blank">{{ $company->manager->name }}</a>
                                     </strong>
+                                    @endnotRole
                                 </div>
-                                @endnotRole
                             </div>
                         </div>
                     </div>
@@ -134,12 +134,16 @@
                             @forelse($company->users as $user)
                                 <tr>
                                     <td>
-                                        <div class="d-flex flex-column">
-                                            <span class="fw-bold">{{ $user->name }}</span>
-                                            @notRole(['manager'])
-                                            <small
-                                                class="text-muted">{{ $user->type['name'] }}</small>
-                                            @endnotRole
+                                        <div class="d-flex align-items-center gap-1">
+                                            <div class="d-grid">
+                                            <span class="fw-bold">
+                                                {{ $user->name }} <x-subscription-badge :entity="$user" />
+                                            </span>
+                                                @notRole(['manager'])
+                                                <small
+                                                    class="text-muted">{{ $user->type['name'] }}</small>
+                                                @endnotRole
+                                            </div>
                                         </div>
                                     </td>
                                     <td>{{ $user->phone }}</td>
@@ -150,7 +154,7 @@
                                             <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
                                         @endif
                                     </td>
-                                    <td>
+                                    <td data-sort="{{ $user->created_at->toDateTimeString() }}">
                                         <span class="text-muted">{{ jalaliDate($user->created_at) }}</span>
                                     </td>
                                     @if(can('manage-subsets'))
@@ -181,7 +185,6 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
 
     <script>
         $('#basic-1').DataTable({

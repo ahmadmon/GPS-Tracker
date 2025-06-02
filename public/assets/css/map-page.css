@@ -1,0 +1,67 @@
+#map {
+    height: 80vh;
+    z-index: 1 !important;
+}
+
+.route-arrow {
+    font-size: 20px;
+    color: red;
+    text-shadow: 2px 2px 2px white;
+}
+
+.show-arrows-btn {
+    position: absolute;
+    top: 58px;
+    right: 9px;
+    z-index: 1000;
+    padding: 10px;
+    background: white;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.custom-marker {
+    background: none;
+    border: none;
+}
+
+.custom-marker div {
+    transition: transform 0.3s ease;
+    transform-origin: center center;
+}
+
+.marker-popup h4 {
+    margin: 0 0 8px 0;
+    color: #333;
+}
+
+.marker-popup p {
+    margin: 4px 0;
+    color: #666;
+}
+
+.device-sidebar {
+    height: 90vh;
+}
+
+.leaflet-routing-container {
+    display: none;
+}
+
+.leaflet-control-custom {
+    background-color: white;
+    border: 2px solid gray;
+    border-radius: 5px;
+    width: 33px;
+    height: 33px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer !important;
+}
+
+.leaflet-control-custom.disabled {
+    background-color: lightgray;
+    border: 2px solid darkgray;
+}

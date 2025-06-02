@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Facades\Acl;
 use App\Http\Requests\UserRequest;
 use App\Http\Services\Notify\SMS\SmsService;
+use App\Jobs\SendSms;
 use App\Models\Company;
 use App\Models\Permission;
 use App\Models\Role;
@@ -12,6 +13,7 @@ use App\Models\User;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends BaseController
@@ -25,11 +27,11 @@ class UserController extends BaseController
         Acl::authorize('users-list');
 
         if ($this->role === 'manager') {
-            $users = User::orderByDesc('id')
-                ->whereIn('id', $this->userCompaniesSubsetsId)
+            $users = User::whereIn('id', $this->userCompaniesSubsetsId)
+                ->latest()
                 ->cursor();
         } else {
-            $users = User::orderByDesc('id')->cursor();
+            $users = User::with('wallet')->latest()->get();
         }
 
 
@@ -61,7 +63,7 @@ class UserController extends BaseController
         $roles = collect([]);
         if (can('user-permissions')) {
 
-            $permissions = Cache::remember('permissions-list', 60 * 60, fn() => Permission::all()
+            $permissions = Cache::remember('permissions-list', 60 * 60, static fn() => Permission::orderBy('order')->get()
                 ->groupBy('groupName')
                 ->mapWithKeys(function ($permissions, $key) {
                     return [
@@ -72,7 +74,7 @@ class UserController extends BaseController
                     ];
                 }));
 
-            $roles = Cache::remember('roles-list', 60 * 60, fn() => Role::all());
+            $roles = Cache::remember('roles-list', 60 * 60, static fn() => Role::all());
         }
 
 
@@ -90,7 +92,9 @@ class UserController extends BaseController
 //            'password' => $randomString,
             'roles' => $roles,
             'permissions' => $permissions,
-            'companies' => $companies
+            'companies' => $companies,
+            'firstPermissionId' => DB::table('permissions')->first()->id,
+            'lastPermissionId' => DB::table('permissions')->orderByDesc('id')->first()->id,
         ]);
     }
 
@@ -109,7 +113,7 @@ class UserController extends BaseController
         $user = User::create(Arr::except($validated, ['permissions', 'role']));
 
 
-        if (isset($validated['role']) && isset($validated['permissions'])) {
+        if (isset($validated['role'], $validated['permissions'])) {
             $user->roles()->syncWithoutDetaching([$validated['role']]);
             $user->permissions()->syncWithoutDetaching($validated['permissions']);
             $user->clearPermissionCache();
@@ -122,9 +126,8 @@ class UserController extends BaseController
         }
 
         // Send Sms To User
-//        $smsService->setTo($user->phone);
-//        $smsService->setText("{$user->name} عزیز به سمفا خوش آمدید\nنام کاربری شما: {$user->phone}\nرمز عبور موقت شما: {$validated['password']}\nبرای ورود و تغییر رمز، به سایت مراجعه کنید.");
-//        $smsService->fire();
+        $message = "{$user->name} عزیز به سمفا خوش آمدید\nنام کاربری شما: {$user->phone}\nرمز عبور موقت شما: {$validated['password']}\nبرای ورود و تغییر رمز، به سایت مراجعه کنید.";
+        SendSms::dispatch($user->phone, $message);
 
         //removing The session
 //        session()->forget('generatedPass');
@@ -161,7 +164,7 @@ class UserController extends BaseController
         $userPermissions = [];
         if (can('user-permissions')) {
 
-            $permissions = Cache::remember('permissions-list', 60 * 60, fn() => Permission::all()
+            $permissions = Cache::remember('permissions-list', 60 * 60, static fn() => Permission::orderBy('order')->get()
                 ->groupBy('groupName')
                 ->mapWithKeys(function ($permissions, $key) {
                     return [
@@ -192,7 +195,9 @@ class UserController extends BaseController
             'roles' => $roles,
             'permissions' => $permissions,
             'userPermissions' => $userPermissions,
-            'companies' => $companies
+            'companies' => $companies,
+            'firstPermissionId' => DB::table('permissions')->first()->id,
+            'lastPermissionId' => DB::table('permissions')->orderByDesc('id')->first()->id,
         ]);
     }
 
@@ -227,6 +232,7 @@ class UserController extends BaseController
     {
         Acl::authorize('delete-user', $user);
 
+        $user->wallet()->delete();
         $user->delete();
 
         return back()->with('success-alert', 'کاربر با موفقیت حذف گردید.');

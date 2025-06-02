@@ -27,16 +27,16 @@ class PermissionServiceProvider extends ServiceProvider
     {
         try {
             Gate::before(
-                fn(User $user): bool => $user->hasUserType('super-admin') || $user->hasRole(['programmer']));
+                static fn(User $user): bool => $user->hasUserType('super-admin') || $user->hasRole(['developer']));
 
 
 //            Gate::define('has-permission', fn(User $user, string $permission): bool => $user->hasPermissionTo($permission));
-            Gate::define('has-permission', fn(string $permission): bool => Acl::hasPermission($permission));
+            Gate::define('has-permission', static fn(string $permission): bool => Acl::hasPermission($permission));
 
 
-            Blade::if('role', fn($role): bool => auth()->check() && Acl::hasRole($role));
+            Blade::if('role', static fn($role): bool => auth()->check() && Acl::hasRole($role));
 
-            Blade::if('notRole', fn($role): bool => auth()->check() && !Acl::hasRole($role));
+            Blade::if('notRole', static fn($role): bool => auth()->check() && !Acl::hasRole($role));
 
 
         } catch (\Exception $e) {

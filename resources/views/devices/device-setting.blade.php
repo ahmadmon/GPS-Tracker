@@ -91,7 +91,7 @@
     <x-partials.alert.success-alert />
     <x-partials.alert.error-alert />
 
-    <div class="card">
+    <div class="card" id="command-section">
         <div class="card-header">
             <h5>دستورات دستگاه</h5>
         </div>

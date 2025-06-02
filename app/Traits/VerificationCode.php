@@ -3,6 +3,7 @@
 namespace App\Traits;
 
 
+use App\Jobs\SendSms;
 use App\Models\User;
 use App\Models\VerificationCode as OtpCode;
 use Carbon\Carbon;
@@ -10,7 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 trait VerificationCode
 {
-    public function generateOtp(string $mobile, $smsService, $existsUser = null)
+    public function generateOtp(string $mobile, $existsUser = null)
     {
         $user = User::where('phone', $mobile)->first() ?? $existsUser;
 
@@ -27,9 +28,8 @@ trait VerificationCode
             'expired_at' => $now->addMinutes(value: 2)
         ]);
 
-        $smsService->setTo($mobile);
-        $smsService->setText("سمفا - سامانه هوشمند ردیابی GPS\nرمز ورود: {$verificationCode->otp}\n");
-        $smsService->fire();
+        $message = "سمفا - سامانه هوشمند رهیابی GPS\nرمز ورود: {$verificationCode->otp}\n";
+        SendSms::dispatch($mobile, $message);
 
 
         return $verificationCode;

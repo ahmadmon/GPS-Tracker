@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
@@ -73,6 +76,15 @@ class User extends Authenticatable
         );
     }
 
+    /**
+     * @return void
+     *
+     */
+    protected static function booted(): void
+    {
+        static::created(fn($user) => $user->wallet()->create());
+    }
+
     protected function joinedCompaniesList(): Attribute
     {
         return Attribute::make(
@@ -91,7 +103,11 @@ class User extends Authenticatable
         return $this->hasMany(Vehicle::class, 'user_id');
     }
 
-    // related to The users Company (Joined by Company)
+    /**
+     * @return Collection
+     *
+     * related to The users Company (Joined by Company)
+     */
     public function subsets(): Collection
     {
         if (!$this->hasUserType('manager')) {
@@ -106,15 +122,36 @@ class User extends Authenticatable
         return $this->belongsToMany(Company::class, 'companies_user');
     }
 
-    // related to The Company manager
+    /**
+     * @return HasMany
+     *
+     * related to The Company manager
+     */
     public function companies(): HasMany
     {
-        return $this->hasMany(Company::class, 'user_id');
+        return $this->hasMany(Company::class, 'user_id')->where('status', 1);
     }
 
     public function geofences(): HasManyThrough
     {
         return $this->hasManyThrough(Geofence::class, Device::class);
+    }
+
+    /**
+     * Get the user's wallet.
+     */
+    public function wallet(): MorphOne
+    {
+        return $this->morphOne(Wallet::class, 'walletable');
+    }
+
+
+    /**
+     * @return bool
+     */
+    public function isSubscriber(): bool
+    {
+        return $this->wallet->hasSubscription();
     }
 
 

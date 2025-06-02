@@ -32,6 +32,7 @@
     <div class="container-fluid">
         <x-partials.alert.success-alert/>
         <x-partials.alert.error-alert/>
+        <x-partials.alert.warning-alert/>
         <div class="row">
             <!-- Zero Configuration  Starts-->
             <div class="col-sm-12">
@@ -48,6 +49,11 @@
                                     <th>کاربر</th>
                                     <th>شماره تماس</th>
                                     <th>وضعیت</th>
+                                    @role(['super-admin','admin'])
+                                    @if(can('wallet-list'))
+                                        <th>موجودی کیف پول</th>
+                                    @endif
+                                    @endrole
                                     <th>تاریخ عضویت</th>
                                     <th>عملیات</th>
                                 </tr>
@@ -59,18 +65,30 @@
                                             <div class="d-flex flex-column">
                                                 <a href="{{ route('user.show', $user->id) }}">
                                                     <span class="fw-bold">{{ $user->name }}</span>
+                                                    <x-subscription-badge :entity="$user"/>
                                                 </a>
                                                 @notRole(['manager'])
                                                 <small
-                                                        class="text-muted">{{ $user->type['name'] }}</small>
+                                                    class="text-muted">{{ $user->type['name'] }}</small>
                                                 @endnotRole
                                             </div>
                                         </td>
                                         <td>{{ $user->phone }}</td>
                                         <td>
-                                            <x-partials.alpine.change-status :status="(bool)$user->status" :url="route('user.change-status',$user->id)" />
+                                            <x-partials.alpine.change-status :status="(bool)$user->status"
+                                                                             :url="route('user.change-status',$user->id)"/>
                                         </td>
-                                        <td>
+                                        @role(['super-admin', 'admin'])
+                                        @if(can('wallet-list'))
+                                            <td data-sort="{{ $user?->wallet?->balance }}">
+                                                <a href="{{ route('wallet-management.show', $user->wallet) }}"
+                                                   target="_blank">
+                                                    <strong>{{ priceFormat($user?->wallet?->balance) }} تومان</strong>
+                                                </a>
+                                            </td>
+                                        @endif
+                                        @endrole
+                                        <td data-sort="{{ $user->created_at->toDateTimeString() }}">
                                             <span class="text-muted">{{ jalaliDate($user->created_at) }}</span>
                                         </td>
                                         <td x-data="{ show: false }">
@@ -96,7 +114,7 @@
                                             </div>
                                             @if(can('delete-user'))
                                                 <x-partials.btns.confirm-rmv-btn
-                                                        url="{{ route('user.destroy', $user->id) }}"/>
+                                                    url="{{ route('user.destroy', $user->id) }}"/>
                                             @endif
                                         </td>
                                     </tr>
@@ -115,15 +133,18 @@
         </div>
     </div>
 
+    @php
+        $sort = auth()->user()->hasRole(['user', 'manager']) ? 3 : 4;
+    @endphp
+
 @endsection
 
 @push('scripts')
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
 
     <script>
         $('#basic-1').DataTable({
-            order: [[3, 'asc']],
+            order: [[{{ $sort }}, 'desc']],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
             }

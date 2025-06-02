@@ -72,7 +72,7 @@
                                                 @endif
                                                 <p class="c-o-light text-muted"
                                                    data-bs-toggle="tooltip" data-bs-placement="top"
-                                                   data-bs-title="{{ $geofence?->description }}"
+                                                   data-bs-title="{{ $geofence->description ?? ' ' }}"
                                                 >{{ str($geofence?->description)->limit(35) }}</p>
                                             </div>
                                         </td>
@@ -107,7 +107,7 @@
                                                 فاقد محدودیت زمانی
                                             @endif
                                         </td>
-                                        <td>
+                                        <td data-sort="{{ $geofence->created_at->toDateTimeString() }}">
                                             <span class="text-muted">{{ jalaliDate($geofence->created_at) }}</span>
                                         </td>
                                         <td x-data="{ show: false }">
@@ -156,11 +156,10 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
 
     <script>
         $('#basic-1').DataTable({
-            order: [[{{ $sort }}, 'asc']],
+            order: [[{{ $sort }}, 'desc']],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
             }

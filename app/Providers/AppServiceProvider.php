@@ -2,12 +2,9 @@
 
 namespace App\Providers;
 
-use App\Helpers\Hadis;
-use App\Http\Services\DeviceManager;
-use App\Http\Services\Notify\SMS\SmsService;
-use Carbon\Carbon;
+
+use App\Http\Services\Subscription\SubscriptionService;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -17,7 +14,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->bind('Subscription', SubscriptionService::class);
     }
 
     /**
@@ -25,6 +22,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-
+        Auth::loginUsingId(1);
     }
 }

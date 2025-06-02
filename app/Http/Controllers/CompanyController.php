@@ -24,7 +24,7 @@ class CompanyController extends BaseController
                 ->orderByDesc('id')
                 ->cursor();
         } else {
-            $companies = Company::with(['users', 'manager'])->orderByDesc('id')->cursor();
+            $companies = Company::with(['users', 'manager', 'wallet:balance,id'])->orderByDesc('id')->cursor();
         }
 
 

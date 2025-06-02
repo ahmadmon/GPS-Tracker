@@ -119,9 +119,7 @@ class CheckGeofenceStatusJob implements ShouldQueue
             $message = "دستگاه {$device->name} به حصار {$fence->name} در تاریخ {$now} ورود کرد.\nمشاهده موقعیت دستگاه:\n\nhttps://maps.google.com/?q={$trip->lat},{$trip->long}";
         }
 
-        $smsService = new SmsService();
-        $smsService->setTo($device->user->phone);
-        $smsService->setText($message);
+        SendSms::dispatch($device->user->phone, $message);
     }
 
 }

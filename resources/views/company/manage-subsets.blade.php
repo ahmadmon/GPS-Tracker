@@ -25,6 +25,11 @@
                                     لیست سازمان ها
                                 </a>
                             </li>
+                            <li class="breadcrumb-item dana">
+                                <a href="{{ route('company.show', $company) }}">
+                                    جزئیات سازمان
+                                </a>
+                            </li>
                             <li class="breadcrumb-item dana">مدیریت زیر مجموعه</li>
                         </ol>
                     </div>

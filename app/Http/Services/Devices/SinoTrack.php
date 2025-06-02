@@ -41,7 +41,7 @@ class SinoTrack implements DeviceInterface
             '1' => "803{$this->password} {apn}",
             '2' => "805{$this->password} {interval}",
             '3' => "777{password}{$this->password}",
-            '4' => "{phone}{$this->password} 1",
+            '4' => "{phones}{$this->password} 1",
             '5' => "D101#",
             '6' => "{mode}{$this->password}",
             '7' => "RESET",

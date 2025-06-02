@@ -171,7 +171,6 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
 
     <script>
         $('#basic-1').DataTable({

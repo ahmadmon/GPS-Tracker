@@ -7,7 +7,7 @@ use App\Models\User;
 use App\Traits\VerificationCode;
 use Carbon\Carbon;
 use Jantinnerezo\LivewireAlert\Enums\Position;
-use Jantinnerezo\LivewireAlert\LivewireAlert;
+use Jantinnerezo\LivewireAlert\Facades\LivewireAlert;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
 
@@ -59,8 +59,7 @@ class ChangeUserInfo extends Component
 
         $this->show = true;
 
-        $smsService = new SmsService();
-        $otpModel = $this->generateOtp($this->phone, $smsService, auth()->user());
+        $otpModel = $this->generateOtp($this->phone, auth()->user());
         $seconds = isset($otpModel) ? Carbon::parse($otpModel->expired_at)->diffInSeconds(Carbon::now()) : -180;
         $this->duration = (int)number_format($seconds) * -1;
     }
@@ -97,6 +96,7 @@ class ChangeUserInfo extends Component
 
     private function showAlert($type, $message): void
     {
+
         LivewireAlert::title($message)
             ->position(Position::Top)
             ->$type()

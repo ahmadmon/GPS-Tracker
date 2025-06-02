@@ -103,7 +103,7 @@
                                         <td>
                                            <x-partials.alpine.change-status :status="(bool)$device->status" :url="route('device.change-status',$device->id)" />
                                         </td>
-                                        <td>{{ jalaliDate($device?->created_at,time:true) }}</td>
+                                        <td data-sort="{{ $device->created_at->toDateTimeString() }}">{{ jalaliDate($device?->created_at,time:true) }}</td>
                                         <td x-data="{ show: false }">
                                             <div class="btn-group" x-cloak x-show="!show">
                                                 <button class="btn dropdown-toggle" type="button"
@@ -154,7 +154,6 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
     <script>
         $('#basic-1').DataTable({
             order: [[7, 'desc']],

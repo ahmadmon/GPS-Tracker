@@ -9,6 +9,10 @@
 
 @section('content')
 
+    @php
+        $sort = auth()->user()->hasRole(['user', 'manager']) ? 4 : 5;
+    @endphp
+
     <div class="container-fluid">
         <div class="page-title">
             <div class="row">
@@ -52,22 +56,36 @@
                                     @endnotRole
                                     <th>شماره تماس</th>
                                     <th>وضعیت</th>
+                                    <th>موجودی کیف پول</th>
                                     <th>تاریخ ایجاد</th>
                                     <th>عملیات</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 @forelse($companies as $company)
+                                    @php
+                                        $isSubscriber = $company->isSubscriber();
+                                    @endphp
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center gap-2">
+                                                @if($isSubscriber)
+                                                    <a href="{{ route('profile.subscription.show', $company->wallet->id) }}" class="d-inline">
+                                                    <span
+                                                        data-bs-toggle="tooltip" data-bs-placement="top" title="مشاهده جزئیات اشتراک"
+                                                        class="badge bg-warning">
+                                                        <i data-feather="star"></i>
+                                                    </span>
+                                                    </a>
+                                                @endif
                                                 <div class="currency-icon warning">
                                                     <img class="img-fluid" width="32" height="32"
                                                          src="{{ $company->logo ?? asset('assets/images/custom/workplace-64px.png') }}"
                                                          alt="">
                                                 </div>
-                                                <div><a class="f-14 mb-0 f-w-500 c-light"
-                                                        href="{{ route('company.show', $company->id) }}">{{ $company->name }}</a>
+                                                <div>
+                                                    <a class="f-14 mb-0 f-w-500 c-light"
+                                                       href="{{ route('company.show', $company->id) }}">{{ $company->name }}</a>
                                                     <p class="c-o-light text-muted cursor-pointer"
                                                        data-bs-toggle="tooltip" data-bs-placement="top"
                                                        data-bs-title="{{ $company?->address }}">{{ str($company?->address)->limit(35) }}</p>
@@ -86,7 +104,22 @@
                                             <x-partials.alpine.change-status :status="(bool)$company->status"
                                                                              :url="route('company.change-status',$company->id)"/>
                                         </td>
-                                        <td>
+                                        @role(['super-admin', 'admin'])
+                                        <td data-sort="{{ $company?->wallet?->balance }}">
+                                            <a href="{{ route('wallet-management.show', $company->wallet) }}"
+                                               target="_blank">
+                                                <strong>{{ priceFormat($company?->wallet?->balance) }} تومان</strong>
+                                            </a>
+                                        </td>
+                                        @endrole
+                                        @role(['manager'])
+                                        <td data-sort="{{ $company?->wallet?->balance }}">
+                                            <a href="{{ route('profile.wallet') }}">
+                                                <strong>{{ priceFormat($company?->wallet?->balance) }} تومان</strong>
+                                            </a>
+                                        </td>
+                                        @endrole
+                                        <td data-sort="{{ $company->created_at->toDateTimeString() }}">
                                             <span class="text-muted">{{ jalaliDate($company->created_at) }}</span>
                                         </td>
                                         <td x-data="{ show: false }">
@@ -114,15 +147,24 @@
                                                            href="{{ route('company.manage-subsets', $company->id) }}">مدیریت
                                                             زیرمجموعه ها</a>
                                                     @endif
+                                                    @if($isSubscriber)
+                                                        <a class="dropdown-item"
+                                                           href="{{ route('profile.subscription.show', $company->wallet->id) }}">جزيیات
+                                                            اشتراک</a>
+                                                    @else
+                                                        <a class="dropdown-item"
+                                                           href="{{ route('profile.subscription.index', $company->wallet->id) }}">خرید
+                                                            اشتراک</a>
+                                                    @endif
                                                 </ul>
                                             </div>
                                             <x-partials.btns.confirm-rmv-btn
-                                                    url="{{ route('company.destroy', $company->id) }}"/>
+                                                url="{{ route('company.destroy', $company->id) }}"/>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="text-center">داده ای یافت نشد.</td>
+                                        <td colspan="{{ $sort+1 }}" class="text-center">داده ای یافت نشد.</td>
                                     </tr>
                                 @endforelse
                                 </tbody>
@@ -139,11 +181,10 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
 
     <script>
         $('#basic-1').DataTable({
-            order: [[4, 'asc']],
+            order: [[{{ $sort }}, 'desc']],
             "language": {
                 "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
             }

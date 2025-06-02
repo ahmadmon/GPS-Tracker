@@ -22,12 +22,12 @@ class VehicleController extends BaseController
                 ->cursor();
 
         } elseif ($this->role === 'manager') {
-            $vehicles = Vehicle::with('user', 'device:id,name')
+            $vehicles = Vehicle::with(['user', 'device:id,name'])
                 ->whereIn('user_id', $this->userCompaniesSubsetsId->merge([$this->user->id]))
                 ->cursor();
 
         } else {
-            $vehicles = Vehicle::with('user', 'device:id,name')->cursor();
+            $vehicles = Vehicle::with(['user', 'device:id,name'])->cursor();
         }
 
         return view('vehicle.index', compact('vehicles'));

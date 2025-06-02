@@ -26,8 +26,16 @@
     font-family: 'dana', Serif !important;
 }
 
-[x-clock] {
+[x-cloak] {
     display: none !important;
+}
+
+[data-validation-valid='false'] {
+    border-color: red;
+}
+
+[data-validation-valid='true'] {
+    border-color: green;
 }
 
 .cursor-pointer {
@@ -371,5 +379,69 @@ section.leaflet-control-layers-list div.leaflet-control-layers-base label span s
     .device-section i:hover {
         color: #7366FF;
         transform: translateX(0);
+    }
+}
+
+.text-danger li {
+    color: inherit;
+}
+
+.task-card-height {
+    height: 300px !important;
+    overflow-y: auto !important;
+}
+
+.mega-horizontal {
+    display: block !important;
+    height: 35vh;
+    overflow-y: auto;
+}
+
+.mega-horizontal .card {
+    flex: 1 1 48%;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.card .media {
+    flex: 1;
+}
+
+.card .form-check-label {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.megaoption-space {
+    display: flex;
+    justify-content: space-between;
+    flex-grow: 1;
+}
+
+.mega-title-badge {
+    display: inline-block;
+    margin-left: 10px;
+    text-align: right;
+}
+
+.mega-title-badge .badge {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.card .media-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+
+@media only screen and (max-width: 575.98px) {
+    .alert-dismissible p {
+        max-width: 100%;
     }
 }

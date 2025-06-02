@@ -113,7 +113,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive text-nowrap">
-                        <table class="display" id="basic-1">
+                        <table class="display" id="devices">
                             <thead>
                             <tr>
                                 <th>نام</th>
@@ -125,7 +125,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            @forelse($user->devices as $device)
+                            @foreach($user->devices as $device)
                                 <tr>
                                     <td>
                                         <div class="d-flex flex-column">
@@ -142,7 +142,7 @@
                                             <span class="badge dana rounded-pill badge-danger">غیرفعال</span>
                                         @endif
                                     </td>
-                                    <td>{{ jalaliDate($device?->connected_at,time:true) }}</td>
+                                    <td data-sort="{{ $device->connected_at }}">{{ jalaliDate($device?->connected_at,time:true) }}</td>
                                     <td x-data="{ show: false }">
                                         <div class="btn-group" x-cloak x-show="!show">
                                             <button class="btn dropdown-toggle" type="button"
@@ -174,11 +174,7 @@
                                         @endif
                                     </td>
                                 </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="6" class="text-center">داده ای یافت نشد.</td>
-                                </tr>
-                            @endforelse
+                            @endforeach
                             </tbody>
                         </table>
                     </div>
@@ -200,7 +196,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive custom-scrollbar text-nowrap">
-                        <table class="display" id="basic-2">
+                        <table class="display" id="vehicles">
                             <thead>
                             <tr>
                                 <th>وسیله نقلیه</th>
@@ -267,18 +263,34 @@
 @push('scripts')
     <script src="{{ asset('assets/js/datatable/datatables/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('assets/js/datatable/datatables/datatable.custom.js') }}"></script>
-    <script src="{{ asset('assets/js/datatable/datatables/dataTables.bootstrap5.js')}}"></script>
     <script>
-        $('#basic-1').DataTable({
-            "language": {
-                "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
+        $(document).ready(function() {
+            // Destroy previous instance of DataTable if it exists, then reinitialize it
+            const devicesTb = $('#devices');
+            const vehiclesTb = $('#vehicles');
+
+
+            if ($.fn.dataTable.isDataTable('#devices')) {
+                devicesTb.DataTable().clear().destroy();
             }
+
+            devicesTb.DataTable({
+                order: [[4, 'desc']],
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
+                }
+            });
+
+            if ($.fn.dataTable.isDataTable('#vehicles')) {
+                vehiclesTb.DataTable().destroy();
+            }
+
+            vehiclesTb.DataTable({
+                "language": {
+                    "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
+                }
+            });
         });
 
-        $('#basic-2').DataTable({
-            "language": {
-                "url": "https://cdn.datatables.net/plug-ins/9dcbecd42ad/i18n/Persian.json"
-            }
-        });
     </script>
 @endpush

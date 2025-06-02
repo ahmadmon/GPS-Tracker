@@ -31,7 +31,14 @@
             <div class="col-md-8 offset-md-2">
                 <p class="sub-content">@yield('message')</p>
             </div>
-            <div><a class="btn btn-primary-gradien btn-lg" href="{{ route('home') }}">بازگشت به داشبورد</a></div>
+            @if(View::hasSection('code') && View::getSection('code') !== '503')
+                @role(['user', 'manager'])
+                <div><a class="btn btn-primary-gradien btn-lg" href="{{ route('home') }}">بازگشت به نقشه</a></div>
+                @endrole
+                @notRole(['user', 'manager'])
+                <div><a class="btn btn-primary-gradien btn-lg" href="{{ route('home') }}">بازگشت به داشبورد</a></div>
+                @endnotRole
+            @endif
         </div>
     </div>
     <!-- error-layout end-->

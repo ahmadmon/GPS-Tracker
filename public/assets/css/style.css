@@ -19843,6 +19843,45 @@ select.crypto-select.primary {
   background-color: rgba(255, 170, 5, 0.1);
 }
 
+
+.badge-l-warning,.badge-l-warning:hover {
+    background-color: #fec
+}
+
+.badge-l-primary,.badge-l-primary:hover,.badge-light-primary,.badge-light-primary:hover {
+    background-color: rgba(115,102,255,.1)
+}
+
+.badge-l-dark,.badge-l-dark:hover {
+    background-color: #8d97af
+}
+
+.badge-light-dark,.badge-light-dark:hover {
+    background-color: rgba(63,71,90,.34);
+    color: #3f475a
+}
+
+.badge-l-light,.badge-l-light:hover {
+    background-color: #a6a6bb
+}
+
+.badge-l-info,.badge-l-info:hover {
+    background-color: #dbf2fd
+}
+
+.badge-l-success,.badge-l-success:hover {
+    background-color: #d5eed2
+}
+
+.badge-l-secondary,.badge-l-secondary:hover {
+    background-color: #d5d5d5
+}
+
+.badge-l-primary,.badge-l-primary:hover {
+    background-color: #fff
+}
+
+
 .table thead th {
   border-bottom: 2px solid #ecf3fa;
 }
@@ -30031,9 +30070,19 @@ html {
   }
 }
 @media only screen and (max-width: 767px) {
-  .taskadd table tr td:nth-child(2) {
-    min-width: 745px;
+  .taskadd table tr td:nth-child(4) {
+    min-width: 200px;
   }
+
+    .taskadd table tr td:nth-child(2) {
+        min-width: 130px;
+    } .taskadd table tr td:nth-child(5) {
+          min-width: 100px;
+      }
+
+    .taskadd table tr td:nth-child(6) {
+        min-width: 230px;
+    }
 }
 @media only screen and (max-width: 575px) {
   .taskadd table tr td:first-child {
@@ -42911,6 +42960,142 @@ html[dir=rtl] body.dark-only .page-wrapper .page-body-wrapper .page-body .card:n
     min-width: 67%;
     width: 67%;
   }
+}
+
+
+
+
+.effective-card .effect-card {
+    background-color: var(--light-background);
+    border-radius: 4px;
+    display: block;
+    overflow: hidden;
+    padding: 18px;
+    position: relative;
+    text-decoration: none;
+    z-index: 0
+}
+
+.effective-card .effect-card .common-box1 {
+    gap: 8px;
+    justify-content: flex-start;
+    margin-bottom: 8px
+}
+
+.effective-card .effect-card .common-box1 svg {
+    color: #455a64;
+    min-height: 16px;
+    min-width: 16px
+}
+
+.effective-card .effect-card h5 {
+    color: var(--body-font-color)
+}
+
+.effective-card .effect-card p {
+    color: #75758a
+}
+
+.effective-card .effect-card:hover h5,.effective-card .effect-card:hover p {
+    color: #fff;
+    transition: all .3s ease-out
+}
+
+.effective-card .effect-card:hover svg {
+    color: #fff
+}
+
+@media (max-width: 1399px) {
+    .effective-card .effect-card:hover:before {
+        height:82px;
+        width: 82px
+    }
+}
+
+.effective-card .effect-card .go-corner {
+    align-items: center;
+    background-color: var(--theme-default);
+    border-radius: 0 4px 0 32px;
+    cursor: pointer;
+    display: flex;
+    height: 36px;
+    justify-content: center;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 36px
+}
+
+@media (max-width: 1788px) and (min-width:576px) {
+    .effective-card .effect-card .go-corner {
+        height:28px;
+        width: 28px
+    }
+}
+
+[dir=rtl] .effective-card .effect-card .go-corner {
+    border-radius: 4px 0 32px 0;
+    left: 0;
+    right: unset
+}
+
+.effective-card .effect-card .go-corner .go-arrow {
+    color: var(--white);
+    margin-right: -4px;
+    margin-top: -4px
+}
+
+[dir=rtl] .effective-card .effect-card .go-corner .go-arrow {
+    margin-left: -4px;
+    margin-right: unset
+}
+
+.effective-card .effect-card .go-corner .go-arrow i {
+    font-size: 14px;
+    transform: rotate(140deg)
+}
+
+.effective-card .effect-card:before {
+    background: var(--theme-default);
+    border-radius: 32px;
+    content: "";
+    height: 40px;
+    position: absolute;
+    right: -14px;
+    top: -16px;
+    transform: scale(1);
+    transform-origin: 60% 50%;
+    transition: transform .25s ease-out;
+    width: 40px;
+    z-index: -1
+}
+
+@media (max-width: 1788px) and (min-width:576px) {
+    .effective-card .effect-card:before {
+        height:28px;
+        width: 28px
+    }
+}
+
+[dir=rtl] .effective-card .effect-card:before {
+    left: -14px;
+    right: unset;
+    transform-origin: 40% 50%
+}
+
+.effective-card .effect-card:hover:before {
+    transform: scale(17)
+}
+
+.effective-card .common-hover .card-header.border-3 {
+    border-bottom-width: 1px!important
+}
+
+.common-align {
+    align-items: center;
+    display: flex;
+    justify-content: center;
 }
 
 /**=====================
