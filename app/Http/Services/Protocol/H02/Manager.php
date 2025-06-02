@@ -53,6 +53,6 @@ class Manager extends ProtocolAbstract
      */
     public function messages(string $message): array
     {
-        return array_filter(array_map('trim', explode('0d0a', $message)));
+        return array_filter(array_map('trim', explode("\n", hex2bin($message))));
     }
 }

@@ -168,7 +168,7 @@
                                     <div class="form-check">
                                         <input class="form-check-input" id="role-{{ $role->id }}"
                                                value="{{ $role->id }}"
-                                               :checked="parseInt(role) === {{ (int)$role->id }}"
+                                               :checked="parseInt(role) === @json((int)$role->id)"
                                                @change="$dispatch('updated-role', { roleName: '{{ $role->title }}' })"
                                                type="radio" name="role">
                                         <label class="form-check-label cursor-pointer" for="role-{{ $role->id }}"
