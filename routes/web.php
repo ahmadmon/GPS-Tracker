@@ -77,7 +77,8 @@ Route::middleware(['auth'])->group(function () {
 
     // <!-- Subscription Plan -->
     Route::resource('subscription-plan', SubscriptionPlanController::class)->parameters(['subscription-plan' => 'slug']);
-    Route::get('/subscription-plan/change-status/{subscriptionPlan}', [SubscriptionPlanController::class, 'changeStatus'])->name('subscription-plan.change-status');
+    Route::get('/subscription-plan/change-status/{slug}', [SubscriptionPlanController::class, 'changeStatus'])->name('subscription-plan.change-status');
+//    Route::get('/subscription-plan/change-pin/{slug}', [SubscriptionPlanController::class, 'changePin'])->name('subscription-plan.change-pin');
 
     // <!-- Profile -->
     Route::prefix('profile')->name('profile.')->group(function () {
