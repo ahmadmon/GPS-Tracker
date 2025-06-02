@@ -13,8 +13,8 @@ return new class extends Migration {
         Schema::create('subscription_cancellations', function (Blueprint $table) {
             $table->id();
             $table->foreignId('subscription_id')->constrained()->cascadeOnUpdate()->cascadeOnDelete();
-            $table->tinyText('reason')->index(191);
-            $table->string('iban')->nullable()->index(192);
+            $table->tinyText('reason');
+            $table->string('iban')->nullable();
             $table->unsignedBigInteger('refund_amount')->nullable();
             $table->enum('status', ['pending', 'refunded', 'rejected'])->default('pending');
             $table->tinyText('rejected_reason')->nullable();
